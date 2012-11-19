@@ -14,7 +14,7 @@ namespace GenericLib
 				{
 					GameObject go = new GameObject();
 					m_instance = go.AddComponent<T>();
-					go.name = "singleton";
+					go.name = "Singleton."+typeof(T).ToString();
 				}
 				
 				return m_instance;
