@@ -3,14 +3,14 @@ using System.Collections.Generic;
 
 namespace GenericLib
 {
-	//TODO Abstract this class and implement a version for accepting mouse input?
+	//TODO Abstract TouchGestures and implement a version for accepting mouse input?
 	public class TouchGestures : MonoSingleton<TouchGestures>
 	{	
 		#region Helper Classes
 		
 		// Data Structure to hold information on what a finger is doing
 		// This exists to abstract the Touch class for suture mouse support.
-		// TODO: Think of a better name!
+		// TODO: Rethink Finger Class!
 		public class Finger
 		{
 			public int m_id;
@@ -78,7 +78,7 @@ namespace GenericLib
 			
 			for (int i=0; i<nTouches; i++)
 			{
-				// TODO: Update when there has been a change?
+				// TODO: Only Update when there has been a change?
 				// TODO: Store References of all touches?
 				Touch t = Input.touches[i];
 				
@@ -95,7 +95,6 @@ namespace GenericLib
 					case TouchPhase.Canceled:
 					{
 						DoTouchEnded(WrapFinger(t));
-					
 						break;
 					}
 						
