@@ -22,7 +22,7 @@ namespace GenericLib
 		void Start ()
 		{
 			m_manager = PrefabPoolManager.Instance;
-			m_manager.RegisterPool (this, m_objectPrefab);
+			m_manager.RegisterPool (m_objectPrefab.name, this);
 			
 			m_pooledPrefabs = new Queue<GameObject> ();
 			m_activePrefabs = new List<GameObject> ();
@@ -45,6 +45,12 @@ namespace GenericLib
 		public GameObject GetNextActive ()
 		{
 			// TODO : Pool new object if no object could be found in queue
+			if (m_pooledPrefabs.Count == 0)
+			{
+				Debug.LogError ("[Prefab Pool] No more GameObjects pooled!!");
+				return null;
+			}
+			
 			GameObject go = m_pooledPrefabs.Dequeue ();
 			go.SetActive (true);
 			m_activePrefabs.Add (go);

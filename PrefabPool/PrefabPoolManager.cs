@@ -6,11 +6,11 @@ namespace GenericLib
 {
 	public class PrefabPoolManager : MonoSingleton<PrefabPoolManager>
 	{
-		private Dictionary<GameObject, PrefabPool> m_prefabPools = new Dictionary<GameObject, PrefabPool>();
+		private Dictionary<string, PrefabPool> m_prefabPools = new Dictionary<string, PrefabPool>();
 		
-		public void RegisterPool(PrefabPool pool, GameObject prefab)
+		public void RegisterPool (string prefabId, PrefabPool pool)
 		{
-			m_prefabPools.Add (prefab, pool);
+			m_prefabPools.Add (prefabId, pool);
 		}
 		
 		public GameObject Spawn (GameObject prefab, Vector3 pos, Quaternion rot)
@@ -21,16 +21,21 @@ namespace GenericLib
 			if (pool == null) return null;
 			
 			GameObject go = pool.GetNextActive();
+			if (go == null)
+			{
+				Debug.LogError ("[PrefabPoolManager] Could not Spawn - PrefabPool did not give us a GameObject!");
+				return null;
+			}
+			
 			go.transform.position = pos;
 			go.transform.rotation = rot;
 			
 			return go;
 		}
 		
-		// TODO : Prefab Pool Despawn Function should have just one parameter.
-		public void Despawn (GameObject prefabType, GameObject prefabInstance)
+		public void Despawn (GameObject prefabInstance)
 		{
-			PrefabPool pool = GetPool (prefabType);
+			PrefabPool pool = GetPool (prefabInstance);
 			if (pool == null) return;
 			
 			pool.ReturnToPool (prefabInstance);
@@ -40,7 +45,8 @@ namespace GenericLib
 		{
 			try
 			{
-				PrefabPool pool = m_prefabPools[prefabType];
+				string id = GetPrefabId (prefabType);
+				PrefabPool pool = m_prefabPools[id];
 				return pool;
 			}
 			catch (MissingReferenceException e)
@@ -56,6 +62,24 @@ namespace GenericLib
 				Debug.LogError(e.Message);
 				
 				return null;
+			}
+		}
+		
+		// TODO : Better Generation of PrefabId's ??
+		string GetPrefabId (GameObject prefabType)
+		{
+			int i = prefabType.name.IndexOf('(');
+			
+			if (i < 0)
+			{
+				return prefabType.name;
+			}
+			else
+			{
+				string id = prefabType.name.Substring(0, i);
+				Debug.Log (id);
+				
+				return id;
 			}
 		}
 	}
