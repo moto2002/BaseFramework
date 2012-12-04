@@ -2,7 +2,7 @@ using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
 
-namespace GenericLib
+namespace BaseFramework
 {
 	public class PrefabPoolManager : MonoSingleton<PrefabPoolManager>
 	{

@@ -1,7 +1,7 @@
 using UnityEngine;
 using System.Collections.Generic;
 
-namespace GenericLib
+namespace BaseFramework
 {
 	//TODO Abstract TouchGestures and implement a version for accepting mouse input?
 	public class TouchGestures : MonoSingleton<TouchGestures>

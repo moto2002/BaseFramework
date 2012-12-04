@@ -1,7 +1,7 @@
 using UnityEngine;
 using System.Collections;
 
-namespace GenericLib
+namespace BaseFramework
 {
 	public abstract class TouchHandler : MonoBehaviour
 	{

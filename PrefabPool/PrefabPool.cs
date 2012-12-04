@@ -2,7 +2,7 @@ using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
 
-namespace GenericLib
+namespace BaseFramework
 {
 	//TODO: Implement PrefabPool
 	public class PrefabPool : MonoBehaviour

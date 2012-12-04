@@ -1,7 +1,7 @@
 using UnityEngine;
 using System.Collections;
 
-namespace GenericLib
+namespace BaseFramework
 {
 	public class TouchColliderHandler : TouchHandler
 	{
@@ -9,7 +9,7 @@ namespace GenericLib
 		
 		void Start ()
 		{
-			m_camera = GameObject.FindGameObjectWithTag ("MainCamera").GetComponent<Camera>();
+			m_camera = Camera.mainCamera;
 		}
 		
 		bool IsTouching (Vector3 touchPos)
