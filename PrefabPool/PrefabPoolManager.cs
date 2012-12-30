@@ -13,12 +13,24 @@ namespace BaseFramework
 			m_prefabPools.Add (prefabId, pool);
 		}
 		
+		public GameObject Spawn (GameObject prefab)
+		{
+			return Spawn (prefab, Vector3.zero, Quaternion.identity);
+		}
+		
 		public GameObject Spawn (GameObject prefab, Vector3 pos, Quaternion rot)
 		{
 			PrefabPool pool = GetPool (prefab);
 			
 			// TODO : When spawning a prefab, create a new pool if pool == null
-			if (pool == null) return null;
+			if (pool == null)
+			{
+				GameObject poolObject = new GameObject ("PrefabPool."+prefab.ToString());
+				pool = poolObject.AddComponent <PrefabPool> ();
+				pool.Cached = 4;
+				
+				return null;
+			}
 			
 			GameObject go = pool.GetNextActive();
 			if (go == null)
@@ -33,6 +45,19 @@ namespace BaseFramework
 			return go;
 		}
 		
+		public void Queue (GameObject prefab, int amount)
+		{
+			PrefabPool pool = GetPool (prefab);
+			
+			if (pool == null)
+			{
+				GameObject poolObject = new GameObject ("PrefabPool."+prefab.ToString());
+				pool = poolObject.AddComponent <PrefabPool> ();
+			}
+			
+			pool.Cached = amount;
+		}
+		
 		public void Despawn (GameObject prefabInstance)
 		{
 			PrefabPool pool = GetPool (prefabInstance);
@@ -41,7 +66,7 @@ namespace BaseFramework
 			pool.ReturnToPool (prefabInstance);
 		}
 		
-		PrefabPool GetPool(GameObject prefabType)
+		PrefabPool GetPool (GameObject prefabType)
 		{
 			try
 			{
