@@ -12,9 +12,19 @@ namespace BaseFramework
 			{
 				if (m_instance == null)
 				{
-					GameObject go = new GameObject();
-					m_instance = go.AddComponent<T>();
-					go.name = "Singleton."+typeof(T).ToString();
+					m_instance = (FindObjectOfType (typeof (T)) as T);
+					
+					if (m_instance == null)
+					{
+						GameObject go = new GameObject();
+						go.name = "Singleton."+typeof(T).ToString();
+						m_instance = go.AddComponent<T>();
+					}
+					
+					if (m_instance == null)
+					{
+						Debug.LogError ("Singleton Instance did not instantiate properly.");
+					}
 				}
 				
 				return m_instance;

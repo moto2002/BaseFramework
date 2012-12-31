@@ -22,16 +22,7 @@ namespace BaseFramework
 			set { Recache (value); }
 		}
 		
-		bool Initialised
-		{
-			get { return m_manager == null || m_pooledPrefabs == null || m_activePrefabs == null || m_cacheLimit == 0; }
-		}
-		
 		void Awake ()
-		{
-		}
-		
-		void Initialise ()
 		{
 			m_manager = PrefabPoolManager.Instance;
 			m_manager.RegisterPool (m_objectPrefab.name, this);
@@ -44,11 +35,6 @@ namespace BaseFramework
 		
 		void PoolObject ()
 		{
-			if (!Initialised)
-			{
-				Initialise ();
-			}
-			
 			GameObject go = Instantiate (m_objectPrefab) as GameObject;
 			go.SetActive (false);
 			go.name = go.name+"."+m_pooledPrefabs.Count;
@@ -79,11 +65,6 @@ namespace BaseFramework
 		
 		public GameObject GetNextActive ()
 		{
-			if (!Initialised)
-			{
-				Initialise ();
-			}
-			
 			// TODO : Pool new object if no object could be found in queue (increase pool size)
 			if (m_pooledPrefabs.Count == 0)
 			{
@@ -99,11 +80,6 @@ namespace BaseFramework
 		
 		public void ReturnToPool (GameObject go)
 		{
-			if (!Initialised)
-			{
-				Initialise ();
-			}
-			
 			m_activePrefabs.Remove (go);
 			m_pooledPrefabs.Enqueue (go);
 			

@@ -10,6 +10,7 @@ namespace BaseFramework
 		
 		public void RegisterPool (string prefabId, PrefabPool pool)
 		{
+			Debug.Log (prefabId);
 			m_prefabPools.Add (prefabId, pool);
 		}
 		

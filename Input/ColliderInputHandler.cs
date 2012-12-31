@@ -3,43 +3,43 @@ using System.Collections;
 
 namespace BaseFramework
 {
-	public class TouchColliderHandler : TouchHandler
+	public class ColliderInputHandler : InputHandler
 	{
-		private Camera m_camera;
+		private Camera m_camera; // todo : better camera support?
 		
 		void Start ()
 		{
 			m_camera = Camera.mainCamera;
 		}
 		
-		bool IsTouching (Vector3 touchPos)
+		bool InputIntersects (Vector3 inputFocus)
 		{
-			Ray touchRay = m_camera.ScreenPointToRay (touchPos);
+			Ray touchRay = m_camera.ScreenPointToRay (inputFocus);
 			RaycastHit hitInfo;
 			
 			if (Physics.Raycast(touchRay, out hitInfo))
 			{
-				return collider.bounds.Contains(hitInfo.point);
+				return collider.bounds.Contains (hitInfo.point);
 			}
 			
 			return false;
 		}
 		
-		public override void TouchStart (TouchGestures.Finger f)
+		public override void InputBegan (InputData data)
 		{
-			if (IsTouching (f.m_position))
+			if (InputIntersects (data.Focus))
 				SendMessageUpwards ("WasTouched", SendMessageOptions.DontRequireReceiver);
 		}
 		
-		public override void TouchUpdate (TouchGestures.Finger f)
+		public override void InputChanged (InputData data)
 		{
-			if (IsTouching (f.m_position))
+			if (InputIntersects (data.Focus))
 				SendMessageUpwards ("IsBeingTouched", SendMessageOptions.DontRequireReceiver);
 		}
 		
-		public override void TouchEnd (TouchGestures.Finger f)
+		public override void InputStopped (InputData data)
 		{
-			if (IsTouching (f.m_position))
+			if (InputIntersects (data.Focus))
 				SendMessageUpwards ("StoppedTouching", SendMessageOptions.DontRequireReceiver);
 		}
 	}
