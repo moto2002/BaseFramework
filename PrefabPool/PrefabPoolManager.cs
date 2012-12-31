@@ -10,7 +10,6 @@ namespace BaseFramework
 		
 		public void RegisterPool (string prefabId, PrefabPool pool)
 		{
-			Debug.Log (prefabId);
 			m_prefabPools.Add (prefabId, pool);
 		}
 		
@@ -102,10 +101,7 @@ namespace BaseFramework
 			}
 			else
 			{
-				string id = prefabType.name.Substring(0, i);
-				Debug.Log (id);
-				
-				return id;
+				return prefabType.name.Substring (0, i);
 			}
 		}
 	}

@@ -30,7 +30,7 @@ namespace BaseFramework
 			m_pooledPrefabs = new Queue<GameObject> ();
 			m_activePrefabs = new List<GameObject> ();
 			
-			Recache (4);
+			Recache (5);
 		}
 		
 		void PoolObject ()
