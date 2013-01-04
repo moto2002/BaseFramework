@@ -4,87 +4,152 @@ using System.Collections.Generic;
 
 namespace BaseFramework
 {
-	//TODO: Implement PrefabPool
+	[ExecuteInEditMode ()]
 	public class PrefabPool : MonoBehaviour
 	{
 		public string m_name; //TODO : Specify Prefab Pool Name
 		public GameObject m_objectPrefab;
 		
-		private int m_cacheLimit = 0;
-		
 		private PrefabPoolManager m_manager;
-		private Queue<GameObject> m_pooledPrefabs;
-		private List<GameObject> m_activePrefabs;
+		
+		private List<GameObject> m_pooledObjects = new List<GameObject> ();
+		private Queue<GameObject> m_inactiveObjects = new Queue<GameObject> ();
+		
+		#region Public Properties / Methods
 		
 		public int Cached
 		{
-			get { return m_cacheLimit; }
+			get { return m_pooledObjects.Count; }
 			set { Recache (value); }
 		}
 		
-		void Awake ()
+		public GameObject GetNextActive ()
+		{
+			// TODO : Pool new object if no object could be found in queue (increase pool size)
+			if (m_inactiveObjects.Count == 0)
+			{
+				Debug.LogError ("[Prefab Pool] No more GameObjects pooled!!");
+				return null;
+			}
+			
+			GameObject go = m_inactiveObjects.Dequeue ();
+			go.SetActive (true);
+			
+			return go;
+		}
+		
+		public void ReturnToPool (GameObject go)
+		{
+			m_inactiveObjects.Enqueue (go);
+			go.SetActive (false);
+		}
+		
+		#endregion
+		
+		#region Monobehaviour Overrides
+		
+		void Start ()
 		{
 			m_manager = PrefabPoolManager.Instance;
 			m_manager.RegisterPool (m_objectPrefab.name, this);
+		}
+		
+		void OnEnable ()
+		{
+			for (int i=0; i<transform.childCount; i++)
+			{
+				GameObject go = transform.GetChild (i).gameObject;
+				if (!m_pooledObjects.Contains (go))
+				{
+					m_pooledObjects.Add (go);
+				}
+				
+				if (!go.activeSelf && !m_inactiveObjects.Contains (go))
+				{
+					m_inactiveObjects.Enqueue (go);
+				}
+			}
+		}
+		
+		#endregion
+		
+		#region Internal Functions
+		
+		void Recache (int newSize) // TODO : Recache should be able to lower the number of prefabs in memory too!!
+		{
+			// How many objects to we need to Instantiate / Destroy
+			int diff = newSize - m_pooledObjects.Count;
 			
-			m_pooledPrefabs = new Queue<GameObject> ();
-			m_activePrefabs = new List<GameObject> ();
+			bool addMore = diff > 0;
+			diff = Mathf.Abs (diff);
 			
-			Recache (5);
+			// Do the Instantions / Destroys
+			for (int i=0; i<diff; i++)
+			{
+				if (addMore)
+				{
+					PoolObject ();
+				}
+				else
+				{
+					UnpoolObject ();
+				}
+			}
+			
+			// Rename pooled objects
+			RenameObjects ();
 		}
 		
 		void PoolObject ()
 		{
 			GameObject go = Instantiate (m_objectPrefab) as GameObject;
 			go.SetActive (false);
-			go.name = go.name+"."+m_pooledPrefabs.Count;
 			go.transform.parent = transform;
-			m_pooledPrefabs.Enqueue (go);
+			
+			m_pooledObjects.Add (go);
+			m_inactiveObjects.Enqueue (go);
 		}
 		
-		void Recache (int newSize) // TODO : Recache should be able to lower the number of prefabs in memory too!!
+		void UnpoolObject ()
 		{
-			// How many objects to we need to Instantiate / Destroy
-			int diff = newSize - m_cacheLimit;
-			
-			// Do the Instantions / Destroys
-			if (diff < 0)
+			GameObject toRemove = null;
+			foreach (GameObject go in m_pooledObjects)
 			{
-				Debug.LogWarning ("PrefabPools cannot recache to less objects");
-				return;
+				if (m_inactiveObjects.Contains (go))
+				{
+					toRemove = go;
+					break;
+				}
 			}
 			
-			for (int i = 0; i<diff; i++)
+			if (toRemove != null)
 			{
-				PoolObject ();
+				m_pooledObjects.Remove (toRemove);
+				// todo : remove from m_inactiveObjects too
+				DestroyImmediate (toRemove);
 			}
-			
-			// Set m_cacheLimit to newSize
-			m_cacheLimit = newSize;
 		}
 		
-		public GameObject GetNextActive ()
+		void RenameObjects ()
 		{
-			// TODO : Pool new object if no object could be found in queue (increase pool size)
-			if (m_pooledPrefabs.Count == 0)
+			for (int i=0; i<transform.childCount; i++)
 			{
-				Debug.LogError ("[Prefab Pool] No more GameObjects pooled!!");
-				return null;
+				Transform t = transform.GetChild (i);
+				
+				int nameIndex = t.name.IndexOf ('.');
+				
+				if (nameIndex > 0)
+				{
+					string trimmedName = t.name.Substring (0, nameIndex);
+					t.name = trimmedName + "." + i;
+				}
+				else
+				{
+					t.name = t.name + "." + i;
+				}
 			}
-			
-			GameObject go = m_pooledPrefabs.Dequeue ();
-			go.SetActive (true);
-			m_activePrefabs.Add (go);
-			return go;
 		}
 		
-		public void ReturnToPool (GameObject go)
-		{
-			m_activePrefabs.Remove (go);
-			m_pooledPrefabs.Enqueue (go);
-			
-			go.SetActive (false);
-		}
-		
+		#endregion
 	}
 }

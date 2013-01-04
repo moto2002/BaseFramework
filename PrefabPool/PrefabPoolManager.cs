@@ -1,16 +1,25 @@
 using UnityEngine;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 
 namespace BaseFramework
 {
+	[ExecuteInEditMode ()]
 	public class PrefabPoolManager : MonoSingleton<PrefabPoolManager>
 	{
-		private Dictionary<string, PrefabPool> m_prefabPools = new Dictionary<string, PrefabPool>();
+		private Dictionary<string, PrefabPool> m_prefabPools = new Dictionary<string, PrefabPool>(); // todo: index by type, not string.
 		
-		public void RegisterPool (string prefabId, PrefabPool pool)
+		public void RegisterPool (string objectType, PrefabPool pool)
 		{
-			m_prefabPools.Add (prefabId, pool);
+			if (!m_prefabPools.ContainsKey (objectType))
+			{
+				m_prefabPools.Add (objectType, pool);
+			}
+			else
+			{
+				Debug.LogWarning ("PoolManager already contains a reference to this type!", this);
+			}
 		}
 		
 		public GameObject Spawn (GameObject prefab)
@@ -20,6 +29,7 @@ namespace BaseFramework
 		
 		public GameObject Spawn (GameObject prefab, Vector3 pos, Quaternion rot)
 		{
+			
 			PrefabPool pool = GetPool (prefab);
 			
 			// TODO : When spawning a prefab, create a new pool if pool == null
