@@ -8,11 +8,11 @@ namespace BaseFramework
 	{
 		public Transform CentreOfMass;
 		
-		private bool m_cycle = false;
+		public bool m_cycle = true;
+		public float m_timescale;
 		
 		private float m_orbitRadius;
 		private float m_angle = 0.0f;
-		private float m_timescale = 2;
 		
 		
 		public float DayLengthInSeconds // todo : expose in inspector
@@ -67,7 +67,7 @@ namespace BaseFramework
 			// OrbitRandius * sin (deltaAngleDegrees) =
 			// OrbitRandius * cos (deltaAngleDegrees) =
 			
-			m_angle += m_timescale / 360; // todo: private var, eliminate timescale?
+			m_angle += Mathf.Deg2Rad * (m_timescale/360); // todo: private var, eliminate timescale?
 			
 			float x = m_orbitRadius * Mathf.Sin (m_angle);
 			//Debug.Log ("Sin: " + x);
