@@ -9,7 +9,6 @@ namespace BaseFramework
 		public float Sensitivity = 5.0f;
 		private InputData[] m_data;
 		
-		
 		void Start ()
 		{
 			m_data = new InputData[ButtonsToTrack];

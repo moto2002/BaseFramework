@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace BaseFramework
 {
-	public class InputData
+	public struct InputData
 	{
 		public bool Active;
 		public Vector3 Focus;
@@ -15,7 +15,7 @@ namespace BaseFramework
 	public class InputManager : MonoSingleton<InputManager>
 	{
 		// InputEvent delegate
-		public delegate void InputEvent (InputData f);
+		public delegate void InputEvent (ref InputData f);
 		
 		// InputEvents thrown
 		public event InputEvent InputStart;
@@ -23,22 +23,22 @@ namespace BaseFramework
 		public event InputEvent InputEnd;
 		
 		
-		private void InputStarted (InputData data)
+		private void InputStarted (ref InputData data)
 		{
 			if (InputStart != null)
-				InputStart (data);
+				InputStart (ref data);
 		}
 		
-		private void InputChanged (InputData data)
+		private void InputChanged (ref InputData data)
 		{
 			if (InputUpdate != null)
-				InputUpdate (data);
+				InputUpdate (ref data);
 		}
 		
-		private void InputStopped (InputData data)
+		private void InputStopped (ref InputData data)
 		{
 			if (InputEnd != null)
-				InputEnd (data);
+				InputEnd (ref data);
 		}
 		
 		void Awake () // todo (functionality) : Add appropriate InputTypes automatically.

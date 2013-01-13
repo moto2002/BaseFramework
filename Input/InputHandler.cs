@@ -23,8 +23,8 @@ namespace BaseFramework
 			m_input.InputEnd -= InputStopped;
 		}
 		
-		public abstract void InputBegan (InputData f);
-		public abstract void InputChanged (InputData f);
-		public abstract void InputStopped (InputData f);
+		public abstract void InputBegan (ref InputData f);
+		public abstract void InputChanged (ref InputData f);
+		public abstract void InputStopped (ref InputData f);
 	}
 }

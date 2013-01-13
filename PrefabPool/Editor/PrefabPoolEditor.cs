@@ -1,6 +1,5 @@
 using UnityEngine;
 using UnityEditor;
-using System.Collections;
 
 namespace BaseFramework
 {
@@ -14,20 +13,19 @@ namespace BaseFramework
 	public class PrefabPoolEditor : Editor
 	{
 		public override void OnInspectorGUI ()
-		{
-			base.OnInspectorGUI ();
-			
+		{	
 			PrefabPool pool = target as PrefabPool;
+			string prefabType = pool.ObjectPrefab == null ? "None" : pool.ObjectPrefab.name;
 			
 			EditorGUILayout.BeginHorizontal ();
-			EditorGUILayout.LabelField ("Size of Pool", GUILayout.MaxWidth (146)); 
-			pool.Cached = EditorGUILayout.IntField (pool.Cached);
+			EditorGUILayout.PrefixLabel ("Pool Prefab");
+			EditorGUILayout.LabelField (prefabType);
 			EditorGUILayout.EndHorizontal ();
-	
-			if (GUI.changed)
-			{
-				EditorUtility.SetDirty (target);
-			}
+			
+			EditorGUILayout.BeginHorizontal ();
+			EditorGUILayout.PrefixLabel ("Size of Pool"); 
+			EditorGUILayout.LabelField (pool.Cached.ToString ());
+			EditorGUILayout.EndHorizontal ();
 		}
 	}
 }

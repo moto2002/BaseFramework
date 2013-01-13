@@ -3,6 +3,7 @@ using System.Collections;
 
 namespace BaseFramework
 {
+	[ExecuteInEditMode ()]
 	public class MonoSingleton<T> : MonoBehaviour where T : MonoBehaviour
 	{
 		private static T m_instance;
@@ -29,6 +30,11 @@ namespace BaseFramework
 				
 				return m_instance;
 			}
+		}
+		
+		protected virtual void OnEnable()
+		{
+			name = "Singleton."+typeof(T).ToString();
 		}
 	}
 }
