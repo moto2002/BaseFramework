@@ -1,7 +1,7 @@
 using UnityEngine;
 using System.Collections.Generic;
 
-namespace BaseFramework
+namespace BaseFramework.InputManager
 {
 	/// <summary>
 	/// Input manager. Provides a framework for handling complex input.

@@ -1,8 +1,13 @@
 using UnityEngine;
 using System.Collections;
 
-namespace BaseFramework
+namespace BaseFramework.InputManager
 {
+	/// <summary>
+	/// Touch input type. Terrible Implementation!!
+	/// 
+	/// TODO : REDO TouchInputType. SRSLY!
+	/// </summary>
 	public class TouchInputType : InputType
 	{
 		public int m_id;
@@ -29,26 +34,21 @@ namespace BaseFramework
 					case TouchPhase.Began:
 					{
 					
-						SendMessageUpwards ("InputStarted", WrapTouch (t));
+						InputStarted (ref WrapTouch (t));
 						break;
 					}
 					
 					case TouchPhase.Ended:
 					case TouchPhase.Canceled:
 					{
-						SendMessageUpwards ("InputStopped", WrapTouch (t));
+						InputStopped (ref WrapTouch (t));
 						break;
 					}
 						
+					case TouchPhase.Stationary:	
 					case TouchPhase.Moved:
 					{
-						SendMessageUpwards ("InputChanged", WrapTouch (t));
-						break;
-					}
-						
-					case TouchPhase.Stationary:
-					{
-						SendMessageUpwards ("InputChanged", WrapTouch (t));
+						InputTick (ref WrapTouch (t));
 						break;
 					}
 				}
@@ -58,6 +58,7 @@ namespace BaseFramework
 		InputData WrapTouch (Touch t)
 		{
 			InputData f = new InputData();
+			f.Type = InputMethod.TouchInput;
 			f.Focus = t.position;
 			
 			/*

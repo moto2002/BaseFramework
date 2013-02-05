@@ -1,8 +1,16 @@
 using UnityEngine;
 using System.Collections;
 
-namespace BaseFramework
+namespace BaseFramework.InputManager
 {
+	/// <summary>
+	/// Stores InputData for 3 Buttons. Could be improved to support more.
+	/// Checks every button, every tick.
+	/// Uses .Equals.. bit primitive, no?
+	/// 
+	/// TODO : Support for more buttons in MouseInputType
+	/// TODO : Better (Customizable?) Input for MouseInputType
+	/// </summary>
 	public class MouseInputType : InputType
 	{
 		public float Sensitivity = 5.0f;
@@ -15,10 +23,11 @@ namespace BaseFramework
 			for (int i=0; i<m_data.Length; i++)
 			{
 				m_data[i] = new InputData ();
+				m_data[i].Type = InputMethod.MouseInput;
 			}
 		}
 		
-		void Update () // todo (efficiency) : this is disgusting. clean it up.
+		void Update ()
 		{
 			for (int i=0; i<m_data.Length; i++)
 			{
@@ -29,15 +38,15 @@ namespace BaseFramework
 				
 				if (!before.Active && m_data[i].Active)
 				{
-					SendMessageUpwards ("InputStarted", m_data[i]);
+					InputStarted (ref m_data[i]);
 				}
 				if (!m_data[i].Equals (before))
 				{
-					SendMessageUpwards ("InputChanged", m_data[i]);
+					InputTick (ref m_data[i]);
 				}
 				else if (m_data[i].Equals (before))
 				{
-					SendMessageUpwards ("InputStopped", m_data[i]);
+					InputStopped (ref m_data[i]);
 				}
 			}
 		}

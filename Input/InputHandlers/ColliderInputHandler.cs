@@ -1,8 +1,20 @@
 using UnityEngine;
 using System.Collections;
 
-namespace BaseFramework
+namespace BaseFramework.InputManager
 {
+	/// <summary>
+	/// Collider input handler. Sends Messages if Input interacts with any colliders attached or defined as children.
+	/// 
+	/// Messages:
+	/// WasTouched
+	/// IsBeingTouched
+	/// StoppedTouching
+	/// 
+	/// Handles:
+	/// Mouse Input
+	/// Touch Input
+	/// </summary>
 	public class ColliderInputHandler : InputHandler
 	{
 		private Collider[] m_colliders;
@@ -10,7 +22,7 @@ namespace BaseFramework
 		
 		void Start ()
 		{
-			m_colliders = GetComponentsInChildren<Collider>();
+			m_colliders = GetComponentsInChildren<Collider>(true);
 			m_camera = Camera.mainCamera;
 		}
 		
@@ -30,6 +42,11 @@ namespace BaseFramework
 			}
 			
 			return false;
+		}
+		
+		protected override int ValidInputMethods ()
+		{
+			return InputMethod.MouseInput | InputMethod.TouchInput;
 		}
 		
 		public override void InputBegan (ref InputData data)
