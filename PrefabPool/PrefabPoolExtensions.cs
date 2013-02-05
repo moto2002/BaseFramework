@@ -7,7 +7,7 @@ namespace BaseFramework
 	{
 		public static void ReturnToPool (this GameObject go)
 		{
-			go.SendMessageUpwards ("PoolObject", go, SendMessageOptions.DontRequireReceiver);
+			go.SendMessageUpwards ("PoolObject", go);
 		}
 		
 		public static void IsInPool (this GameObject go)

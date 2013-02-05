@@ -84,8 +84,8 @@ namespace BaseFramework
 			m_prefabPools = new Dictionary<string, PrefabPool>();
 			
 			if (m_prefabKeys.Count != m_prefabValues.Count)
-			{
-				Debug.LogError ("Keys and Values are out of sync!!");
+ 			{
+				Debug.LogError ("Keys and Values are out of sync!! (keys: "+m_prefabKeys.Count+", values: "+m_prefabValues.Count+")");
 				m_prefabKeys = new List<string>();
 				m_prefabValues = new List<PrefabPool>();
 				return;

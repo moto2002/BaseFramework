@@ -11,6 +11,10 @@ namespace BaseFramework
 		public Vector2 m_deltaPos;
 		public TouchPhase m_phase;
 		
+		void Start ()
+		{
+		}
+		
 		void Update() // todo : different forms of input
 		{
 			int nTouches = Input.touchCount;
@@ -51,8 +55,6 @@ namespace BaseFramework
 			}
 		}
 		
-		#region Helper Functions
-		
 		InputData WrapTouch (Touch t)
 		{
 			InputData f = new InputData();
@@ -85,7 +87,5 @@ namespace BaseFramework
 			*/
 			return false;
 		}
-		
-		#endregion
 	}
 }

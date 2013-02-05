@@ -26,6 +26,11 @@ namespace BaseFramework
 			EditorGUILayout.PrefixLabel ("Size of Pool"); 
 			EditorGUILayout.LabelField (pool.Cached.ToString ());
 			EditorGUILayout.EndHorizontal ();
+			
+			EditorGUILayout.BeginHorizontal ();
+			EditorGUILayout.PrefixLabel ("Inactive Objects"); 
+			EditorGUILayout.LabelField (pool.InactiveObjects.ToString ());
+			EditorGUILayout.EndHorizontal ();
 		}
 	}
 }

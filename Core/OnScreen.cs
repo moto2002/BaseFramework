@@ -17,7 +17,7 @@ namespace BaseFramework
 			m_wasOnScreen = IsOnScreen ();
 		}
 		
-		void Update () // todo (functionality / efficiency) : would it be better to use events?
+		void Update ()
 		{
 			bool onScreen = IsOnScreen ();
 			

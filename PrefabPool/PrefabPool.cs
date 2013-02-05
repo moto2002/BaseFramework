@@ -8,26 +8,34 @@ namespace BaseFramework
 	public class PrefabPool : MonoBehaviour
 	{
 		[SerializeField]
-		private GameObject m_objectPrefab; // bug: this keeps getting set to nothing when play mode is entered.
+		private bool m_initialised;
 		
 		[SerializeField]
-		private List<GameObject> m_pooledObjects = new List<GameObject> ();
+		private GameObject m_objectPrefab;
 		
 		[SerializeField]
-		private Queue<GameObject> m_inactiveObjects = new Queue<GameObject> ();
+		private List<GameObject> m_pooledObjects;
+		
+		[SerializeField]
+		private Queue<GameObject> m_inactiveObjects; // TODO : bug: this keeps getting set to nothing when play mode is entered.
 		
 		#region Public Interface
 		
 		public GameObject ObjectPrefab
 		{
 			get { return m_objectPrefab; }
-			set { m_objectPrefab = value; }
+			set { m_objectPrefab = value; } // todo : check if a pool of this type exists already?
 		}
 		
 		public int Cached
 		{
 			get { return m_pooledObjects.Count; }
 			set { Recache (value); }
+		}
+		
+		public int InactiveObjects
+		{
+			get { return m_inactiveObjects.Count; }
 		}
 		
 		public GameObject GetNextActive ()
@@ -47,13 +55,41 @@ namespace BaseFramework
 		
 		#region Internal Functions
 		
+		void Awake ()
+		{
+			if (!m_initialised)
+			{
+				Initialise ();
+			}
+		}
+		
+		void Initialise ()
+		{
+			if (!m_initialised)
+			{
+				m_initialised = true;
+				
+				if (m_pooledObjects == null)
+				{
+					m_pooledObjects = new List<GameObject>();
+				}
+				
+				if (m_inactiveObjects == null)
+				{
+					m_inactiveObjects = new Queue<GameObject>();
+				}
+			}
+		}
+		
 		void Update ()
 		{
+			// Don't do anything if in sync with all children
 			if (m_pooledObjects.Count.Equals (transform.childCount))
 			{
 				return;
 			}
 			
+			// If not in sync, sync up!
 			for (int i=0; i<transform.childCount; i++)
 			{
 				GameObject go = transform.GetChild (i).gameObject;
@@ -67,11 +103,13 @@ namespace BaseFramework
 					m_inactiveObjects.Enqueue (go);
 				}
 			}
+			RenameObjects ();
 		}
 		
+		// TODO : Recaching is bugged.
 		void Recache (int newSize)
 		{
-			// How many objects to we need to Instantiate / Destroy
+			// How many objects we need to Instantiate / Destroy
 			int diff = newSize - m_pooledObjects.Count;
 			
 			bool addMore = diff > 0;
@@ -82,7 +120,7 @@ namespace BaseFramework
 			{
 				if (addMore)
 				{
-					PoolObject ();
+					PoolNewObject ();
 				}
 				else
 				{
@@ -94,12 +132,13 @@ namespace BaseFramework
 			RenameObjects ();
 		}
 		
-		void PoolObject ()
+		void PoolNewObject ()
 		{
 			GameObject go = Instantiate (m_objectPrefab) as GameObject;
 			go.SetActive (false);
 			go.transform.parent = transform;
 			
+			Rename (go, m_pooledObjects.Count);
 			m_pooledObjects.Add (go);
 			PoolObject (go);
 		}
@@ -108,7 +147,7 @@ namespace BaseFramework
 		{
 			if (!m_pooledObjects.Contains (go))
 			{
-				Debug.LogWarning ("[PrefabPool] GameObject is not contained in pooled objects!", gameObject);
+				Debug.LogError ("[PrefabPool] GameObject is not contained in pooled objects!", gameObject);
 				return;
 			}
 			
@@ -118,7 +157,8 @@ namespace BaseFramework
 		
 		void UnpoolObject ()
 		{
-			GameObject toRemove = GetNextActive ();
+			GameObject toRemove = GetNextActive();
+			//GameObject toRemove = m_pooledObjects[m_pooledObjects.Count-1];
 			
 			if (toRemove != null)
 			{
@@ -132,18 +172,22 @@ namespace BaseFramework
 			for (int i=0; i<transform.childCount; i++)
 			{
 				Transform t = transform.GetChild (i);
+				Rename (t.gameObject, i);
+			}
+		}
+		
+		void Rename (GameObject go, int index)
+		{
+			int nameIndex = go.name.IndexOf ('.');
 				
-				int nameIndex = t.name.IndexOf ('.');
-				
-				if (nameIndex > 0)
-				{
-					string trimmedName = t.name.Substring (0, nameIndex);
-					t.name = trimmedName + "." + i;
-				}
-				else
-				{
-					t.name = t.name + "." + i;
-				}
+			if (nameIndex > 0)
+			{
+				string trimmedName = go.name.Substring (0, nameIndex);
+				go.name = trimmedName + "." + index;
+			}
+			else
+			{
+				go.name = go.name + "." + index;
 			}
 		}
 		
