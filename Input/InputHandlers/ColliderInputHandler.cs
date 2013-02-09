@@ -44,7 +44,7 @@ namespace BaseFramework.InputManager
 			return false;
 		}
 		
-		protected override int ValidInputMethods ()
+		protected override InputMethod ValidInputMethods ()
 		{
 			return InputMethod.MouseInput | InputMethod.TouchInput;
 		}

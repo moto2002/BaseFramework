@@ -16,21 +16,21 @@ namespace BaseFramework.InputManager
 			m_initialRotation = Quaternion.identity; // todo : make editable
 		}
 		
-		protected override int ValidInputMethods ()
+		protected override InputMethod ValidInputMethods ()
 		{
 			return InputMethod.AccelerometerInput | InputMethod.KeyboardInput;
 		}
 		
-		public void InputBegan (ref InputData f)
+		public override void InputBegan (ref InputData f)
 		{
 		}
 		
-		public abstract void InputChanged (ref InputData f)
+		public override void InputChanged (ref InputData f)
 		{
 			Vector3 up = GetOrientation();
 		}
 		
-		public abstract void InputStopped (ref InputData f)
+		public override  void InputStopped (ref InputData f)
 		{
 		}
 		

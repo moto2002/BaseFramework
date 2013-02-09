@@ -27,28 +27,28 @@ namespace BaseFramework.InputManager
 			for (int i=0; i<nTouches; i++)
 			{
 				// todo (efficiency) : Only Update when there has been a change?
-				Touch t = Input.touches[i];
+				InputData data = WrapTouch ( Input.touches[i] );
 				
-				switch (t.phase)
+				switch (Input.touches[i].phase)
 				{
 					case TouchPhase.Began:
 					{
 					
-						InputStarted (ref WrapTouch (t));
+						InputStarted (ref data);
 						break;
 					}
 					
 					case TouchPhase.Ended:
 					case TouchPhase.Canceled:
 					{
-						InputStopped (ref WrapTouch (t));
+						InputStopped (ref data);
 						break;
 					}
 						
 					case TouchPhase.Stationary:	
 					case TouchPhase.Moved:
 					{
-						InputTick (ref WrapTouch (t));
+						InputTick (ref data);
 						break;
 					}
 				}

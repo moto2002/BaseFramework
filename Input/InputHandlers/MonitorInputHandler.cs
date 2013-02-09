@@ -8,7 +8,7 @@ namespace BaseFramework.InputManager
 	/// </summary>
 	public class MonitorInputHandler : InputHandler
 	{
-		protected override int ValidInputMethods ()
+		protected override InputMethod ValidInputMethods ()
 		{
 			return InputMethod.AccelerometerInput;
 		}

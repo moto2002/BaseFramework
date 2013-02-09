@@ -6,10 +6,10 @@ namespace BaseFramework.InputManager
 	public abstract class InputHandler : MonoBehaviour
 	{
 		private InputManager m_input;
-		private InputType m_validInputMethods;
+		private InputMethod m_validInputMethods;
 		
 		
-		protected abstract int ValidInputMethods();
+		protected abstract InputMethod ValidInputMethods();
 		
 		protected virtual void Awake ()
 		{
@@ -31,7 +31,7 @@ namespace BaseFramework.InputManager
 		
 		public void InputBeganWrapper (ref InputData f)
 		{
-			if (m_validInputMethods & f.Type != InputMethod.None)
+			if ((m_validInputMethods & f.Type) != InputMethod.None)
 			{
 				InputBegan (ref f);
 			}
@@ -39,7 +39,7 @@ namespace BaseFramework.InputManager
 		
 		public void InputChangedWrapper (ref InputData f)
 		{
-			if (m_validInputMethods & f.Type != InputMethod.None)
+			if ((m_validInputMethods & f.Type) != InputMethod.None)
 			{
 				InputChanged (ref f);
 			}
@@ -47,7 +47,7 @@ namespace BaseFramework.InputManager
 		
 		public void InputStoppedWrapper (ref InputData f)
 		{
-			if (m_validInputMethods & f.Type != InputMethod.None)
+			if ((m_validInputMethods & f.Type) != InputMethod.None)
 			{
 				InputStopped (ref f);
 			}
