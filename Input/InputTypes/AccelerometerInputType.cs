@@ -25,17 +25,17 @@ namespace BaseFramework.InputManager
 			m_data.Active = true;
 			m_data.Type = InputMethod.AccelerometerInput;
 			
-			InputStarted(ref m_data);
+			InputBegin(m_data);
 		}
 		
 		void Update ()
 		{
 			m_data.Focus = Input.acceleration;
 			
-			Debug.Log (m_tte);
+			//Debug.Log (m_tte);
 			if (m_tte++ < FramesPerEvent-1)
 			{
-				InputTick(ref m_data);
+				InputTick(m_data);
 			}
 			
 			int nEvents = Input.accelerationEventCount;

@@ -20,8 +20,10 @@ namespace BaseFramework.InputManager
 		private Collider[] m_colliders;
 		private Camera m_camera; // todo : better camera support?
 		
-		void Start ()
+		protected override void Start ()
 		{
+			base.Start();
+			
 			m_colliders = GetComponentsInChildren<Collider>(true);
 			m_camera = Camera.mainCamera;
 		}
@@ -49,19 +51,19 @@ namespace BaseFramework.InputManager
 			return InputMethod.MouseInput | InputMethod.TouchInput;
 		}
 		
-		public override void InputBegan (ref InputData data)
+		public override void InputBegan (InputData data)
 		{
 			if (InputIntersects (data.Focus))
 				SendMessageUpwards ("WasTouched", SendMessageOptions.DontRequireReceiver);
 		}
 		
-		public override void InputChanged (ref InputData data)
+		public override void InputChanged (InputData data)
 		{
 			if (InputIntersects (data.Focus))
 				SendMessageUpwards ("IsBeingTouched", SendMessageOptions.DontRequireReceiver);
 		}
 		
-		public override void InputStopped (ref InputData data)
+		public override void InputStopped (InputData data)
 		{
 			if (InputIntersects (data.Focus))
 				SendMessageUpwards ("StoppedTouching", SendMessageOptions.DontRequireReceiver);

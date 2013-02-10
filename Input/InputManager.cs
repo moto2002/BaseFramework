@@ -11,14 +11,14 @@ namespace BaseFramework.InputManager
 	public class InputManager : MonoSingleton<InputManager>
 	{
 		// InputEvent delegate
-		public delegate void InputEvent (ref InputData f);
+		public delegate void InputEvent (InputData f);
 		
 		// InputEvents thrown
 		public event InputEvent InputStart;
 		public event InputEvent InputUpdate;
 		public event InputEvent InputEnd;
 		
-		void Awake ()
+		private void Start ()
 		{
 #if UNITY_EDITOR || UNITY_STANDALONE_OSX || UNITY_STANDALONE_WIN || UNITY_STANDALONE_LINUX
 			AddInput<MouseInputType>();
@@ -28,7 +28,7 @@ namespace BaseFramework.InputManager
 
 #if UNITY_IPHONE || UNITY_ANDROID
 			AddInput<TouchInputType>();
-			//AddInput<AccelerometerInputType>();
+			AddInput<AccelerometerInputType>();
 #endif
 		}
 		
@@ -40,22 +40,23 @@ namespace BaseFramework.InputManager
 			go.name = typeof(T).Name;
 		}
 		
-		private void InputStarted (ref InputData data)
+		private void InputStarted (InputData data)
 		{
 			if (InputStart != null)
-				InputStart (ref data);
+				InputStart (data);
+			
 		}
 		
-		private void InputChanged (ref InputData data)
+		private void InputChanged (InputData data)
 		{
 			if (InputUpdate != null)
-				InputUpdate (ref data);
+				InputUpdate (data);
 		}
 		
-		private void InputStopped (ref InputData data)
+		private void InputStopped (InputData data)
 		{
 			if (InputEnd != null)
-				InputEnd (ref data);
+				InputEnd (data);
 		}
 	}
 }

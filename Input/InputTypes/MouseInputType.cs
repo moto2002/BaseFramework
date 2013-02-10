@@ -27,8 +27,9 @@ namespace BaseFramework.InputManager
 			}
 		}
 		
-		void Update ()
+		void Update () // bugged?!!?!
 		{
+			//*
 			for (int i=0; i<m_data.Length; i++)
 			{
 				InputData before = m_data[i];
@@ -38,17 +39,18 @@ namespace BaseFramework.InputManager
 				
 				if (!before.Active && m_data[i].Active)
 				{
-					InputStarted (ref m_data[i]);
+					InputBegin (m_data[i]);
 				}
 				if (!m_data[i].Equals (before))
 				{
-					InputTick (ref m_data[i]);
+					InputTick (m_data[i]);
 				}
 				else if (m_data[i].Equals (before))
 				{
-					InputStopped (ref m_data[i]);
+					InputEnd (m_data[i]);
 				}
 			}
+			//*/
 		}
 	}
 }

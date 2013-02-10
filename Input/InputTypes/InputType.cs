@@ -14,7 +14,8 @@ namespace BaseFramework.InputManager
 		KeyboardInput		= 8
 	};
 	
-	public struct InputData
+	[System.Serializable]
+	public class InputData
 	{
 		public bool Active;
 		public Vector3 Focus;
@@ -26,19 +27,19 @@ namespace BaseFramework.InputManager
 	{
 		// Should attempt to add itself to the input manager as a child transform if on a supported platform
 		
-		protected void InputStarted (ref InputData data)
+		protected void InputBegin (InputData data)
 		{
 			SendMessageUpwards ("InputStarted", data);
 		}
 		
-		protected void InputTick (ref InputData data)
+		protected void InputTick (InputData data)
 		{
-			SendMessageUpwards ("InputStarted", data);
+			SendMessageUpwards ("InputChanged", data);
 		}
 		
-		protected void InputStopped (ref InputData data)
+		protected void InputEnd (InputData data)
 		{
-			SendMessageUpwards ("InputStarted", data);
+			SendMessageUpwards ("InputStopped", data);
 		}
 	}
 }

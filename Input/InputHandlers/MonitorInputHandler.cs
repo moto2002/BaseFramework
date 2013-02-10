@@ -10,22 +10,34 @@ namespace BaseFramework.InputManager
 	{
 		protected override InputMethod ValidInputMethods ()
 		{
-			return InputMethod.AccelerometerInput;
+			return InputMethod.AccelerometerInput | InputMethod.MouseInput;
 		}
 		
-		public override void InputBegan (ref InputData f)
+		public override void InputBegan (InputData f)
 		{
-			throw new System.NotImplementedException ();
+			LogInput (f);
 		}
 		
-		public override void InputChanged (ref InputData f)
+		public override void InputChanged (InputData f)
 		{
-			throw new System.NotImplementedException ();
+			LogInput (f);
 		}
 		
-		public override void InputStopped (ref InputData f)
+		public override void InputStopped (InputData f)
 		{
-			throw new System.NotImplementedException ();
+			LogInput (f);
+		}
+		
+		private void Update()
+		{
+			
+		}
+		
+		private void LogInput (InputData data)
+		{
+			Debug.Log ("Received Input ["+data.Type.ToString()+"]");
+			Debug.Log ("-- Active: "+data.Active);
+			Debug.Log ("-- Focus:  "+data.Focus);
 		}
 	}
 }

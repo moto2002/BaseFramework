@@ -8,10 +8,17 @@ namespace BaseFramework.InputManager
 		private InputManager m_input;
 		private InputMethod m_validInputMethods;
 		
+		#region Abstract Methods
 		
 		protected abstract InputMethod ValidInputMethods();
 		
-		protected virtual void Awake ()
+		public abstract void InputBegan (InputData f);
+		public abstract void InputChanged (InputData f);
+		public abstract void InputStopped (InputData f);
+		
+		#endregion
+		
+		protected virtual void Start  ()
 		{
 			m_validInputMethods = ValidInputMethods();
 			
@@ -29,32 +36,28 @@ namespace BaseFramework.InputManager
 			m_input.InputEnd -= InputStoppedWrapper;
 		}
 		
-		public void InputBeganWrapper (ref InputData f)
+		public void InputBeganWrapper (InputData f)
 		{
 			if ((m_validInputMethods & f.Type) != InputMethod.None)
 			{
-				InputBegan (ref f);
+				InputBegan (f);
 			}
 		}
 		
-		public void InputChangedWrapper (ref InputData f)
+		public void InputChangedWrapper (InputData f)
 		{
 			if ((m_validInputMethods & f.Type) != InputMethod.None)
 			{
-				InputChanged (ref f);
+				InputChanged (f);
 			}
 		}
 		
-		public void InputStoppedWrapper (ref InputData f)
+		public void InputStoppedWrapper (InputData f)
 		{
 			if ((m_validInputMethods & f.Type) != InputMethod.None)
 			{
-				InputStopped (ref f);
+				InputStopped (f);
 			}
 		}
-		
-		public abstract void InputBegan (ref InputData f);
-		public abstract void InputChanged (ref InputData f);
-		public abstract void InputStopped (ref InputData f);
 	}
 }
