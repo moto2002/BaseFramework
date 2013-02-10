@@ -22,16 +22,16 @@ namespace BaseFramework.InputManager
 			return InputMethod.AccelerometerInput | InputMethod.KeyboardInput;
 		}
 		
-		public override void InputBegan (InputData f)
+		public override void OnInputStart (InputData f)
 		{
 		}
 		
-		public override void InputChanged (InputData f)
+		public override void OnInputTick (InputData f)
 		{
 			Vector3 up = GetOrientation();
 		}
 		
-		public override  void InputStopped (InputData f)
+		public override  void OnInputEnd (InputData f)
 		{
 		}
 		

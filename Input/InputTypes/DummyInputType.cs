@@ -17,7 +17,7 @@ namespace BaseFramework.InputManager
 		
 		void Update ()
 		{
-			InputTick (m_data);
+			OnInput (m_data, InputEventType.InputTick);
 		}
 	}
 }

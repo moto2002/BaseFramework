@@ -15,19 +15,19 @@ namespace BaseFramework.InputManager
 			return InputMethod.AccelerometerInput | InputMethod.MouseInput;
 		}
 		
-		public override void InputBegan (InputData f)
+		public override void OnInputStart (InputData f)
 		{
-			LogInput (f);
+			LogInput (f, InputEventType.InputStart);
 		}
 		
-		public override void InputChanged (InputData f)
+		public override void OnInputTick (InputData f)
 		{
-			LogInput (f);
+			LogInput (f, InputEventType.InputTick);
 		}
 		
-		public override void InputStopped (InputData f)
+		public override void OnInputEnd (InputData f)
 		{
-			LogInput (f);
+			LogInput (f, InputEventType.InputEnd);
 		}
 		
 		#endregion
@@ -44,9 +44,17 @@ namespace BaseFramework.InputManager
 		/// Prints InputData to the console.
 		/// </summary>
 		/// <param name='data'>The supplied InputData</param>
-		private void LogInput (InputData data)
+		private void LogInput (InputData data, InputEventType type)
 		{
-			Debug.Log ("Received Input ["+data.Type.ToString()+"]");
+			string[] eventTypeStrings = 
+			{
+				"START",
+				"TICK",
+				"END"
+			};
+			
+			string eventType = eventTypeStrings[(int)type];
+			Debug.Log (eventType+"_EVENT ["+data.Type.ToString()+"]");
 			Debug.Log ("-- Active: "+data.Active);
 			Debug.Log ("-- Focus:  "+data.Focus);
 		}

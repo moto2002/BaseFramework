@@ -23,23 +23,40 @@ namespace BaseFramework.InputManager
 		public InputMethod Type;
 	}
 	
+	public enum InputEventType
+	{
+		InputStart = 0,
+		InputTick  = 1,
+		InputEnd   = 2
+	}
+	
 	public abstract class InputType : MonoBehaviour
 	{
-		// Should attempt to add itself to the input manager as a child transform if on a supported platform
-		
-		protected void InputBegin (InputData data)
+		private static string[] MESSAGE_TYPES = 
 		{
-			SendMessageUpwards ("InputStarted", data);
-		}
+			"InputStart",
+			"InputTick",
+			"InputEnd"
+		};
 		
-		protected void InputTick (InputData data)
-		{
-			SendMessageUpwards ("InputChanged", data);
-		}
 		
-		protected void InputEnd (InputData data)
+		protected void OnInput (InputData data, InputEventType type)
 		{
-			SendMessageUpwards ("InputStopped", data);
+			try
+			{
+				string message = MESSAGE_TYPES[(int)type];
+				
+				if (!string.IsNullOrEmpty (message))
+					SendMessageUpwards (message, data);
+			}
+			catch (IndexOutOfRangeException e)
+			{
+				Debug.LogError ("No message defined for InputEventType "+type.ToString());
+				Debug.LogError (e.Message);
+				return;
+			}
+			
+			
 		}
 	}
 }

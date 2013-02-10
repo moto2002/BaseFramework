@@ -12,9 +12,9 @@ namespace BaseFramework.InputManager
 		
 		protected abstract InputMethod ValidInputMethods();
 		
-		public abstract void InputBegan (InputData f);
-		public abstract void InputChanged (InputData f);
-		public abstract void InputStopped (InputData f);
+		public abstract void OnInputStart (InputData f);
+		public abstract void OnInputTick (InputData f);
+		public abstract void OnInputEnd (InputData f);
 		
 		#endregion
 		
@@ -24,23 +24,23 @@ namespace BaseFramework.InputManager
 			
 			m_input = InputManager.Instance;
 			
-			m_input.InputStart += InputBeganWrapper;
-			m_input.InputUpdate += InputChangedWrapper;
-			m_input.InputEnd += InputStoppedWrapper;
+			m_input.OnInputStart += InputBeganWrapper;
+			m_input.OnInputTick += InputChangedWrapper;
+			m_input.OnInputEnd += InputStoppedWrapper;
 		}
 		
 		protected virtual void OnDestroy ()
 		{
-			m_input.InputStart -= InputBeganWrapper;
-			m_input.InputUpdate -= InputChangedWrapper;
-			m_input.InputEnd -= InputStoppedWrapper;
+			m_input.OnInputStart -= InputBeganWrapper;
+			m_input.OnInputTick -= InputChangedWrapper;
+			m_input.OnInputEnd -= InputStoppedWrapper;
 		}
 		
 		public void InputBeganWrapper (InputData f)
 		{
 			if ((m_validInputMethods & f.Type) != InputMethod.None)
 			{
-				InputBegan (f);
+				OnInputStart (f);
 			}
 		}
 		
@@ -48,7 +48,7 @@ namespace BaseFramework.InputManager
 		{
 			if ((m_validInputMethods & f.Type) != InputMethod.None)
 			{
-				InputChanged (f);
+				OnInputTick (f);
 			}
 		}
 		
@@ -56,7 +56,7 @@ namespace BaseFramework.InputManager
 		{
 			if ((m_validInputMethods & f.Type) != InputMethod.None)
 			{
-				InputStopped (f);
+				OnInputEnd (f);
 			}
 		}
 	}
