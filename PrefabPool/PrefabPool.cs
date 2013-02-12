@@ -4,111 +4,193 @@ using System.Collections.Generic;
 
 namespace BaseFramework
 {
-	//TODO: Implement PrefabPool
+	[ExecuteInEditMode ()]
 	public class PrefabPool : MonoBehaviour
 	{
-		public string m_name; //TODO : Specify Prefab Pool Name
-		public GameObject m_objectPrefab;
+		[SerializeField]
+		private bool m_initialised;
 		
-		private int m_cacheLimit = 0;
+		[SerializeField]
+		private GameObject m_objectPrefab;
 		
-		private PrefabPoolManager m_manager;
-		private Queue<GameObject> m_pooledPrefabs;
-		private List<GameObject> m_activePrefabs;
+		[SerializeField]
+		private List<GameObject> m_pooledObjects;
+		
+		[SerializeField]
+		private Queue<GameObject> m_inactiveObjects; // TODO : bug: this keeps getting set to nothing when play mode is entered.
+		
+		#region Public Interface
+		
+		public GameObject ObjectPrefab
+		{
+			get { return m_objectPrefab; }
+			set { m_objectPrefab = value; } // todo : check if a pool of this type exists already?
+		}
 		
 		public int Cached
 		{
-			get { return m_cacheLimit; }
+			get { return m_pooledObjects.Count; }
 			set { Recache (value); }
 		}
 		
-		bool Initialised
+		public int InactiveObjects
 		{
-			get { return m_manager == null || m_pooledPrefabs == null || m_activePrefabs == null || m_cacheLimit == 0; }
-		}
-		
-		void Awake ()
-		{
-		}
-		
-		void Initialise ()
-		{
-			m_manager = PrefabPoolManager.Instance;
-			m_manager.RegisterPool (m_objectPrefab.name, this);
-			
-			m_pooledPrefabs = new Queue<GameObject> ();
-			m_activePrefabs = new List<GameObject> ();
-			
-			Recache (4);
-		}
-		
-		void PoolObject ()
-		{
-			if (!Initialised)
-			{
-				Initialise ();
-			}
-			
-			GameObject go = Instantiate (m_objectPrefab) as GameObject;
-			go.SetActive (false);
-			go.name = go.name+"."+m_pooledPrefabs.Count;
-			go.transform.parent = transform;
-			m_pooledPrefabs.Enqueue (go);
-		}
-		
-		void Recache (int newSize) // TODO : Recache should be able to lower the number of prefabs in memory too!!
-		{
-			// How many objects to we need to Instantiate / Destroy
-			int diff = newSize - m_cacheLimit;
-			
-			// Do the Instantions / Destroys
-			if (diff < 0)
-			{
-				Debug.LogWarning ("PrefabPools cannot recache to less objects");
-				return;
-			}
-			
-			for (int i = 0; i<diff; i++)
-			{
-				PoolObject ();
-			}
-			
-			// Set m_cacheLimit to newSize
-			m_cacheLimit = newSize;
+			get { return m_inactiveObjects.Count; }
 		}
 		
 		public GameObject GetNextActive ()
 		{
-			if (!Initialised)
+			if (m_inactiveObjects.Count == 0)
 			{
-				Initialise ();
+				Cached += 5;
 			}
 			
-			// TODO : Pool new object if no object could be found in queue (increase pool size)
-			if (m_pooledPrefabs.Count == 0)
-			{
-				Debug.LogError ("[Prefab Pool] No more GameObjects pooled!!");
-				return null;
-			}
-			
-			GameObject go = m_pooledPrefabs.Dequeue ();
+			GameObject go = m_inactiveObjects.Dequeue ();
 			go.SetActive (true);
-			m_activePrefabs.Add (go);
+			
 			return go;
 		}
 		
-		public void ReturnToPool (GameObject go)
+		#endregion
+		
+		#region Internal Functions
+		
+		void Awake ()
 		{
-			if (!Initialised)
+			if (!m_initialised)
 			{
 				Initialise ();
 			}
+		}
+		
+		void Initialise ()
+		{
+			if (!m_initialised)
+			{
+				m_initialised = true;
+				
+				if (m_pooledObjects == null)
+				{
+					m_pooledObjects = new List<GameObject>();
+				}
+				
+				if (m_inactiveObjects == null)
+				{
+					m_inactiveObjects = new Queue<GameObject>();
+				}
+			}
+		}
+		
+		void Update ()
+		{
+			// Don't do anything if in sync with all children
+			if (m_pooledObjects.Count.Equals (transform.childCount))
+			{
+				return;
+			}
 			
-			m_activePrefabs.Remove (go);
-			m_pooledPrefabs.Enqueue (go);
+			// If not in sync, sync up!
+			for (int i=0; i<transform.childCount; i++)
+			{
+				GameObject go = transform.GetChild (i).gameObject;
+				if (!m_pooledObjects.Contains (go))
+				{
+					m_pooledObjects.Add (go);
+				}
+				
+				if (!go.activeSelf && !m_inactiveObjects.Contains (go))
+				{
+					m_inactiveObjects.Enqueue (go);
+				}
+			}
+			RenameObjects ();
+		}
+		
+		// TODO : Recaching is bugged.
+		void Recache (int newSize)
+		{
+			// How many objects we need to Instantiate / Destroy
+			int diff = newSize - m_pooledObjects.Count;
 			
+			bool addMore = diff > 0;
+			diff = Mathf.Abs (diff);
+			
+			// Do the Instantions / Destroys
+			for (int i=0; i<diff; i++)
+			{
+				if (addMore)
+				{
+					PoolNewObject ();
+				}
+				else
+				{
+					UnpoolObject ();
+				}
+			}
+			
+			// Rename pooled objects
+			RenameObjects ();
+		}
+		
+		void PoolNewObject ()
+		{
+			GameObject go = Instantiate (m_objectPrefab) as GameObject;
+			go.SetActive (false);
+			go.transform.parent = transform;
+			
+			Rename (go, m_pooledObjects.Count);
+			m_pooledObjects.Add (go);
+			PoolObject (go);
+		}
+		
+		void PoolObject (GameObject go)
+		{
+			if (!m_pooledObjects.Contains (go))
+			{
+				Debug.LogError ("[PrefabPool] GameObject is not contained in pooled objects!", gameObject);
+				return;
+			}
+			
+			m_inactiveObjects.Enqueue (go);
 			go.SetActive (false);
 		}
 		
+		void UnpoolObject ()
+		{
+			GameObject toRemove = GetNextActive();
+			//GameObject toRemove = m_pooledObjects[m_pooledObjects.Count-1];
+			
+			if (toRemove != null)
+			{
+				m_pooledObjects.Remove (toRemove);
+				DestroyImmediate (toRemove);
+			}
+		}
+		
+		void RenameObjects ()
+		{
+			for (int i=0; i<transform.childCount; i++)
+			{
+				Transform t = transform.GetChild (i);
+				Rename (t.gameObject, i);
+			}
+		}
+		
+		void Rename (GameObject go, int index)
+		{
+			int nameIndex = go.name.IndexOf ('.');
+				
+			if (nameIndex > 0)
+			{
+				string trimmedName = go.name.Substring (0, nameIndex);
+				go.name = trimmedName + "." + index;
+			}
+			else
+			{
+				go.name = go.name + "." + index;
+			}
+		}
+		
+		#endregion
 	}
 }
