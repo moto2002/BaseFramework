@@ -12,7 +12,7 @@ namespace BaseFramework.InputManager
 		
 		protected override InputMethod ValidInputMethods ()
 		{
-			return InputMethod.AccelerometerInput | InputMethod.MouseInput;
+			return InputMethod.AccelerometerInput;
 		}
 		
 		public override void OnInputStart (InputData f)

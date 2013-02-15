@@ -29,6 +29,10 @@ namespace BaseFramework.InputManager
 		public override void OnInputTick (InputData f)
 		{
 			Vector3 up = GetOrientation();
+			Vector3 axis = Vector3.forward;
+			
+			
+			transform.rotation = Quaternion.LookRotation (-f.Focus);
 		}
 		
 		public override  void OnInputEnd (InputData f)
@@ -43,10 +47,10 @@ namespace BaseFramework.InputManager
 			default:
 			case DeviceOrientation.Portrait:
 			case DeviceOrientation.Unknown:
-				return Vector3.up;
+				return Vector3.down;
 				
 			case DeviceOrientation.PortraitUpsideDown:
-				return Vector3.down;
+				return Vector3.up;
 				
 			case DeviceOrientation.FaceUp:
 				return Vector3.forward;
@@ -55,10 +59,10 @@ namespace BaseFramework.InputManager
 				return Vector3.back;
 				
 			case DeviceOrientation.LandscapeLeft:
-				return Vector3.back;
+				return Vector3.left;
 			
 			case DeviceOrientation.LandscapeRight:
-				return Vector3.back;
+				return Vector3.right;
 			}
 		}
 	}

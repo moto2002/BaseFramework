@@ -14,12 +14,7 @@ namespace BaseFramework.InputManager
 	/// </summary>
 	public class AccelerometerInputType : InputType
 	{
-		public int FramesPerEvent = 5;
-		
-		private int m_tte = 0;
-		private InputData m_data;
-		
-		void Start ()
+		private void Start ()
 		{
 			m_data = new InputData();
 			m_data.Active = true;
@@ -28,16 +23,13 @@ namespace BaseFramework.InputManager
 			OnInput (m_data, InputEventType.InputStart);
 		}
 		
-		void Update ()
+		private void Update ()
 		{
 			m_data.Focus = Input.acceleration;
 			
-			//Debug.Log (m_tte);
-			if (m_tte++ < FramesPerEvent-1)
-			{
-				OnInput (m_data, InputEventType.InputTick);
-			}
+			OnInput (m_data, InputEventType.InputTick);
 			
+			// todo : smoothing?
 			int nEvents = Input.accelerationEventCount;
 			for (int eventIndex=0; eventIndex<nEvents; eventIndex++)
 			{
@@ -49,5 +41,7 @@ namespace BaseFramework.InputManager
 				//temp.Focus = accelEvent.acceleration && accelEvent.deltaTime;
 			}
 		}
+		
+		private InputData m_data;
 	}
 }
