@@ -8,7 +8,7 @@ namespace BaseFramework
 	{
 		public Transform CentreOfMass;
 		
-		public bool m_cycle = true;
+		public bool m_cycle = false;
 		public float m_timescale;
 		
 		private float m_orbitRadius;
