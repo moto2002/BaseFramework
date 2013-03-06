@@ -31,7 +31,7 @@ namespace BaseFramework
 		{
 			float forward = Input.GetAxis ("Vertical");
 			float strafe = Input.GetAxis ("Horizontal");
-			float jump = 0.0f;
+			//float jump = 0.0f;
 			
 			forward *= MoveSpeed;
 			strafe *= MoveSpeed;
