@@ -3,11 +3,10 @@ using System.Collections;
 
 namespace BaseFramework
 {
+	[RequireComponent( typeof( Camera ) )]
 	public class ThirdPersonCameraController : MonoBehaviour
 	{
-		public Transform CameraAnchor;
-		public Transform CameraTransform;
-		public Transform CharacterTransform;
+		public Transform CameraPivot;
 		
 		public bool InvertX = false;
 		public bool InvertY = false;
@@ -15,35 +14,33 @@ namespace BaseFramework
 		public float HorizontalSpeed = 10.0f;
 		public float VerticalSpeed = 5.0f;
 		
-		void Start ()
+		public float CamDist
 		{
-			if (CameraTransform == null)
-			{
-				Debug.LogError ("CameraTransform is null!", this);
-			}
+			get { return m_cameraDistance; }
+			set { m_cameraDistance = Mathf.Clamp( value, MINIMUM_CAMERA_DISTANCE, MAXIMUM_CAMERA_DISTANCE ); }
+		}
+		
+		private void Start()
+		{
+			m_cameraDistance = 25.0f; // todo : smoothing when this value changes.
 			
-			if (CameraAnchor == null)
+			if (CameraPivot == null)
 			{
-				Debug.LogError ("CameraAnchor is null", this);
-			}
-			
-			if (CharacterTransform == null)
-			{
-				Debug.LogError ("CharacterTransform is null!", this);
+				Debug.LogError ("CameraPivot is null!", this);
 			}
 		}
 		
-		void OnEnable ()
+		private void OnEnable()
 		{
 			Screen.lockCursor = true;
 		}
 		
-		void OnDisable ()
+		private void OnDisable()
 		{
 			Screen.lockCursor = false;
 		}
-		
-		void Update ()
+		 
+		private void Update()
 		{
 			float x = Input.GetAxis ("Mouse X") * HorizontalSpeed;
 			float y = Input.GetAxis ("Mouse Y") * VerticalSpeed;
@@ -51,13 +48,18 @@ namespace BaseFramework
 			x = InvertX ? -x : x;
 			y = InvertY ? y : -y;
 			
-			// todo: mouse smoothing
+			Quaternion rotation = Quaternion.Euler( y, x, 0 ); // todo : limit vertical rotation
 			
-			//x *= Time.deltaTime;
-			//y *= Time.deltaTime;
+			// transform camera about a pivot
+			Vector3 currDir = (transform.position - CameraPivot.position).normalized;
+			transform.position = CameraPivot.position + (rotation * currDir * m_cameraDistance);
 			
-			CameraTransform.Rotate (y, 0, 0, Space.Self);
-			CharacterTransform.Rotate (0, x, 0, Space.Self);
+			// rotate camera to aim at pivot
+			transform.rotation = Quaternion.LookRotation( CameraPivot.position - transform.position );
 		}
+		
+		private float m_cameraDistance;
+		private const float MINIMUM_CAMERA_DISTANCE = 5.0f;
+		private const float MAXIMUM_CAMERA_DISTANCE = 20.0f;
 	}
 }
