@@ -9,12 +9,12 @@ namespace BaseFramework.InputManager
 	/// </summary>
 	public class RotationInputHandler : InputHandler
 	{
-		private Quaternion m_initialRotation;
+		//private Quaternion m_initialRotation;
 		
 		protected override void Start()
 		{
 			base.Start();
-			m_initialRotation = Quaternion.identity; // todo : make editable
+			//m_initialRotation = Quaternion.identity; // todo : make editable
 		}
 		
 		protected override InputMethod ValidInputMethods ()
@@ -28,7 +28,7 @@ namespace BaseFramework.InputManager
 		
 		public override void InputChanged (InputData f)
 		{
-			Vector3 up = GetOrientation();
+			//Vector3 up = GetOrientation();
 		}
 		
 		public override  void InputStopped (InputData f)

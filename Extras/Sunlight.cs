@@ -46,34 +46,10 @@ namespace BaseFramework
 			{
 				return;
 			}
-			
-			// trigonometry. shit.
-			
-			// soh cah toa
-			
-			//
-			//    o          x
-			//     \        /
-			//      \  _  / 
-			//       \''/
-			//        O  
-			// 
-			// 
-			
-			// so the angle is determined by the orbit speed.
-			//
-			// deltaAngleDegrees = timescale (seconds) / 360
-			//
-			// OrbitRandius * sin (deltaAngleDegrees) =
-			// OrbitRandius * cos (deltaAngleDegrees) =
-			
-			m_angle += Mathf.Deg2Rad * (m_timescale/360); // todo: private var, eliminate timescale?
+			m_angle += Mathf.Deg2Rad * (m_timescale/360); // todo: make static private var & eliminate timescale?
 			
 			float x = m_orbitRadius * Mathf.Sin (m_angle);
-			//Debug.Log ("Sin: " + x);
-			
 			float y = m_orbitRadius * Mathf.Cos (m_angle);
-			//Debug.Log ("Cos: " + y);
 			
 			Vector3 dir = CentreOfMass.position - transform.position;
 			transform.rotation = Quaternion.LookRotation (dir);
@@ -89,7 +65,7 @@ namespace BaseFramework
 			}
 			else
 			{
-				Debug.LogWarning ("Ne CentreOfMass set.", this);
+				Debug.LogWarning ("No CentreOfMass set.", this);
 			}
 		}
 	}
