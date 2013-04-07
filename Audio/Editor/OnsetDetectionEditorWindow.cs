@@ -17,6 +17,7 @@ namespace BaseFramework.Audio
 		{
 			title = "Onset Detection";
 			
+			/*
 			if (m_sampleTexture == null)
 			{
 				m_sampleTexture = new Texture2D(2, 2);
@@ -33,6 +34,7 @@ namespace BaseFramework.Audio
 			{
 				m_currWindow = new float[ m_windowResolution ];
 			}
+			*/
 		}
 		
 		private void OnDisable()
@@ -63,8 +65,8 @@ namespace BaseFramework.Audio
 				if (m_onsetDetectionObject.m_audioClip != null)
 				{
 					m_audio = m_onsetDetectionObject.m_audioClip;
-					m_sampleData = new float[ m_audio.samples * m_audio.channels ]; // Need to be able to retrieve FFT of this data!
-					m_audio.GetData( m_sampleData, 0 );
+					//m_sampleData = new float[ m_audio.samples * m_audio.channels ]; // Need to be able to retrieve FFT of this data!
+					//m_audio.GetData( m_sampleData, 0 );
 				}
 				else
 				{
@@ -79,6 +81,7 @@ namespace BaseFramework.Audio
 			DrawAndHandleControls();
 		}
 		
+		/*
 		private void TestAnalyzer()
 		{
 			// Define a test array with a given window size
@@ -102,6 +105,7 @@ namespace BaseFramework.Audio
 			// Draw it!
 			DrawSpectrumAnalysis( test, pos );
 		}
+		*/
 		
 		private void DrawAndHandleControls()
 		{
@@ -110,13 +114,14 @@ namespace BaseFramework.Audio
 			if ( !m_playingAudio )
 			{
 				m_playingAudio = GUILayout.Button( "Test Audio Track" );
-				m_currWindow = new float[ m_windowResolution ];
+				//m_currWindow = new float[ m_windowResolution ];
 			}
 			else
 			{
 				m_playingAudio = !GUILayout.Button( "Stop Playing" );
 			}
 			
+			/*
 			// Define Debug Fourier Transform Button
 			if ( GUILayout.Button ( "Transform" ) )
 			{
@@ -128,13 +133,14 @@ namespace BaseFramework.Audio
 				
 				//Debug.Log("Length : "+fTransform.Length);
 			}
+			*/
 			
 			// Handle Start / Stop Playing Events
 			if ( m_playingAudio && !wasPlaying )
 			{
 				// Started playing
 				m_onsetDetectionObject.audio.Play();
-				SetCurrentSampleWindow();
+				//SetCurrentSampleWindow();
 			}
 			else if ( !m_playingAudio && wasPlaying )
 			{
@@ -142,6 +148,7 @@ namespace BaseFramework.Audio
 				m_onsetDetectionObject.audio.Stop();
 			}
 			
+			/*
 			// Define Spectral Analyser
 			Rect spectralAnalysizerPosition = new Rect (
 				0,
@@ -150,8 +157,10 @@ namespace BaseFramework.Audio
 				Screen.height / 4
 			);
 			DrawSpectrumAnalysis( m_currWindow, spectralAnalysizerPosition );
+			*/
 		}
 		
+		/*
 		private void DrawSpectrumAnalysis( float[] data, Rect bounds )
 		{
 			float baseLine = bounds.y + bounds.height / 2;
@@ -192,31 +201,34 @@ namespace BaseFramework.Audio
 			if (!m_onsetDetectionObject.audio.isPlaying)
 				return;
 			
-			m_currWindow = new float[m_windowResolution];
+			m_currWindow = new float[ m_windowResolution ];
 			
 			int initialSample = (int)(m_audio.frequency * m_onsetDetectionObject.audio.time);
 			for (int i=0; i<m_windowResolution; i++)
 			{
 				int currSampleIndex = initialSample + i;
 				if ( currSampleIndex < m_transformedData.Length )
-					m_currWindow[i] = m_transformedData[ currSampleIndex ];//m_sampleData[ currSampleIndex ];
+					m_currWindow[ i ] = m_transformedData[ currSampleIndex ];//m_sampleData[ currSampleIndex ];
 				else
-					m_currWindow[i] = 0.0f;
+					m_currWindow[ i ] = 0.0f;
 			}
 		}
+		*/
 		
+		/*
 		private int m_windowUpdateTTL = 0;
 		private int m_windowUpdateRate = 1;
 		private int m_windowResolution = 256;
 		
-		private bool m_playingAudio;
 		private float[] m_sampleData;
 		private float[] m_currWindow;
 		private float[] m_transformedData;
 		
-		private AudioClip m_audio;
 		private Texture2D m_sampleTexture;
+		*/
 		
+		private AudioClip m_audio;
+		private bool m_playingAudio;
 		private OnsetDetection m_onsetDetectionObject;
 	}
 }
