@@ -46,9 +46,5 @@ namespace BaseFramework.Audio
 			
 			return null;
 		}
-		
-		//public float[] FFT( float[] samples )
-		//{
-		//}
 	}
 }

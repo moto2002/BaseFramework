@@ -1,6 +1,8 @@
 using UnityEngine;
 using UnityEditor;
 
+using BaseFramework.Math;
+
 namespace BaseFramework.Audio
 {
 	public class OnsetDetectionEditorWindow : EditorWindow
@@ -103,6 +105,7 @@ namespace BaseFramework.Audio
 		
 		private void DrawAndHandleControls()
 		{
+			// Define Start / Stop Testing Button
 			bool wasPlaying = m_playingAudio;
 			if ( !m_playingAudio )
 			{
@@ -112,9 +115,21 @@ namespace BaseFramework.Audio
 			else
 			{
 				m_playingAudio = !GUILayout.Button( "Stop Playing" );
-				
 			}
 			
+			// Define Debug Fourier Transform Button
+			if ( GUILayout.Button ( "Transform" ) )
+			{
+				m_transformedData = BaseMath.FastFourierTransform_CooleyTukey( m_sampleData );
+				//for ( int i=0; i<fTransform.Length; i++ )
+				//{
+				//	Debug.Log( "[" + i + "] : " + fTransform[i] );
+				//}
+				
+				//Debug.Log("Length : "+fTransform.Length);
+			}
+			
+			// Handle Start / Stop Playing Events
 			if ( m_playingAudio && !wasPlaying )
 			{
 				// Started playing
@@ -127,6 +142,7 @@ namespace BaseFramework.Audio
 				m_onsetDetectionObject.audio.Stop();
 			}
 			
+			// Define Spectral Analyser
 			Rect spectralAnalysizerPosition = new Rect (
 				0,
 				Screen.height / 2,
@@ -182,8 +198,8 @@ namespace BaseFramework.Audio
 			for (int i=0; i<m_windowResolution; i++)
 			{
 				int currSampleIndex = initialSample + i;
-				if ( currSampleIndex < m_sampleData.Length )
-					m_currWindow[i] = m_sampleData[ currSampleIndex ];
+				if ( currSampleIndex < m_transformedData.Length )
+					m_currWindow[i] = m_transformedData[ currSampleIndex ];//m_sampleData[ currSampleIndex ];
 				else
 					m_currWindow[i] = 0.0f;
 			}
@@ -193,9 +209,10 @@ namespace BaseFramework.Audio
 		private int m_windowUpdateRate = 1;
 		private int m_windowResolution = 256;
 		
-		private static bool m_playingAudio;
-		private static float[] m_sampleData;
-		private static float[] m_currWindow;
+		private bool m_playingAudio;
+		private float[] m_sampleData;
+		private float[] m_currWindow;
+		private float[] m_transformedData;
 		
 		private AudioClip m_audio;
 		private Texture2D m_sampleTexture;
