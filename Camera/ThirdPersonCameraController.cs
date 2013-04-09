@@ -22,12 +22,8 @@ namespace BaseFramework
 		
 		private void Start()
 		{
-			m_cameraDistance = 25.0f; // todo : smoothing when this value changes.
-			
-			if (CameraPivot == null)
-			{
-				Debug.LogError ("CameraPivot is null!", this);
-			}
+			m_currDir = (transform.position - CameraPivot.position).normalized;
+			m_cameraDistance = 50.0f; // todo : smoothing when this value changes.
 		}
 		
 		private void OnEnable()
@@ -42,23 +38,28 @@ namespace BaseFramework
 		 
 		private void Update()
 		{
+			// TODO : Slight bug- Mouse Axis hasstrange initial value when launching in editor?
 			float x = Input.GetAxis ("Mouse X") * HorizontalSpeed;
 			float y = Input.GetAxis ("Mouse Y") * VerticalSpeed;
 			
 			x = InvertX ? -x : x;
 			y = InvertY ? y : -y;
 			
-			Quaternion rotation = Quaternion.Euler( y, x, 0 ); // todo : limit vertical rotation
+			// TODO : Fix rotation calculation-
+			// The problem is that the up vector of the camera is always +y. we want it to be able to change.
+			Quaternion rotation = Quaternion.AngleAxis( y, transform.right ) * Quaternion.AngleAxis( x, transform.up );
 			
 			// transform camera about a pivot
-			Vector3 currDir = (transform.position - CameraPivot.position).normalized;
-			transform.position = CameraPivot.position + (rotation * currDir * m_cameraDistance);
+			m_currDir = rotation * m_currDir;
+			transform.position = CameraPivot.position + (m_currDir * m_cameraDistance);
 			
 			// rotate camera to aim at pivot
-			transform.rotation = Quaternion.LookRotation( CameraPivot.position - transform.position );
+			transform.rotation = Quaternion.LookRotation( CameraPivot.position - transform.position, transform.up );
 		}
 		
 		private float m_cameraDistance;
+		private Vector3 m_currDir;
+		
 		private const float MINIMUM_CAMERA_DISTANCE = 5.0f;
 		private const float MAXIMUM_CAMERA_DISTANCE = 20.0f;
 	}
