@@ -26,11 +26,22 @@ namespace BaseFramework.Math
 		{
 			return new ComplexNumber(
 				a.m_real * b.m_real - a.m_imaginary * b.m_imaginary,
-				a.m_real * b.m_imaginary - a.m_imaginary * b.m_real
+				a.m_real * b.m_imaginary + b.m_real * a.m_imaginary
+			);
+		}
+		
+		public static ComplexNumber operator/( ComplexNumber a, ComplexNumber b )
+		{
+			float denominator = b.m_real * b.m_real + b.m_imaginary * b.m_imaginary;
+			return new ComplexNumber(
+				( a.m_real * b.m_real + a.m_imaginary * b.m_imaginary ) / denominator,
+				( a.m_imaginary * b.m_real - a.m_real * b.m_imaginary ) / denominator
 			);
 		}
 		
 		#endregion
+		
+		#region Properties
 		
 		public float RealNumber
 		{
@@ -38,7 +49,7 @@ namespace BaseFramework.Math
 			set { m_real = value; }
 		}
 		
-		public float ImaginaryNumber
+		public float ImaginaryScale
 		{
 			get { return m_imaginary; }
 			set { m_imaginary = value; }
@@ -70,6 +81,8 @@ namespace BaseFramework.Math
 				}
 			}
 		}
+		
+		#endregion
 		
 		#region Constructors
 		

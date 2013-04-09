@@ -14,11 +14,13 @@ namespace BaseFramework.Audio
 	/// </summary>
 	public class AudioSpectrumAnalyser
 	{
+		public AudioSpectrumAnalyser( ) : this( 44100, null, 256 ) { }
 		public AudioSpectrumAnalyser( float[] sampleData ) : this( 44100, sampleData, 256 ) { }
+		public AudioSpectrumAnalyser( int frequency, int resolution ) : this( frequency, null, resolution ) { }
 		public AudioSpectrumAnalyser( int frequency, float[] sampleData, int resolution )
 		{
 			m_frequency = frequency;
-			m_sampleData = sampleData;
+			//m_sampleData = sampleData;
 			m_windowResolution = resolution;
 			
 			m_sampleTexture = new Texture2D( 2, 2 );
@@ -29,6 +31,29 @@ namespace BaseFramework.Audio
 			m_sampleTexture.SetPixel( 0, 1, Color.blue );
 			m_sampleTexture.SetPixel( 1, 1, Color.blue );
 			m_sampleTexture.Apply();
+		}
+		
+		public int Frequency
+		{
+			get { return m_frequency; }
+			set { m_frequency = value; }
+		}
+		
+		public int WindowResolution
+		{
+			get { return m_windowResolution; }
+			set { m_windowResolution = value; }
+		}
+		
+		public static void Draw( float[] data, Rect position ) // TODO : Make a static function?
+		{
+			DrawAxis( position );
+			//DrawSpectrumAnalysis( data, position );
+		}
+		
+		private static void DrawAxis( Rect bounds )
+		{
+			
 		}
 		
 		private void DrawSpectrumAnalysis( float[] data, Rect bounds )
@@ -50,6 +75,7 @@ namespace BaseFramework.Audio
 			}
 		}
 		
+		/*
 		private void SetCurrentSampleWindow( float currAudioTime )
 		{
 			m_currWindow = new float[ m_windowResolution ];
@@ -64,12 +90,13 @@ namespace BaseFramework.Audio
 					m_currWindow[ i ] = 0.0f;
 			}
 		}
+		//*/
 		
 		private int m_frequency;
 		private int m_windowResolution;
 		
-		private float[] m_sampleData;
-		private float[] m_currWindow;
+		//private float[] m_sampleData;
+		//private float[] m_currWindow;
 		
 		private Texture2D m_sampleTexture;
 	}
