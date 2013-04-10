@@ -84,6 +84,11 @@ namespace BaseFramework.Math
 		
 		#endregion
 		
+		public static ComplexNumber FromPolar( float r, float radians )
+		{
+			return new ComplexNumber( r * Mathf.Cos( radians ), r * Mathf.Sin( radians ) );
+		}
+		
 		#region Constructors
 		
 		public ComplexNumber() : this( 0.0f, 0.0f )
