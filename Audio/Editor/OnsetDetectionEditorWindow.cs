@@ -13,13 +13,27 @@ namespace BaseFramework.Audio
 			EditorWindow.GetWindow( typeof( OnsetDetectionEditorWindow ) );
 		}
 		
+		private float[] m_testData;
+		private ComplexNumber[] m_fftOutput;
+			
 		private void OnEnable()
 		{
 			title = "Onset Detection";
+			GenerateTestData();
 		}
 		
 		private void OnDisable()
 		{
+		}
+		
+		private void GenerateTestData()
+		{
+			int testLength = 4;
+			m_testData = new float[testLength];
+			
+			for (int i=0; i<testLength; i++)
+				m_testData[ i ] = 5 + 2 * Mathf.Cos( (Mathf.PI / 2) * i - (90 * Mathf.Deg2Rad) ) + 3 * Mathf.Cos( Mathf.PI * i );
+			Debug.Log (m_testData[0]);
 		}
 		
 		private void OnGUI()
@@ -28,7 +42,7 @@ namespace BaseFramework.Audio
 			
 			// Check we have a reference to the OnsetDetection object.
 			// If we don't, give the developer the option to create one.
-			if (m_onsetDetectionObject == null)
+			if ( m_onsetDetectionObject == null )
 			{
 				if ( GUILayout.Button( "Create Onset Detection Singleton" ) )
 				{
@@ -40,14 +54,14 @@ namespace BaseFramework.Audio
 			
 			// Make sure the local AudioClip variable is synchronised with the OnsetDetection object.
 			// If it is not, resynchronise.
-			if (m_audio == null || m_audio != m_onsetDetectionObject.m_audioClip)
+			if ( m_audio == null || m_audio != m_onsetDetectionObject.m_audioClip )
 			{
 				// Make sure the OnsetDetection object holds some reference.
-				if (m_onsetDetectionObject.m_audioClip != null)
+				if ( m_onsetDetectionObject.m_audioClip != null )
 				{
 					m_audio = m_onsetDetectionObject.m_audioClip;
-					//m_sampleData = new float[ m_audio.samples * m_audio.channels ]; // Need to be able to retrieve FFT of this data!
-					//m_audio.GetData( m_sampleData, 0 );
+					m_sampleData = new float[ m_audio.samples * m_audio.channels ]; // Need to be able to retrieve FFT of this data!
+					m_audio.GetData( m_sampleData, 0 );
 				}
 				else
 				{
@@ -58,7 +72,21 @@ namespace BaseFramework.Audio
 				return;
 			}
 			
-			AudioSpectrumAnalyser.Draw( new float[1], new Rect( Screen.width / 4, Screen.height / 2, Screen.width / 2, Screen.height / 4 ) );
+			if ( GUILayout.Button( "Test" ) )
+			{
+				m_fftOutput = BaseMath.FastFourierTransform_CooleyTukey( m_testData );
+				
+				foreach (ComplexNumber n in m_fftOutput)
+					Debug.Log( n.RealNumber );
+			}
+			
+			Rect testRect = new Rect();
+			testRect.yMin = Screen.height / 2;
+			testRect.xMin = 0.0f;
+			testRect.yMax = Screen.height;
+			testRect.xMax = Screen.width;
+			
+			//AudioSpectrumAnalyser.Draw( testRect, m_testData );
 			//DrawAndHandleControls();
 		}
 		
@@ -91,6 +119,7 @@ namespace BaseFramework.Audio
 		}
 		
 		private AudioClip m_audio;
+		private float[] m_sampleData;
 		private bool m_playingAudio;
 		private OnsetDetection m_onsetDetectionObject;
 	}
