@@ -1,6 +1,8 @@
 using UnityEngine;
 using UnityEditor;
 
+using BaseFramework.Math;
+
 namespace BaseFramework.Audio
 {
 	/// <summary>
@@ -27,6 +29,16 @@ namespace BaseFramework.Audio
 			m_sampleTexture.Apply();
 		}
 		
+		public static void Draw( Rect position, ComplexNumber[] data )
+		{
+			float[] realData = new float[ data.Length ];
+			for (int i=0; i<realData.Length; i++)
+			{
+				realData[ i ] = data[ i ].Magnitude;
+			}
+			Draw( position, realData );
+		}
+		
 		public static void Draw( Rect position, float[] data )
 		{
 			Draw ( position, data, 1 );
@@ -46,9 +58,11 @@ namespace BaseFramework.Audio
 		private static void DrawSpectrumAnalysis( Rect bounds, float[] data, int resolution )
 		{
 			float baseLine = bounds.y + bounds.height / 2;
-			float sampleWidth = bounds.width / (data.Length / resolution);
+			float sampleWidth = bounds.width / (data.Length / 2 / resolution);
 			
-			for (int i=0; i<data.Length; i+=resolution)
+			NormaliseData( ref data );
+			
+			for (int i=0; i<data.Length/2; i+=resolution)
 			{
 				float sampleMagnitude = 0.0f; // = data[ i ] * bounds.height/2;
 				for (int j=0; j<resolution; j++)
@@ -64,6 +78,15 @@ namespace BaseFramework.Audio
 				);
 				GUI.DrawTexture( pos, m_sampleTexture );
 			}
+		}
+		
+		private static void NormaliseData( ref float[] data )
+		{
+			float maxValue = 1.0f;
+			foreach (float val in data)
+				maxValue = Mathf.Abs( val ) > maxValue ? Mathf.Abs( val ) : maxValue;
+			for (int i=0; i<data.Length; i++)
+				data[ i ] /= maxValue;	
 		}
 		
 		private static Texture2D m_sampleTexture;

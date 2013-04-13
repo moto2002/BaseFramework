@@ -1,63 +1,63 @@
-using System;
 using UnityEngine;
+using System.Collections;
 
 namespace BaseFramework.Math
 {
-	public class BaseMath
+	public static class BaseMath
 	{
-		public static ComplexNumber[] FastFourierTransform_CooleyTukey( float[] realData )
+		/// <summary>
+		/// Calculate the mean average value of a set of real-number data.
+		/// </summary>
+		/// <returns>
+		/// The mean average.
+		/// </returns>
+		/// <param name='realData'>
+		/// A set of real-number floating point data.
+		/// </param>
+		public static float MeanAverage( float[] realData )
 		{
-			ComplexNumber[] x = new ComplexNumber[ realData.Length ];
-			for (int i=0; i<x.Length; i++)
-			{
-				x[i] = new ComplexNumber( realData[ i ] );
-			}
-			return FastFourierTransform_CooleyTukey( x );
+			float mu = 0.0f;
+			for (int i=0; i<realData.Length; i++)
+				mu += realData[ i ];
+			mu /= realData.Length;
+			return mu;
 		}
 		
-		public static ComplexNumber[] FastFourierTransform_CooleyTukey( ComplexNumber[] x )
+		/// <summary>
+		/// Calculates the Standard Deviation of a set of real-number data.
+		/// </summary>
+		/// <returns>
+		/// The deviation.
+		/// </returns>
+		/// <param name='realData'>
+		/// Real data.
+		/// </param>
+		public static float StandardDeviation( float[] realData )
 		{
-			int N = x.Length; // The total number of samples
-			if (N == 1)
+			return Mathf.Sqrt( Varience( realData ) );
+		}
+		
+		/// <summary>
+		/// Calculates the varience of a set of real-number data.
+		/// </summary>
+		/// <returns>
+		/// The varience.
+		/// </returns>
+		/// <param name='realData'>
+		/// A set of real-number floating point data
+		/// </param>
+		public static float Varience( float[] realData )
+		{
+			float mu = MeanAverage( realData );
+			float sigma = 0.0f;
+			
+			for (int i=0; i<realData.Length; i++)
 			{
-				// If we have only one sample, it is our result
-				return x;
+				sigma += Mathf.Pow( realData[ i ] - mu, 2 );
 			}
+			sigma /= realData.Length - 1;
 			
-			// Split data set in half:
-			ComplexNumber[] E = new ComplexNumber[ N/2 ];
-			ComplexNumber[] D = new ComplexNumber[ N/2 ];
-			for (int i=0; i<N/2; i++)
-			{
-				//E[ i ] = x[ i ];
-				//D[ i ] = x[ i + N / 2 ];
-				E[ i ] = x[ 2 * i ];
-				D[ i ] = x[ 2 * i + 1 ];
-			}
-			
-			// Recurse.
-			E = FastFourierTransform_CooleyTukey( E );
-			D = FastFourierTransform_CooleyTukey( D );
-			
-			// Multiply half_2 by complex number (for reasons)
-			for (int k=0; k<N/2; k++)
-			{
-				ComplexNumber temp = ComplexNumber.FromPolar( 1, -2 * Mathf.PI * k / N );
-				D[k] *= temp;
-			}
-			
-			// Define the result array:
-			ComplexNumber[] X = new ComplexNumber[ N ];
-			
-			// Add Complex Numbers
-			for (int k=0; k<N/2; k++)
-			{
-				X[ k ] = E[ k ] + D[ k ];
-				X[ k + N/2 ] = E[ k ] - D[ k ];
-			}
-			
-			// Return result
-			return X;
+			return sigma;
 		}
 	}
 }
