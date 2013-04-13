@@ -1,13 +1,10 @@
 using UnityEngine;
 using UnityEditor;
 
-namespace BaseFramework.UnityWiki
+namespace BaseFramework.Math
 {
 	/// <summary>
 	/// Editor Window used to test the functionality of the EditorGraph drawing.
-	/// 
-	/// TODO : Custom wave generation function input. That would be cool! But admittedly, a waste of time.
-	/// 	   ALTHOUGH! You could potentially generate a "cool" looking waveform and save the data set. Again, not sure how this would be of any use....... yet.
 	/// </summary>
 	public class EditorGraphTestWindow : EditorWindow
 	{
@@ -33,8 +30,8 @@ namespace BaseFramework.UnityWiki
 			float[] sampleData = new float[ sampleDataLength ];
 			for( int i=0; i<sampleDataLength; i++ )
 			{
-				sampleData[ i ] = Mathf.Sin( i * Mathf.PI / 8f );
-				
+				sampleData[ i ] = Mathf.Sin( i * Mathf.PI * 0.2f );
+				//5+2*Mathf.Sin( i * Mathf.PI / 8f ) + 0.75f * Mathf.Cos( i * 2 * Mathf.PI );
 				//5 + 2 * Mathf.Cos( 2 * Mathf.PI * i - (90 * Mathf.Deg2Rad) ) + 3 * Mathf.Cos( 4 * Mathf.PI * i );
 			}
 			return sampleData;
@@ -54,17 +51,14 @@ namespace BaseFramework.UnityWiki
 			m_testGraph.X_Offset = EditorGUILayout.IntField( "Sample Position", m_testGraph.X_Offset );
 			
 			EditorGUILayout.BeginHorizontal();
-			EditorGUILayout.PrefixLabel( "Min / Max limits" );
-			m_limit = EditorGUILayout.IntField( m_limit );
-			EditorGUILayout.LabelField( "Min:"+m_testGraph.Min_Y );
-			EditorGUILayout.LabelField( "Max:"+m_testGraph.Max_Y );
+			m_testGraph.Min_Y = EditorGUILayout.FloatField( "Min Limit", m_testGraph.Min_Y );
+			m_testGraph.Max_Y = EditorGUILayout.FloatField( "Max Limit", m_testGraph.Max_Y );
 			if ( GUILayout.Button( "Reset" ) )
 			{
 				m_testGraph.Max_Y = 1;
 				m_testGraph.Min_Y = -1;
 			}
 			EditorGUILayout.EndHorizontal();
-			EditorGUILayout.MinMaxSlider( ref m_testGraph.Min_Y, ref m_testGraph.Max_Y, -m_limit, m_limit );
 			
 			if (newClip != m_clip)
 			{
@@ -79,7 +73,6 @@ namespace BaseFramework.UnityWiki
 				EditorGraph.DrawGraph( m_testGraph, new Rect( 0, Screen.height/2, Screen.width, Screen.height/4 ) );
 		}
 		
-		private int m_limit = 10;
 		private AudioClip m_clip;
 		private Graph m_testGraph;
 	}

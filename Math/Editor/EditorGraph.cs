@@ -1,18 +1,16 @@
 using UnityEngine;
 using UnityEditor;
-using System.Collections;
 
-namespace BaseFramework.UnityWiki
+namespace BaseFramework.Math
 {
 	/// <summary>
 	/// A static class that provides functionality for drawing a Graph object in the editor.
 	/// 
-	/// Todo List (sorted)
-	/// - Scale magnitudes to fit in Rectangle
-	/// - Trim magnitudes between Min / Max Y
-	/// - Draw the axis
-	/// - Improvements to the axis
-	/// - Automatic positioning (when supplied with a width/height) would be nice!
+	/// TODO - OpenGL Draw code optimizations over large windows!
+	/// TODO - Support for a more generic x-axis
+	/// TODO - Draw the axis a bit nicer (with values etc)
+	/// TODO - Allow for negative Max_Y values and positive Min_Y values! Requires minor changes to the Graph class.
+	/// TODO - Automatic positioning (when supplied with a width/height) would be nice!
 	/// </summary>
 	[InitializeOnLoad]
 	public static class EditorGraph
@@ -20,7 +18,7 @@ namespace BaseFramework.UnityWiki
 		private static Material m_lineMaterial;
 		static EditorGraph()
 		{
-			// No idea how to use shaders or materials properly, so we'll just use the one from the reference.
+			// No idea how to use shaders or materials properly, so we'll just use the one from the unity reference site.
 			m_lineMaterial = new Material(
 				"Shader \"Lines/Colored Blended\" {" +
 				"SubShader { Pass { " +
@@ -40,11 +38,8 @@ namespace BaseFramework.UnityWiki
 		{
 			GUI.Box( position, "Graph" );
 			
-			// Grab the current channel as C
-			Channel[] channels = graph.Channels;
-			
 			// Check if channels exist
-			if( channels == null )
+			if( graph.Channels == null )
 				return;
 			
 			// Set the material pass.... for reasons.
@@ -52,23 +47,23 @@ namespace BaseFramework.UnityWiki
 			
 			// The x-axis spacing
 			float xSpacing = position.width / ( graph.WindowWidth - 1 );
-			
+		
 			// The y-axis spacing
 			float ySpacing = position.height / ( graph.Max_Y - graph.Min_Y );
 			
-			// The axis' position offsets
-			int xOffset = (int)( position.x + 10 );
-			int yOffset = (int)( position.y + position.height / ( graph.Max_Y - graph.Min_Y ) ); // - position.height / ( graph.Max_Y - graph.Min_Y ) ) does the opposite duh!
+			// The x-axis position offset
+			int xOffset = (int)( position.x );
 			
-			// if min y >= 0, yOffset == position.height
-			// if max y <= 0, yOffset == -position.height
+			// The y-axis position offset
+			float ratio = Mathf.Clamp01( graph.Max_Y / ( graph.Max_Y - graph.Min_Y ) );
+			int yOffset = (int)( position.y + (position.height * ratio) );
 			
 			// Let's start drawing!
 			GL.PushMatrix();
 			GL.LoadPixelMatrix();
 			GL.Begin( GL.LINES );
 			
-			// Draw axis!
+			// Draw the axis!
 			GL.Color( Color.cyan );
 			
 			// x axis
@@ -79,14 +74,16 @@ namespace BaseFramework.UnityWiki
 			GL.Vertex3( xOffset, position.y, 0.0f );
 			GL.Vertex3( xOffset, position.y + position.height, 0.0f  );
 			
-			for( int chan = 0; chan < channels.Length; chan++ )
+			// Examine all channels in the graph
+			for( int channelIndex = 0; channelIndex < graph.Channels.Length; channelIndex++ )
 			{
-				Channel C = channels[ chan ];
+				// Grab the current channel as C
+				Channel C = graph.Channels[ channelIndex ];
 				
 				// Should never happen. Log an error if it does.
 				if( C == null )
 				{
-					Debug.LogError( "Channel [" + chan +"] is of null value." );
+					Debug.LogError( "Channel [" + channelIndex +"] is of null value." );
 					continue;
 				}
 	 			
@@ -102,10 +99,10 @@ namespace BaseFramework.UnityWiki
 				int lastY = yOffset;
 				
 				// Now we begin processing each sample for the current window
-				for( int dataIndex = 1; dataIndex < graph.WindowWidth; dataIndex++ )
+				for( int dataIndex = 0; dataIndex < graph.WindowWidth; dataIndex++ )
 				{
 					// We don't want no out of range exceptions!
-					if (dataIndex + graph.X_Offset >= C.Data.Length)
+					if (dataIndex + graph.X_Offset > C.Data.Length - 1)
 						break;
 					
 					// Retrieve the amplitude

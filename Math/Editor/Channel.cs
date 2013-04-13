@@ -1,7 +1,13 @@
 using UnityEngine;
 
-namespace BaseFramework.UnityWiki
+namespace BaseFramework.Math
 {
+	/// <summary>
+	/// A Channel that holds data for a Graph object.
+	/// 
+	/// TODO : Improvements to the Data format such that it can contain an X, Y, and Z value.
+	/// 	   This would require modifications to the EditorGraph.DrawGraph function also.
+	/// </summary>
 	public class Channel
 	{
 		public bool isActive = false;
@@ -19,17 +25,7 @@ namespace BaseFramework.UnityWiki
 		{
 			get { return m_data; }
 			set
-			{
-				m_data = new float[ value.Length ];
-				float maxValue = 1.0f;
-				for ( int i=0; i<value.Length;i++ )
-				{
-					m_data[ i ] = value[ i ];
-					maxValue = Mathf.Abs( value[ i ] ) > maxValue ? Mathf.Abs( value[ i ] ) : maxValue;
-				}
-				for ( int i=0; i<m_data.Length; i++ )
-					m_data[ i ] /= maxValue;
-			}
+			{ m_data = value; }
 		}
 		
 		public Color Colour
