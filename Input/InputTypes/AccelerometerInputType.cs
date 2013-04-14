@@ -33,7 +33,7 @@ namespace BaseFramework.InputManager
 			int nEvents = Input.accelerationEventCount;
 			for (int eventIndex=0; eventIndex<nEvents; eventIndex++)
 			{
-				AccelerationEvent accelEvent = Input.accelerationEvents[eventIndex];
+				//AccelerationEvent accelEvent = Input.accelerationEvents[eventIndex];
 				
 				//InputData temp = new InputData();
 				//temp.Active = true;

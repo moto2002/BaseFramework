@@ -3,9 +3,9 @@ using System.Collections;
 
 namespace BaseFramework
 {
+	[RequireComponent( typeof( Camera ) )]
 	public class FirstPersonCameraController : MonoBehaviour
 	{
-		public Transform CameraTransform;
 		public Transform CharacterTransform;
 		
 		public bool InvertX = false;
@@ -16,11 +16,6 @@ namespace BaseFramework
 		
 		void Start ()
 		{
-			if (CameraTransform == null)
-			{
-				Debug.LogError ("CameraTransform is null!", this);
-			}
-			
 			if (CharacterTransform == null)
 			{
 				Debug.LogError ("CharacterTransform is null!", this);
@@ -50,7 +45,7 @@ namespace BaseFramework
 			//x *= Time.deltaTime;
 			//y *= Time.deltaTime;
 			
-			CameraTransform.Rotate (y, 0, 0, Space.Self);
+			transform.Rotate (y, 0, 0, Space.Self); // todo : should rotate about a point.
 			CharacterTransform.Rotate (0, x, 0, Space.Self);
 		}
 	}
