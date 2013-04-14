@@ -90,7 +90,49 @@ namespace BaseFramework.Math
 		
 		#endregion
 		
-		#region Window Functions
+		#region Impulse Response Functions
+		
+		/// <summary>
+		/// Calculates the first difference of an input signal, x. The amplitude of each point in the
+		/// first difference is equal to the gradient of the corresponding sample from the input signal.
+		/// </summary>
+		/// <returns>
+		/// The first difference of a signal.
+		/// </returns>
+		/// <param name='x'>
+		/// An input signal, x.
+		/// </param>
+		public static float[] FirstDifference( float[] x )
+		{
+			int N = x.Length;
+			float[] y = new float[ N ];
+			for (int k = 1; k < N; k++)
+			{
+				y[ k ] = x[ k ] - x[ k - 1 ];
+			}
+			return y;
+		}
+		
+		/// <summary>
+		/// Calculates the running sum of an input signal.
+		/// </summary>
+		/// <returns>
+		/// The running sum.
+		/// </returns>
+		/// <param name='x'>
+		/// An input signal, x.
+		/// </param>
+		public static float[] RunningSum( float[] x )
+		{
+			int N = x.Length;
+			float[] y = new float[ N ];
+			y[ 0 ] = x[ 0 ];
+			for (int k = 1; k < N;  k++)
+			{
+				y[ k ] = x[ k ] + y[ k - 1 ];
+			}
+			return y;
+		}
 		
 //		public static HammingWindow
 		
