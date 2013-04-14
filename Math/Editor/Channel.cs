@@ -24,8 +24,7 @@ namespace BaseFramework.Math
 		public float[] Data
 		{
 			get { return m_data; }
-			set
-			{ m_data = value; }
+			set { m_data = value; }
 		}
 		
 		public Color Colour

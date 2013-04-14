@@ -5,6 +5,98 @@ namespace BaseFramework.Math
 {
 	public static class BaseDSP
 	{
+		#region Utility Functions
+		
+		/// <summary>
+		/// Returns the signal to noise ratio of a signal from provided samples..
+		/// </summary>
+		/// <returns>
+		/// The to noise ratio.
+		/// </returns>
+		/// <param name='sampleData'>
+		/// Data.
+		/// </param>
+		public static float SignalToNoiseRatio( float[] sampleData )
+		{
+			return BaseMath.MeanAverage( sampleData ) / BaseMath.StandardDeviation( sampleData );
+		}
+		
+		/// <summary>
+		/// The typical error of a signal as calculated from provided samples.
+		/// The typical error is defined as ?
+		/// </summary>
+		/// <returns>
+		/// The error.
+		/// </returns>
+		/// <param name='sampleData'>
+		/// Data.
+		/// </param>
+		public static float TypicalError( float[] sampleData )
+		{
+			return BaseMath.StandardDeviation( sampleData ) / Mathf.Pow( sampleData.Length, 0.5f );
+		}
+		
+		#endregion
+		
+		#region Window Functions
+		
+//		public static HammingWindow
+		
+		#endregion
+		
+		#region Decomposition Methods
+		
+		/// <summary>
+		/// Decomposes a signal x into its corresponding even symmetry.
+		/// An even symmetry is defined as an N point signal that forms a mirror image of itself at N/2.
+		/// </summary>
+		/// <returns>
+		/// The even symmetry decomposition of signal x.
+		/// </returns>
+		/// <param name='x'>
+		/// A signal, x.
+		/// </param>
+		public static float[] EvenDecomposition( float[] x )
+		{
+			int N = x.Length;
+			float[] E = new float[ N ];
+			for (int n = 0; n < N; n++)
+			{
+				E[ n ] = ( x[ n ] + x[ N - n ] ) / 2;
+			}
+			return E;
+		}
+		
+		/// <summary>
+		/// Decomposes a signal x into its corresponding odd symetry form.
+		/// An odd symmetry is defined as an N point signal that forms a mirror image of opposite magnitudes at N/2.
+		/// </summary>
+		/// <returns>
+		/// The odd symmetry decomposition of signal x.
+		/// </returns>
+		/// <param name='x'>
+		/// A signal, x.
+		/// </param>
+		public static float[] OddDecomposition( float[] x )
+		{
+			int N = x.Length;
+			float[] O = new float[ N ];
+			for (int n = 0; n < N; n++)
+			{
+				O[ n ] = ( x[ n ] - x[ N - n ] ) / 2;
+			}
+			return O;
+		}
+		
+		/// <summary>
+		/// Fasts the fourier transform.
+		/// </summary>
+		/// <returns>
+		/// The fourier transform.
+		/// </returns>
+		/// <param name='realData'>
+		/// Real data.
+		/// </param>
 		public static ComplexNumber[] FastFourierTransform( float[] realData )
 		{
 			ComplexNumber[] x = new ComplexNumber[ realData.Length ];
@@ -15,6 +107,15 @@ namespace BaseFramework.Math
 			return FastFourierTransform( x );
 		}
 		
+		/// <summary>
+		/// Fasts the fourier transform.
+		/// </summary>
+		/// <returns>
+		/// The fourier transform.
+		/// </returns>
+		/// <param name='x'>
+		/// X.
+		/// </param>
 		public static ComplexNumber[] FastFourierTransform( ComplexNumber[] x )
 		{
 			int N = x.Length; // The total number of samples
@@ -60,32 +161,6 @@ namespace BaseFramework.Math
 			return X;
 		}
 		
-		/// <summary>
-		/// Returns the signal to noise ratio of a siganl from provided samples..
-		/// </summary>
-		/// <returns>
-		/// The to noise ratio.
-		/// </returns>
-		/// <param name='sampleData'>
-		/// Data.
-		/// </param>
-		public static float SignalToNoiseRatio( float[] sampleData )
-		{
-			return BaseMath.MeanAverage( sampleData ) / BaseMath.StandardDeviation( sampleData );
-		}
-		
-		/// <summary>
-		/// The typical error of a signal as calculated from provided samples.
-		/// </summary>
-		/// <returns>
-		/// The error.
-		/// </returns>
-		/// <param name='sampleData'>
-		/// Data.
-		/// </param>
-		public static float TypicalError( float[] sampleData )
-		{
-			return BaseMath.StandardDeviation( sampleData ) / Mathf.Pow( sampleData.Length, 0.5f );
-		}
+		#endregion
 	}
 }

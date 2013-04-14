@@ -46,13 +46,15 @@ namespace BaseFramework.Math
 		public float Max_Y
 		{
 			get { return m_yMax; }
-			set { m_yMax = Mathf.Max( value, 0 ); } //m_yMin ); }
+			set { m_yMax = Mathf.Max( value, 0 ); }
+			//set { m_yMax = Mathf.Max( value, m_yMin ); }
 		}
 		
 		public float Min_Y
 		{
 			get { return m_yMin; }
-			set { m_yMin = Mathf.Min( value, 0 ); } //m_yMax ); }
+			set { m_yMin = Mathf.Min( value, 0 ); }
+			//set { m_yMin = Mathf.Min( value, m_yMax ); }
 		}
 		
 		private int m_xPos;
