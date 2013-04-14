@@ -14,9 +14,9 @@ namespace BaseFramework.InputManager
 		public delegate void InputEvent (InputData f);
 		
 		// InputEvents thrown
-		public event InputEvent InputStart;
-		public event InputEvent InputUpdate;
-		public event InputEvent InputEnd;
+		public event InputEvent OnInputStart;
+		public event InputEvent OnInputTick;
+		public event InputEvent OnInputEnd;
 		
 		private void Start ()
 		{
@@ -40,23 +40,22 @@ namespace BaseFramework.InputManager
 			go.name = typeof(T).Name;
 		}
 		
-		private void InputStarted (InputData data)
+		private void InputStart (InputData data)
 		{
-			if (InputStart != null)
-				InputStart (data);
-			
+			if (OnInputStart != null)
+				OnInputStart (data);
 		}
 		
-		private void InputChanged (InputData data)
+		private void InputTick (InputData data)
 		{
-			if (InputUpdate != null)
-				InputUpdate (data);
+			if (OnInputTick != null)
+				OnInputTick (data);
 		}
 		
-		private void InputStopped (InputData data)
+		private void InputEnd (InputData data)
 		{
-			if (InputEnd != null)
-				InputEnd (data);
+			if (OnInputEnd != null)
+				OnInputEnd (data);
 		}
 	}
 }

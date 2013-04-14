@@ -34,21 +34,21 @@ namespace BaseFramework.InputManager
 					case TouchPhase.Began:
 					{
 					
-						InputBegin (data);
+						OnInput (data, InputEventType.InputStart);
 						break;
 					}
 					
 					case TouchPhase.Ended:
 					case TouchPhase.Canceled:
 					{
-						InputEnd (data);
+						OnInput (data, InputEventType.InputEnd);
 						break;
 					}
 						
 					case TouchPhase.Stationary:	
 					case TouchPhase.Moved:
 					{
-						InputTick (data);
+						OnInput (data, InputEventType.InputTick);
 						break;
 					}
 				}

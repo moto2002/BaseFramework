@@ -39,15 +39,15 @@ namespace BaseFramework.InputManager
 				
 				if (!before.Active && m_data[i].Active)
 				{
-					InputBegin (m_data[i]);
+					OnInput (m_data[i], InputEventType.InputStart);
 				}
 				if (!m_data[i].Equals (before))
 				{
-					InputTick (m_data[i]);
+					OnInput (m_data[i], InputEventType.InputTick);
 				}
 				else if (m_data[i].Equals (before))
 				{
-					InputEnd (m_data[i]);
+					OnInput (m_data[i], InputEventType.InputEnd);
 				}
 			}
 			//*/

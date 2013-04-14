@@ -51,19 +51,19 @@ namespace BaseFramework.InputManager
 			return InputMethod.MouseInput | InputMethod.TouchInput;
 		}
 		
-		public override void InputBegan (InputData data)
+		public override void OnInputStart (InputData data)
 		{
 			if (InputIntersects (data.Focus))
 				SendMessageUpwards ("WasTouched", SendMessageOptions.DontRequireReceiver);
 		}
 		
-		public override void InputChanged (InputData data)
+		public override void OnInputTick (InputData data)
 		{
 			if (InputIntersects (data.Focus))
 				SendMessageUpwards ("IsBeingTouched", SendMessageOptions.DontRequireReceiver);
 		}
 		
-		public override void InputStopped (InputData data)
+		public override void OnInputEnd (InputData data)
 		{
 			if (InputIntersects (data.Focus))
 				SendMessageUpwards ("StoppedTouching", SendMessageOptions.DontRequireReceiver);
