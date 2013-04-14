@@ -36,6 +36,58 @@ namespace BaseFramework.Math
 			return BaseMath.StandardDeviation( sampleData ) / Mathf.Pow( sampleData.Length, 0.5f );
 		}
 		
+		/// <summary>
+		/// Convolute the floating point arrays x and h, using the Input Side Algorithm.
+		/// </summary>
+		/// <returns>
+		/// The convoluted product of x and h.
+		/// </returns>
+		/// <param name='x'>
+		/// The input signal, X.
+		/// </param>
+		/// <param name='h'>
+		/// The impulse response, H.
+		/// </param>
+		public static float[] ConvolutionSum_InputSide( float[] x, float[] h )
+		{
+			float[] y = new float[ x.Length + h.Length ];
+			for (int i=0; i<x.Length; i++)
+			{
+				for (int j=0; j<h.Length; j++)
+				{
+					y[ i + j ] += x[ i ] * h[ j ];
+				}
+			}
+			return y;
+		}
+		
+		/// <summary>
+		/// Convolute the floating point arrays x and h, using the Output Side Algorithm.
+		/// </summary>
+		/// <returns>
+		/// The convoluted product of x and h.
+		/// </returns>
+		/// <param name='x'>
+		/// The input signal, X.
+		/// </param>
+		/// <param name='h'>
+		/// The impulse response, H.
+		/// </param>
+		public static float[] ConvolutionSum_OutputSide( float[] x, float[] h )
+		{
+			int N = x.Length + h.Length;
+			float[] y = new float[ N ];
+			for (int i=0; i<N; i++)
+			{
+				for (int j=0; j<h.Length; j++)
+				{
+					if ( i-j >= 0 && i-j < x.Length)
+						y[ i ] += h[ j ] * x[ i - j ];
+				}
+			}
+			return y;
+		}
+		
 		#endregion
 		
 		#region Window Functions
