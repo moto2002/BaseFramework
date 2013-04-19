@@ -224,8 +224,6 @@ namespace BaseFramework.Math
 			ComplexNumber[] D = new ComplexNumber[ N/2 ];
 			for (int i=0; i<N/2; i++)
 			{
-				//E[ i ] = x[ i ];
-				//D[ i ] = x[ i + N / 2 ];
 				E[ i ] = x[ 2 * i ];
 				D[ i ] = x[ 2 * i + 1 ];
 			}
