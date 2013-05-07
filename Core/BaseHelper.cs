@@ -1,17 +1,20 @@
 using UnityEngine;
 using System.Collections;
 
-public static class BaseHelper
+namespace BaseFramework.Core
 {
-	public static Transform GetRootParent (Transform childTransform)
+	public static class BaseHelper
 	{
-		Transform root = childTransform;
-		
-		while (root.parent != null)
+		public static Transform GetRootParent( Transform childTransform ) // todo : make extensdion method
 		{
-			root = root.parent;
+			Transform root = childTransform;
+			
+			while (root.parent != null)
+			{
+				root = root.parent;
+			}
+			
+			return root;
 		}
-		
-		return root;
 	}
 }
