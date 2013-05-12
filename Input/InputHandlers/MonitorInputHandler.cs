@@ -66,7 +66,7 @@ namespace BaseFramework.InputManager
 		private void DrawInput (InputData data)
 		{
 			string dataName = "default";
-			GUILayoutOption[][] layoutOptions = GetLayoutOptions (data);
+//			GUILayoutOption[][] layoutOptions = GetLayoutOptions (data);
 			
 			switch (data.Type)
 			{

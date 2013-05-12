@@ -7,11 +7,11 @@ namespace BaseFramework
 	[CustomEditor (typeof (Sunlight))]
 	public class SunlightEditor : Editor
 	{
-		SerializedProperty m_radius;
+//		SerializedProperty m_radius;
 		
 		void OnEnable ()
 		{
-			m_radius = serializedObject.FindProperty ("OrbitRadius");
+//			m_radius = serializedObject.FindProperty ("OrbitRadius");
 		}
 		
 		void OnInspecterGUI ()
