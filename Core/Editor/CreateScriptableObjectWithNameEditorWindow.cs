@@ -25,11 +25,10 @@ namespace BaseFramework.Utils
 				return;
 			}
 			
-			
-//			m_info = EditorGUILayout.PropertyField( m_info );
+			//TODO: Create a "Make Another" checkbox.
 			
 			m_assetName = EditorGUILayout.TextField( "Asset Name", m_assetName );
-			m_assetPath = EditorGUILayout.TextField( "Asset Path", m_assetPath );
+			m_assetPath = BaseEditorGUILayout.AssetPathField( "Asset Path", m_assetPath );
 			
 			bool OK = GUILayout.Button( "Create" );
 			
@@ -38,7 +37,7 @@ namespace BaseFramework.Utils
 				!string.IsNullOrEmpty( m_assetPath ) )
 			{
 				ScriptableObject obj = ScriptableObject.CreateInstance( m_scriptableObjectType ) as ScriptableObject;
-				AssetDatabase.CreateAsset( obj, m_assetPath + m_assetName + ".asset" );
+				AssetDatabase.CreateAsset( obj, Application.dataPath + '/' + m_assetPath + m_assetName + ".asset" );
 				Close();
 			}
 		}
@@ -46,6 +45,5 @@ namespace BaseFramework.Utils
 		private static Type m_scriptableObjectType;
 		private string m_assetName;
 		private string m_assetPath;
-//		private SerializedDirectoryInfo m_info; // TODO: Directory Drop down property
 	}
 }
