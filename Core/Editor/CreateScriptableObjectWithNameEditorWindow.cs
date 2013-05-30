@@ -32,12 +32,10 @@ namespace BaseFramework.Utils
 			
 			bool OK = GUILayout.Button( "Create" );
 			
-			if ( OK &&
-				!string.IsNullOrEmpty( m_assetName ) && 
-				!string.IsNullOrEmpty( m_assetPath ) )
+			if ( OK && !string.IsNullOrEmpty( m_assetName ) )
 			{
 				ScriptableObject obj = ScriptableObject.CreateInstance( m_scriptableObjectType ) as ScriptableObject;
-				AssetDatabase.CreateAsset( obj, Application.dataPath + '/' + m_assetPath + m_assetName + ".asset" );
+				AssetDatabase.CreateAsset( obj, "Assets/" + m_assetPath + m_assetName + ".asset" );
 				Close();
 			}
 		}
