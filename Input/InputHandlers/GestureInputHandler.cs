@@ -1,13 +1,18 @@
 using UnityEngine;
-using System.Collections;
+using System.Collections.Generic;
 
 
 namespace BaseFramework.InputManager
 {
-	//TODO: There should only ever be one GestureInputHandler, and it should notify objects of Gesture updates.
 	public class GestureInputHandler : InputHandler
 	{
-		public Gesture[] registeredGestures;
+		protected override void InitialiseInputHandler ()
+		{
+			registeredGestures = new List<Gesture>();
+			registeredGestures.Add( new SwipeGesture() );
+			
+			m_touches = new List<InputData>();
+		}
 		
 		protected override InputMethod ValidInputMethods()
 		{
@@ -16,26 +21,35 @@ namespace BaseFramework.InputManager
 		
 		public override void OnInputStart( InputData data )
 		{
-			for ( int gIndex = 0; gIndex < registeredGestures.Length; gIndex++ )
-			{
-				registeredGestures[ gIndex ].RegisterTouch( data );
-			}
+			m_touches.Add( data );
 		}
 		
 		public override void OnInputTick( InputData data )
 		{
-			for ( int gIndex = 0; gIndex < registeredGestures.Length; gIndex++ )
+			for ( int gIndex = 0; gIndex < registeredGestures.Count; gIndex++ )
 			{
-				registeredGestures[ gIndex ].UpdateGesture( ); //TODO: Something with this result
+				Gesture g = registeredGestures[ gIndex ];
+				if ( g.NumberOfTouchesRequiredForGesture() == m_touches.Count )
+				{
+					g.UpdateGesture( m_touches.ToArray() ); //TODO: Something with this result
+				}
 			}
 		}
 		
 		public override void OnInputEnd( InputData data )
 		{
-			for ( int gIndex = 0; gIndex < registeredGestures.Length; gIndex++ )
+			for ( int gIndex = 0; gIndex < registeredGestures.Count; gIndex++ )
 			{
-				registeredGestures[ gIndex ].DeregisterTouch( data );
+				Gesture g = registeredGestures[ gIndex ];
+				if ( g.NumberOfTouchesRequiredForGesture() == m_touches.Count )
+				{
+					g.UpdateGesture( m_touches.ToArray() ); //TODO: Something with this result
+				}
 			}
+			m_touches.Remove( data );
 		}
+		
+		private List<Gesture> registeredGestures;
+		private List<InputData> m_touches;
 	}
 }

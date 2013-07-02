@@ -4,7 +4,7 @@ using System.Collections;
 
 namespace BaseFramework.InputManager
 {
-	public abstract class InputHandler : MonoBehaviour
+	public abstract class InputHandler : MonoSingleton<InputHandler>
 	{
 		private InputManager m_input;
 		private InputMethod m_validInputMethods;

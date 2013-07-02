@@ -12,17 +12,12 @@ namespace BaseFramework.InputManager
 	/// </summary>
 	public class SwipeGesture : Gesture
 	{
-		public override void RegisterTouch (InputData t)
+		public override int NumberOfTouchesRequiredForGesture ()
 		{
-			throw new System.NotImplementedException ();
+			throw new NotImplementedException ();
 		}
 		
-		public override Vector2 DeregisterTouch (InputData t)
-		{
-			throw new System.NotImplementedException ();
-		}
-		
-		public override Vector2 UpdateGesture ()
+		public override Vector2 UpdateGesture( InputData[] data )
 		{
 			throw new System.NotImplementedException ();
 		}

@@ -6,19 +6,14 @@ namespace BaseFramework.InputManager
 {
 	public class OrbitGesture : Gesture
 	{
-		public override void RegisterTouch (InputData t)
+		public override int NumberOfTouchesRequiredForGesture( )
 		{
-			throw new NotImplementedException ();
+			throw new NotImplementedException();
 		}
 		
-		public override Vector2 DeregisterTouch (InputData t)
+		public override Vector2 UpdateGesture( InputData[] data )
 		{
-			throw new NotImplementedException ();
-		}
-		
-		public override Vector2 UpdateGesture ()
-		{
-			throw new NotImplementedException ();
+			throw new NotImplementedException();
 		}
 	}
 }

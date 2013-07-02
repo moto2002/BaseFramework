@@ -17,17 +17,12 @@ namespace BaseFramework.InputManager
 	/// </summary>
 	public class CustomGesture : Gesture
 	{
-		public override void RegisterTouch (InputData t)
+		public override int NumberOfTouchesRequiredForGesture ()
 		{
 			throw new NotImplementedException ();
 		}
 		
-		public override Vector2 DeregisterTouch (InputData t)
-		{
-			throw new NotImplementedException ();
-		}
-		
-		public override Vector2 UpdateGesture ()
+		public override Vector2 UpdateGesture( InputData[] data )
 		{
 			throw new NotImplementedException ();
 		}
