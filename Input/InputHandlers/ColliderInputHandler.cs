@@ -20,10 +20,8 @@ namespace BaseFramework.InputManager
 		private Collider[] m_colliders;
 		private Camera m_camera; // todo : better camera support?
 		
-		protected override void Start ()
+		protected override void InitialiseInputHandler ()
 		{
-			base.Start();
-			
 			m_colliders = GetComponentsInChildren<Collider>(true);
 			m_camera = Camera.mainCamera;
 		}

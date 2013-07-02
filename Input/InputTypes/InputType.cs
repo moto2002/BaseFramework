@@ -39,24 +39,22 @@ namespace BaseFramework.InputManager
 			"InputEnd"
 		};
 		
-		
 		protected void OnInput (InputData data, InputEventType type)
 		{
 			try
 			{
 				string message = MESSAGE_TYPES[(int)type];
-				
-				if (!string.IsNullOrEmpty (message))
-					SendMessageUpwards (message, data);
+				if (!string.IsNullOrEmpty( message ))
+				{
+					SendMessageUpwards( message, data );
+				}
 			}
-			catch (IndexOutOfRangeException e)
+			catch( IndexOutOfRangeException e )
 			{
-				Debug.LogError ("No message defined for InputEventType "+type.ToString());
-				Debug.LogError (e.Message);
+				Debug.LogError( "No message defined for InputEventType " + type.ToString() );
+				Debug.LogError( e.Message );
 				return;
 			}
-			
-			
 		}
 	}
 }

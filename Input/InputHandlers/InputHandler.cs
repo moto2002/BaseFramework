@@ -1,6 +1,7 @@
 using UnityEngine;
 using System.Collections;
 
+
 namespace BaseFramework.InputManager
 {
 	public abstract class InputHandler : MonoBehaviour
@@ -11,52 +12,63 @@ namespace BaseFramework.InputManager
 		#region Abstract Methods
 		
 		protected abstract InputMethod ValidInputMethods();
+		protected virtual void InitialiseInputHandler() { }
+		protected virtual void DestroyInputHandler() { }
 		
-		public abstract void OnInputStart (InputData f);
-		public abstract void OnInputTick (InputData f);
-		public abstract void OnInputEnd (InputData f);
+		public abstract void OnInputStart( InputData f );
+		public abstract void OnInputTick( InputData f );
+		public abstract void OnInputEnd( InputData f );
 		
 		#endregion
 		
-		protected virtual void Start  ()
+		private void Start( )
 		{
-			m_validInputMethods = ValidInputMethods();
+			m_validInputMethods = ValidInputMethods( );
 			
 			m_input = InputManager.Instance;
 			
 			m_input.OnInputStart += InputBeganWrapper;
 			m_input.OnInputTick += InputChangedWrapper;
 			m_input.OnInputEnd += InputStoppedWrapper;
+			
+			InitialiseInputHandler( );
 		}
 		
-		protected virtual void OnDestroy ()
+		private void OnDestroy( )
 		{
 			m_input.OnInputStart -= InputBeganWrapper;
 			m_input.OnInputTick -= InputChangedWrapper;
 			m_input.OnInputEnd -= InputStoppedWrapper;
+			
+			DestroyInputHandler( );
 		}
 		
-		public void InputBeganWrapper (InputData f)
+		private bool AcceptsInputMethod( InputData data )
 		{
-			if ((m_validInputMethods & f.Type) != InputMethod.None)
+			return ( m_validInputMethods & data.Type ) != InputMethod.None;
+		}
+		
+		public void InputBeganWrapper( InputData data )
+		{
+			if ( AcceptsInputMethod( data ) )
 			{
-				OnInputStart (f);
+				OnInputStart( data );
 			}
 		}
 		
-		public void InputChangedWrapper (InputData f)
+		public void InputChangedWrapper( InputData data )
 		{
-			if ((m_validInputMethods & f.Type) != InputMethod.None)
+			if ( AcceptsInputMethod( data ) )
 			{
-				OnInputTick (f);
+				OnInputTick( data );
 			}
 		}
 		
-		public void InputStoppedWrapper (InputData f)
+		public void InputStoppedWrapper( InputData data )
 		{
-			if ((m_validInputMethods & f.Type) != InputMethod.None)
+			if ( AcceptsInputMethod( data ) )
 			{
-				OnInputEnd (f);
+				OnInputEnd( data );
 			}
 		}
 	}

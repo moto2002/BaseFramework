@@ -1,6 +1,7 @@
 using UnityEngine;
 using System.Collections.Generic;
 
+
 namespace BaseFramework.InputManager
 {
 	/// <summary>

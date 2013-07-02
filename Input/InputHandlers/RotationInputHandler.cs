@@ -11,9 +11,8 @@ namespace BaseFramework.InputManager
 	{
 //		private Quaternion m_initialRotation;
 		
-		protected override void Start()
+		protected override void InitialiseInputHandler ()
 		{
-			base.Start();
 //			m_initialRotation = Quaternion.identity; // todo : make editable
 		}
 		

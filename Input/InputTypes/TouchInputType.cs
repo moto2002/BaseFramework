@@ -4,89 +4,98 @@ using System.Collections;
 namespace BaseFramework.InputManager
 {
 	/// <summary>
-	/// Touch input type. Terrible Implementation!!
+	/// Touch input type.
 	/// 
-	/// TODO : REDO TouchInputType. SRSLY!
+	/// TODO: Handle maxTouches here? Surely thats not an InputType thing, but an InputHandler thing?
+	/// TODO: fingerID represented in the InputData somehow? May be useful for an InputHandler to know which finger is which.
 	/// </summary>
 	public class TouchInputType : InputType
 	{
-		public int m_id;
-		public float m_deltaTime;
-		public Vector2 m_position;
-		public Vector2 m_deltaPos;
-		public TouchPhase m_phase;
+		private int maxTouchesToDetect = 2;
+		private InputData[] touchInput;
 		
-		void Start ()
+		#region Properties
+		
+		public int TouchesToDetect
 		{
+			get { return maxTouchesToDetect; }
+			set
+			{
+				maxTouchesToDetect = Mathf.Clamp( value, 1, 5 );
+				touchInput = new InputData[ maxTouchesToDetect ];
+				for ( int i = 0; i < touchInput.Length; i++ )
+				{
+					touchInput[ i ] = new InputData();
+				}
+			}
 		}
 		
-		void Update() // todo : different forms of input
+		#endregion
+		
+		#region Monobehaviour Overrides
+		
+		void Update()
 		{
-			int nTouches = Input.touchCount;
-			
-			for (int i=0; i<nTouches; i++)
+			for ( int i = 0; i < Input.touchCount; i++ )
 			{
-				// todo (efficiency) : Only Update when there has been a change?
-				InputData data = WrapTouch ( Input.touches[i] );
+				Touch t = Input.touches[ i ];
 				
-				switch (Input.touches[i].phase)
+				if ( t.fingerId >= maxTouchesToDetect )
 				{
-					case TouchPhase.Began:
+					// Not detecting this finger.
+				}
+				else
+				{
+					if ( ProcessTouchToData( touchInput[ t.fingerId ], t ) )
 					{
-					
-						OnInput (data, InputEventType.InputStart);
-						break;
-					}
-					
-					case TouchPhase.Ended:
-					case TouchPhase.Canceled:
-					{
-						OnInput (data, InputEventType.InputEnd);
-						break;
-					}
-						
-					case TouchPhase.Stationary:	
-					case TouchPhase.Moved:
-					{
-						OnInput (data, InputEventType.InputTick);
-						break;
+						switch ( t.phase )
+						{
+							case TouchPhase.Began:
+							{
+								OnInput ( touchInput[ t.fingerId ], InputEventType.InputStart );
+								break;
+							}
+							
+							case TouchPhase.Ended:
+							case TouchPhase.Canceled:
+							{
+								OnInput ( touchInput[ t.fingerId ], InputEventType.InputEnd );
+								ResetTouch( touchInput[ t.fingerId ] );
+								break;
+							}
+								
+							case TouchPhase.Stationary:	
+							case TouchPhase.Moved:
+							{
+								OnInput ( touchInput[ t.fingerId ], InputEventType.InputTick );
+								break;
+							}
+						}
 					}
 				}
 			}
 		}
 		
-		InputData WrapTouch (Touch t)
+		#endregion
+		
+		#region Helper Methods
+		
+		private void ResetTouch( InputData data )
 		{
-			InputData f = new InputData();
-			f.Type = InputMethod.TouchInput;
-			f.Focus = t.position;
-			
-			/*
-			f.m_id 	= t.fingerId;
-			f.m_phase = t.phase;
-			f.m_position = t.position;
-			f.m_deltaTime = t.deltaTime;
-			f.m_deltaPos = t.deltaPosition;
-			*/
-			
-			return f;
+			data.Active = false;
+			data.Focus  = Vector3.zero;
+			data.Type   = InputMethod.None;
 		}
 		
-		bool UpdateFinger (InputData f, Touch t)
+		private bool ProcessTouchToData( InputData data, Touch touch )
 		{
-			/*
-			bool changed =
-				f.m_phase != t.phase ||
-				f.m_position != t.position ||
-				f.m_deltaTime != t.deltaTime ||
-				f.m_deltaPos != t.deltaPosition;
+			data.Active = touch.phase != TouchPhase.Canceled && touch.phase != TouchPhase.Ended;
+			data.Focus  = touch.position;
+			data.Type   = InputMethod.TouchInput;
 			
-			f.m_phase = t.phase;
-			f.m_position = t.position;
-			f.m_deltaTime = t.deltaTime;
-			f.m_deltaPos = t.deltaPosition;
-			*/
-			return false;
+			return true;
 		}
+		
+		#endregion
 	}
 }
