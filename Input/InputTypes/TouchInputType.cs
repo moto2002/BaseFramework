@@ -11,11 +11,16 @@ namespace BaseFramework.InputManager
 	/// </summary>
 	public class TouchInputType : InputType
 	{
-		private int maxTouchesToDetect = 2;
-		private InputData[] touchInput;
+		public static string[] TouchPhases =
+		{
+			"PHASE_BEGAN",
+			"PHASE_MOVED",
+			"PHASE_STATIONARY",
+			"PHASE_ENDED",
+			"PHASE_CANCELLED"
+		};
 		
-		#region Properties
-		
+#region Properties
 		public int TouchesToDetect
 		{
 			get { return maxTouchesToDetect; }
@@ -29,10 +34,26 @@ namespace BaseFramework.InputManager
 				}
 			}
 		}
+#endregion
 		
-		#endregion
+#region Helper Methods
+		private void ResetTouch( InputData data )
+		{
+			data.Active = false;
+			data.Focus  = Vector3.zero;
+			data.Type   = InputMethod.None;
+		}
 		
-		#region Monobehaviour Overrides
+		private bool ProcessTouchToData( InputData data, Touch touch )
+		{
+			data.Active  = touch.phase != TouchPhase.Canceled && touch.phase != TouchPhase.Ended;
+			data.Details = TouchPhases[ (int)touch.phase ];
+			data.Focus   = touch.position;
+			data.Type    = InputMethod.TouchInput;
+			
+			return true;
+		}
+#endregion
 		
 		void Update()
 		{
@@ -76,26 +97,7 @@ namespace BaseFramework.InputManager
 			}
 		}
 		
-		#endregion
-		
-		#region Helper Methods
-		
-		private void ResetTouch( InputData data )
-		{
-			data.Active = false;
-			data.Focus  = Vector3.zero;
-			data.Type   = InputMethod.None;
-		}
-		
-		private bool ProcessTouchToData( InputData data, Touch touch )
-		{
-			data.Active = touch.phase != TouchPhase.Canceled && touch.phase != TouchPhase.Ended;
-			data.Focus  = touch.position;
-			data.Type   = InputMethod.TouchInput;
-			
-			return true;
-		}
-		
-		#endregion
+		private int maxTouchesToDetect = 2;
+		private InputData[] touchInput;
 	}
 }

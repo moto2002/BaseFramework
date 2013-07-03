@@ -19,7 +19,7 @@ namespace BaseFramework.InputManager
 	{
 		public bool Active;
 		public Vector3 Focus;
-		
+		public string Details;
 		public InputMethod Type;
 	}
 	
