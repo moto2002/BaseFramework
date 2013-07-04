@@ -20,7 +20,7 @@ namespace BaseFramework.InputManager
 		public override Vector2 UpdateGesture( InputData[] data )
 		{
 			// Get the one and only touch.
-			if ( data.Length != 1 ) return;
+			if ( data.Length != 1 ) return Vector2.zero;
 			InputData touch = data[0];
 			
 			// Initialise the gesture if the touch has just started
