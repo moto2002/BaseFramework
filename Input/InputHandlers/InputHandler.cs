@@ -1,10 +1,10 @@
+using System;
 using UnityEngine;
-using System.Collections;
 
 
 namespace BaseFramework.InputManager
 {
-	public abstract class InputHandler : MonoSingleton<InputHandler>
+	public abstract class InputHandler
 	{
 		private InputManager m_input;
 		private InputMethod m_validInputMethods;
@@ -12,8 +12,6 @@ namespace BaseFramework.InputManager
 		#region Abstract Methods
 		
 		protected abstract InputMethod ValidInputMethods();
-		protected virtual void InitialiseInputHandler() { }
-		protected virtual void DestroyInputHandler() { }
 		
 		public abstract void OnInputStart( InputData f );
 		public abstract void OnInputTick( InputData f );
@@ -21,7 +19,7 @@ namespace BaseFramework.InputManager
 		
 		#endregion
 		
-		private void Start( )
+		public InputHandler( )
 		{
 			m_validInputMethods = ValidInputMethods( );
 			
@@ -30,8 +28,6 @@ namespace BaseFramework.InputManager
 			m_input.OnInputStart += InputBeganWrapper;
 			m_input.OnInputTick += InputChangedWrapper;
 			m_input.OnInputEnd += InputStoppedWrapper;
-			
-			InitialiseInputHandler( );
 		}
 		
 		private void OnDestroy( )
@@ -39,8 +35,6 @@ namespace BaseFramework.InputManager
 			m_input.OnInputStart -= InputBeganWrapper;
 			m_input.OnInputTick -= InputChangedWrapper;
 			m_input.OnInputEnd -= InputStoppedWrapper;
-			
-			DestroyInputHandler( );
 		}
 		
 		private bool AcceptsInputMethod( InputData data )

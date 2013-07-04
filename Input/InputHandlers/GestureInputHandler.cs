@@ -7,8 +7,8 @@ namespace BaseFramework.InputManager
 {
 	public class GestureInputHandler : InputHandler, INotifier<Vector2>
 	{
-#region InputHandler Implementation
-		protected override void InitialiseInputHandler ()
+		#region InputHandler Implementation
+		public GestureInputHandler( ) : base()
 		{
 			registeredGestures = new List<Gesture>();
 			registeredGestures.Add( new SwipeGesture() );
@@ -38,9 +38,9 @@ namespace BaseFramework.InputManager
 			NotifySubscribers( );
 			m_touches.Remove( data );
 		}
-#endregion
+		#endregion
 		
-#region INotifier Implementation
+		#region INotifier Implementation
 		public bool RegisterSubscription( IObserver<Vector2> subscriber )
 		{
 			if ( m_subscriptions.Contains( subscriber ) )
@@ -80,7 +80,7 @@ namespace BaseFramework.InputManager
 				}
 			}
 		}
-#endregion
+		#endregion
 		
 		private List<InputData> m_touches;
 		private List<Gesture> registeredGestures;

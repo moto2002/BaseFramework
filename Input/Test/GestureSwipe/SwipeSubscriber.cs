@@ -12,7 +12,7 @@ public class SwipeSubscriber : MonoBehaviour, IObserver<Vector2>
 	
 	private void Start()
 	{
-		gestureHandler = (GestureInputHandler)GestureInputHandler.Instance;
+		gestureHandler = InputManager.Instance.RetrieveObject<GestureInputHandler>();
 		gestureHandler.RegisterSubscription( this );
 	}
 	

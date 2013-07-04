@@ -20,23 +20,7 @@ namespace BaseFramework.InputManager
 			"PHASE_CANCELLED"
 		};
 		
-#region Properties
-		public int TouchesToDetect
-		{
-			get { return maxTouchesToDetect; }
-			set
-			{
-				maxTouchesToDetect = Mathf.Clamp( value, 1, 5 );
-				touchInput = new InputData[ maxTouchesToDetect ];
-				for ( int i = 0; i < touchInput.Length; i++ )
-				{
-					touchInput[ i ] = new InputData();
-				}
-			}
-		}
-#endregion
-		
-#region Helper Methods
+		#region Helper Methods
 		private void ResetTouch( InputData data )
 		{
 			data.Active = false;
@@ -44,8 +28,13 @@ namespace BaseFramework.InputManager
 			data.Type   = InputMethod.None;
 		}
 		
-		private bool ProcessTouchToData( InputData data, Touch touch )
+		private bool ProcessTouchToData( ref InputData data, Touch touch )
 		{
+			if ( data == null )
+			{
+				data = new InputData();
+			}
+			
 			data.Active  = touch.phase != TouchPhase.Canceled && touch.phase != TouchPhase.Ended;
 			data.Details = TouchPhases[ (int)touch.phase ];
 			data.Focus   = touch.position;
@@ -53,7 +42,12 @@ namespace BaseFramework.InputManager
 			
 			return true;
 		}
-#endregion
+		#endregion
+		
+		void Start()
+		{
+			touchInput = new InputData[ 5 ];
+		}
 		
 		void Update()
 		{
@@ -61,13 +55,13 @@ namespace BaseFramework.InputManager
 			{
 				Touch t = Input.touches[ i ];
 				
-				if ( t.fingerId >= maxTouchesToDetect )
+//				if ( t.fingerId >= maxTouchesToDetect )
+//				{
+//					// Not detecting this finger.
+//				}
+//				else
 				{
-					// Not detecting this finger.
-				}
-				else
-				{
-					if ( ProcessTouchToData( touchInput[ t.fingerId ], t ) )
+					if ( ProcessTouchToData( ref touchInput[ t.fingerId ], t ) )
 					{
 						switch ( t.phase )
 						{
@@ -97,7 +91,6 @@ namespace BaseFramework.InputManager
 			}
 		}
 		
-		private int maxTouchesToDetect = 2;
 		private InputData[] touchInput;
 	}
 }

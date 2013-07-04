@@ -569,6 +569,7 @@ GameObject:
   - 33: {fileID: 1838894866}
   - 135: {fileID: 1838894865}
   - 23: {fileID: 1838894864}
+  - 114: {fileID: 1838894868}
   m_Layer: 0
   m_Name: SwipeySphere
   m_TagString: Untagged
@@ -627,6 +628,16 @@ Transform:
   m_LocalScale: {x: 1.5, y: 1.5, z: 1.5}
   m_Children: []
   m_Father: {fileID: 0}
+--- !u!114 &1838894868
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1838894863}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 09ca4e0459221434d93f5fb9d67e8b8c, type: 3}
+  m_Name: 
 --- !u!1 &1909301038
 GameObject:
   m_ObjectHideFlags: 0

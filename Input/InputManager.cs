@@ -1,4 +1,5 @@
 using UnityEngine;
+using BaseFramework.Core;
 using System.Collections.Generic;
 
 
@@ -9,7 +10,7 @@ namespace BaseFramework.InputManager
 	/// Complex input could include touch gestures, accelerometer events, and key combinations.
 	/// The input manager also serves as a layer between input and action, making for easier preprocessing.
 	/// </summary>
-	public class InputManager : MonoSingleton<InputManager>
+	public class InputManager : MonoSingleton<InputManager>, IFacade
 	{
 		// InputEvent delegate
 		public delegate void InputEvent (InputData f);
@@ -19,8 +20,13 @@ namespace BaseFramework.InputManager
 		public event InputEvent OnInputTick;
 		public event InputEvent OnInputEnd;
 		
-		private void Start ()
+		private void Awake ()
 		{
+			m_facadeRegistry = new Dictionary<System.Type, object>();
+			
+			GestureInputHandler gestureIHandler = new GestureInputHandler();
+			RegisterObject<GestureInputHandler>( gestureIHandler );
+			
 #if UNITY_EDITOR || UNITY_STANDALONE_OSX || UNITY_STANDALONE_WIN || UNITY_STANDALONE_LINUX
 			AddInput<MouseInputType>();
 			//AddInput<KeyboardInputType>();
@@ -32,6 +38,22 @@ namespace BaseFramework.InputManager
 			AddInput<AccelerometerInputType>();
 #endif
 		}
+		
+		#region IFacade Implementation
+		public T RetrieveObject<T> ()
+		{
+			object result;
+			m_facadeRegistry.TryGetValue( typeof( T ), out result );
+			return (T)result;
+		}
+		
+		public void RegisterObject<T> ( T instance )
+		{
+			m_facadeRegistry.Add( typeof( T ), instance );
+		}
+		
+		private Dictionary<System.Type, object> m_facadeRegistry;
+		#endregion
 		
 		private void AddInput <T> () where T : InputType
 		{
