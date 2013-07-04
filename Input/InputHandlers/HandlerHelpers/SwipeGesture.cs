@@ -14,12 +14,47 @@ namespace BaseFramework.InputManager
 	{
 		public override int NumberOfTouchesRequiredForGesture ()
 		{
-			throw new NotImplementedException ();
+			return 1;
 		}
 		
 		public override Vector2 UpdateGesture( InputData[] data )
 		{
-			throw new System.NotImplementedException ();
+			// Get the one and only touch.
+			if ( data.Length != 1 ) return;
+			InputData touch = data[0];
+			
+			// Initialise the gesture if the touch has just started
+			string beganPhase = TouchInputType.TouchPhases[ (int)TouchPhase.Began ];
+			if ( string.Compare( touch.Details, beganPhase ) == 0 )
+			{
+				m_touchData = touch;
+				m_gestureTime = Time.time;
+				m_result = touch.Focus;
+			}
+			
+			//TODO: Check if swipe gesture is a relatively straight line
+			//TODO: Check if swipe gesture is performed within a certain time limit.
+			if ( m_touchData != null )
+			{
+				
+			}
+			
+			// Calculate & return resulting velocity vector
+			string endPhase = TouchInputType.TouchPhases[ (int)TouchPhase.Ended ];
+			if ( string.Compare( touch.Details, endPhase ) == 0 )
+			{
+				m_gestureTime = Time.time - m_gestureTime;
+				m_result.x = touch.Focus.x - m_result.x;
+				m_result.y = touch.Focus.y - m_result.y;
+				
+				Vector2 velocity = m_result / m_gestureTime;
+				return velocity;
+			}
+			return Vector2.zero;
 		}
+		
+		private float m_gestureTime;
+		private Vector2 m_result;
+		private InputData m_touchData;
 	}
 }
