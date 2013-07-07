@@ -2,7 +2,7 @@ using UnityEngine;
 using UnityEditor;
 using System.Collections.Generic;
 
-namespace BaseFramework
+namespace BaseFramework.Core
 {
 	[CustomEditor (typeof (PrefabPoolManager))]
 	public class PrefabPoolManagerEditor : Editor

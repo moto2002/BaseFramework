@@ -32,11 +32,12 @@ namespace BaseFramework.InputManager
 				m_result = touch.Focus;
 			}
 			
-			//TODO: Check if swipe gesture is a relatively straight line
-			//TODO: Check if swipe gesture is performed within a certain time limit.
 			if ( m_touchData != null )
 			{
+//				Vector3 dir = touch.Focus - m_touchData.Focus;
 				
+				//TODO: Check if swipe gesture is a relatively straight line
+				//TODO: Check if swipe gesture is performed within a certain time limit.
 			}
 			
 			// Calculate & return resulting velocity vector
@@ -52,6 +53,9 @@ namespace BaseFramework.InputManager
 			}
 			return Vector2.zero;
 		}
+		
+//		private static float m_maxTime = 2.0f;
+//		private static float m_maxAngularChangeDeg = 5.0f;
 		
 		private float m_gestureTime;
 		private Vector2 m_result;

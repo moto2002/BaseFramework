@@ -1,30 +1,33 @@
 using UnityEngine;
 using System.Collections.Generic;
 
-public class TrackedMono<T> : MonoBehaviour where T : MonoBehaviour
+namespace BaseFramework.Core
 {
-	private static HashSet<T> m_instances = new HashSet<T>();
-	
-	public HashSet<T> Instances
+	public class TrackedMono<T> : MonoBehaviour where T : MonoBehaviour
 	{
-		get { return m_instances; }
-	}
-	
-	protected virtual void OnEnable()
-	{
-		T component = this as T;
-		if ( component != null )
+		private static HashSet<T> m_instances = new HashSet<T>();
+		
+		public HashSet<T> Instances
 		{
-			m_instances.Add( component );
+			get { return m_instances; }
 		}
-	}
-
-	protected virtual void OnDisable()
-	{
-		T component = this as T;
-		if ( component != null )
+		
+		protected virtual void OnEnable()
 		{
-			m_instances.Remove( component );
+			T component = this as T;
+			if ( component != null )
+			{
+				m_instances.Add( component );
+			}
+		}
+	
+		protected virtual void OnDisable()
+		{
+			T component = this as T;
+			if ( component != null )
+			{
+				m_instances.Remove( component );
+			}
 		}
 	}
 }
