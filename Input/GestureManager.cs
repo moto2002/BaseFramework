@@ -11,64 +11,19 @@ namespace BaseFramework.Gestures
 	{
 		public void AddGesture( GestureRecogniser xGesture )
 		{
-			GestureRecogniser[] xTempArray = m_gestures;
-			int iNewArraySize = xTempArray.Length + 1;
-			
-		  	m_gestures = new GestureRecogniser[ iNewArraySize ];
-			for ( int iGestureIndex = 0; iGestureIndex < iNewArraySize; iGestureIndex++ )
-			{
-				m_gestures[ iGestureIndex ] = xGesture;
-			}
+			m_gestures.Add( xGesture );
 		}
 		
 		public void RemoveGesture( GestureRecogniser xGesture )
 		{
-			int iFoundGestureAtIndex = -1;
-			int iNumberOfGestures = m_gestures.Length;
-			
-			// Search for InputHandler
-			for ( int iGestureIndex = 0; iGestureIndex < iNumberOfGestures; iGestureIndex++ )
-			{
-				GestureRecogniser xThisGesture = m_gestures[ iGestureIndex ];
-				if ( xThisGesture == xGesture )
-				{
-					iFoundGestureAtIndex = iGestureIndex;
-					break;
-				}
-			}
-			
-			// Remove InputHandler if we found it.
-			if ( iFoundGestureAtIndex >= 0 )
-			{
-				GestureRecogniser[] xTempArray = m_gestures;
-				int iNewArraySize = iNumberOfGestures - 1;
-				
-				m_gestures = new GestureRecogniser[ iNewArraySize ];
-				for ( int iGestureIndex = 0; iGestureIndex < iNewArraySize; iGestureIndex++ )
-				{
-					// Check this isn't the Handler to remove
-					if ( iGestureIndex != iFoundGestureAtIndex )
-					{
-						// Make sure we correct the index for InputHandlers who came after the
-						// Handler we are to remove (shift them a space forward in the array)
-						if ( iGestureIndex >= iFoundGestureAtIndex )
-						{
-							m_gestures[ iGestureIndex ] = xTempArray[ iGestureIndex - 1 ];
-						}
-						else
-						{
-							m_gestures[ iGestureIndex ] = xTempArray[ iGestureIndex ];
-						}
-					}
-				}
-			}
+			m_gestures.Remove( xGesture );
 		}
 		
 		private void Awake()
 		{
 			GameObject xCameraGameObject = GameObject.FindGameObjectWithTag( "MainCamera" );
 			m_camera = xCameraGameObject.GetComponent<Camera>();
-			m_gestures = new GestureRecogniser[0];
+			m_gestures = new List<GestureRecogniser>();
 		}
 		
 		private void Update()
@@ -93,9 +48,8 @@ namespace BaseFramework.Gestures
 				bInputCancelled  |= xThisTouchPhase == TouchPhase.Canceled;
 			}
 			
-			for ( int iGestureIndex = 0; iGestureIndex < m_gestures.Length; iGestureIndex++ )
+			foreach ( GestureRecogniser xHandler in m_gestures )
 			{
-				GestureRecogniser xHandler = m_gestures[ iGestureIndex ];
 				int iHandlerTouchesRequired = xHandler.numberOfTouches;
 				switch ( xHandler.gestureState )
 				{
@@ -170,16 +124,23 @@ namespace BaseFramework.Gestures
 				Ray xTouchRay = m_camera.ScreenPointToRay( xTouchPoint );
 				RaycastHit xHitInfo;
 				
-				bool bRaycastHit = xCollider.Raycast( xTouchRay, out xHitInfo, 50.0f );
+				Debug.DrawRay( xTouchRay.origin, xTouchRay.direction * 50.0f, Color.blue, 10.0f );
+				
+				bool bRaycastHit = Physics.Raycast( xTouchRay, out xHitInfo );
+//				bool bRaycastHit = xCollider.Raycast( xTouchRay, out xHitInfo, 50.0f );
 				if ( bRaycastHit )
 				{
-					Vector3 xHitPoint = xHitInfo.point;
-					Bounds xColliderBounds = xCollider.bounds;
-					
-					bool bIntersects = xColliderBounds.Contains( xHitPoint );
-					if ( bIntersects )
+					bool bHitThisCollider = xHitInfo.collider == xCollider;
+					if ( bHitThisCollider )
 					{
-						xValidTouchInput.Add( xThisTouch );
+						Vector3 xHitPoint = xHitInfo.point;
+						Bounds xColliderBounds = xCollider.bounds;
+						
+						bool bIntersects = xColliderBounds.Contains( xHitPoint );
+						if ( bIntersects )
+						{
+							xValidTouchInput.Add( xThisTouch );
+						}
 					}
 				}
 			}
@@ -187,6 +148,6 @@ namespace BaseFramework.Gestures
 		}
 		
 		private Camera m_camera;
-		private GestureRecogniser[] m_gestures;
+		private List<GestureRecogniser> m_gestures;
 	}
 }
