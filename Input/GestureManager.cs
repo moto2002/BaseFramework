@@ -9,6 +9,8 @@ namespace BaseFramework.Gestures
 	/// </summary>
 	public class GestureManager : MonoSingleton<GestureManager>
 	{
+		public static string LAYER_MASK_NAME = "Input";
+		
 		public void AddGesture( GestureRecogniser xGesture )
 		{
 			m_gestures.Add( xGesture );
@@ -126,10 +128,12 @@ namespace BaseFramework.Gestures
 				
 				Debug.DrawRay( xTouchRay.origin, xTouchRay.direction * 50.0f, Color.blue, 10.0f );
 				
-				bool bRaycastHit = Physics.Raycast( xTouchRay, out xHitInfo );
-//				bool bRaycastHit = xCollider.Raycast( xTouchRay, out xHitInfo, 50.0f );
+				int  iLayerMask = 1 << LayerMask.NameToLayer( LAYER_MASK_NAME );
+				bool bRaycastHit = Physics.Raycast( xTouchRay, out xHitInfo, 50.0f, iLayerMask );
+
 				if ( bRaycastHit )
 				{
+					//TODO: Lookup Collider in a Dictionary<Collider, List<GestureRecogniser>>.
 					bool bHitThisCollider = xHitInfo.collider == xCollider;
 					if ( bHitThisCollider )
 					{
