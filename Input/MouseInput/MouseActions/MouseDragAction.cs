@@ -19,25 +19,25 @@ namespace BaseFramework.MouseInput
 			{
 				base.OnButtonPressed( iButtonID );
 				m_startTime = Time.time;
+				state = MouseActionState.MouseActionBegan;
 			}
 		}
 		
 		public override void OnHover( Vector3 xCursorPosition )
 		{
-			if ( state == MouseActionState.MouseActionPossible )
+			if ( state == MouseActionState.MouseActionBegan )
 			{
 				base.OnHover( xCursorPosition );
 				
 				float fCurrentTime = Time.time;
-				float fTimeElapsed = m_startTime - fCurrentTime;
+				float fTimeElapsed = fCurrentTime - m_startTime;
 				
-				if ( fTimeElapsed > m_startTime )
+				if ( fTimeElapsed > beginDelay )
 				{
-					state = MouseActionState.MouseActionBegan;
+					state = MouseActionState.MouseActionChanged;
 				}
 			}
-			else if ( state == MouseActionState.MouseActionBegan ||
-						state == MouseActionState.MouseActionChanged )
+			else if ( state == MouseActionState.MouseActionChanged )
 			{
 				base.OnHover( xCursorPosition );
 				state = MouseActionState.MouseActionChanged;
