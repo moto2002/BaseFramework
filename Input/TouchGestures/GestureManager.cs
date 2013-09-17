@@ -126,8 +126,6 @@ namespace BaseFramework.Gestures
 				Ray xTouchRay = m_camera.ScreenPointToRay( xTouchPoint );
 				RaycastHit xHitInfo;
 				
-				Debug.DrawRay( xTouchRay.origin, xTouchRay.direction * 50.0f, Color.blue, 10.0f );
-				
 				int  iLayerMask = 1 << LayerMask.NameToLayer( LAYER_MASK_NAME );
 				bool bRaycastHit = Physics.Raycast( xTouchRay, out xHitInfo, 50.0f, iLayerMask );
 
