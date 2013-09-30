@@ -7,14 +7,14 @@ using System.Collections.Generic;
 
 namespace BaseFramework.Utils
 {
-	public class BaseEditorGUILayout
+	public class BaseAssetPathControl
 	{
-		public static string AssetPathField( string prefix, string path )
+		public static string New( string prefix, string path )
 		{
-			return AssetPathField( prefix, path, "" );
+			return New( prefix, path, "" );
 		}
 		
-		public static string AssetPathField( string prefix, string path, string fileExtension )
+		public static string New( string prefix, string path, string fileExtension )
 		{
 			List<string> subDirContentsByName = GetAssetRelativeDirectories( "", fileExtension );
 			int foundIndex = subDirContentsByName.FindIndex( x => x.CompareTo( path ) > 0 );

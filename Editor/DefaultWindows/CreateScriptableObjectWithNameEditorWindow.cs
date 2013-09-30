@@ -28,7 +28,7 @@ namespace BaseFramework.Utils
 			//TODO: Create a "Make Another" checkbox.
 			
 			m_assetName = EditorGUILayout.TextField( "Asset Name", m_assetName );
-			m_assetPath = BaseEditorGUILayout.AssetPathField( "Asset Path", m_assetPath );
+			m_assetPath = BaseAssetPathControl.New( "Asset Path", m_assetPath );
 			
 			bool OK = GUILayout.Button( "Create" );
 			
