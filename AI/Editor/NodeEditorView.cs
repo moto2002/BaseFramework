@@ -12,6 +12,11 @@ namespace BaseFramework.AI
 			m_yOriginOffset = fYOriginOffset;
 		}
 		
+		public void SetTree( BehaviourTree xTree )
+		{
+			m_tree = xTree;
+		}
+		
 		public override void Draw()
 		{
 			base.Draw();
@@ -30,5 +35,6 @@ namespace BaseFramework.AI
 		}
 		
 		private float m_yOriginOffset;
+		private BehaviourTree m_tree;
 	}
 }

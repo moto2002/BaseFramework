@@ -5,8 +5,12 @@ using BaseFramework.EditorUtils;
 
 namespace BaseFramework.AI
 {
+	public delegate void MenuButtonPressed();
+	
 	public class BehaviourTreeMenuView : BaseEditorView
 	{
+		public event MenuButtonPressed CreateNewTree;
+		
 		public BehaviourTreeMenuView( BaseEditorWindow xSourceWindow ) : base( xSourceWindow )
 		{
 		}
@@ -30,8 +34,9 @@ namespace BaseFramework.AI
 			Rect xCreateNewTreeButtonRect = new Rect( 0, 0, 256, m_defaultHeight );
 			bool bCreateNew = GUI.Button( xCreateNewTreeButtonRect, "Create new Behaviour Tree" );
 			
-			if ( bCreateNew )
+			if ( bCreateNew && CreateNewTree != null )
 			{
+				CreateNewTree();
 			}
 		}
 		
