@@ -7,9 +7,8 @@ namespace BaseFramework.AI
 {
 	public class NodeEditorView : BaseEditorView
 	{
-		public NodeEditorView( BaseEditorWindow xSourceWindow, float fYOriginOffset ) : base( xSourceWindow )
+		public NodeEditorView( BaseEditorWindow xSourceWindow ) : base( xSourceWindow )
 		{
-			m_yOriginOffset = fYOriginOffset;
 		}
 		
 		public void SetTree( BehaviourTree xTree )

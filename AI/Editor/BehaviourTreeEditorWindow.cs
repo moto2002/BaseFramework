@@ -23,7 +23,11 @@ namespace BaseFramework.AI
 			AddSubview( m_menuView );
 			
 			float fMenuHeight = m_menuView.ViewBounds.height;
-			m_editorView = new NodeEditorView( this, fMenuHeight );
+			float fWindowWidth  = this.maxSize.x;
+			float fWindowHeight = this.maxSize.y;
+			m_editorView = new NodeEditorView( this );
+			m_editorView.ViewBounds = new Rect( 0, fMenuHeight, fWindowWidth, fWindowHeight );
+			
 			AddSubview( m_editorView );
 		}
 		
