@@ -65,6 +65,11 @@ namespace BaseFramework.EditorUtils
 			xView.Superview = this;
 		}
 		
+		public void RemoveAllSubviews()
+		{
+			m_subviews = new List<BaseEditorView>();
+		}
+		
 		public void RemoveFromSuperview()
 		{
 			if ( m_superview != null )
