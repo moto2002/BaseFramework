@@ -30,6 +30,7 @@ namespace BaseFramework.EditorUtils
 		
 		private void OnGUI()
 		{
+			// TODO: Resize Subviews when window is resized!!
 			foreach ( BaseEditorView xView in m_subviews )
 			{
 				GUI.BeginGroup( xView.ViewBounds );
