@@ -4,6 +4,11 @@ namespace BaseFramework.AI
 {
 	public class BehaviourTree
 	{
+		public PrioritySelectorNode RootNode
+		{
+			get { return m_rootNode; }
+		}
+		
 		public BehaviourTree()
 		{
 			m_rootNode = new PrioritySelectorNode();
