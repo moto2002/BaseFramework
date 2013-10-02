@@ -45,7 +45,7 @@ namespace BaseFramework.EditorUtils
 		{
 			foreach ( BaseEditorView xSubview in m_subviews )
 			{
-				GUI.BeginGroup( xSubview.ViewBounds );
+				GUI.BeginGroup( ViewBounds );
 				{
 					xSubview.Draw();
 				}

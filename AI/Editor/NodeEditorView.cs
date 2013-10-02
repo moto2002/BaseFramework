@@ -24,11 +24,6 @@ namespace BaseFramework.AI
 		public override void Draw()
 		{
 			base.Draw();
-			
-			if ( m_rootNodeView != null )
-			{
-				m_rootNodeView.Draw();
-			}
 		}
 		
 		public void GenerateGrid()
@@ -97,6 +92,10 @@ namespace BaseFramework.AI
 			Vector2 xGridPosition = xView.Centre;
 			xGridPosition.x = Mathf.FloorToInt( xGridPosition.x / NodeGridSpacingX );
 			xGridPosition.y = Mathf.FloorToInt( xGridPosition.y / NodeGridSpacingY );
+			
+			xGridPosition.x = Mathf.Max( xGridPosition.x, 1 );
+			xGridPosition.y = Mathf.Max( xGridPosition.y, 1 );
+			
 			
 			Node xOtherNode = GetNodeAtGridPosition( xGridPosition );
 			if ( xOtherNode == null )
