@@ -7,15 +7,12 @@ namespace BaseFramework.AI
 {
 	public class NodeView : BaseDraggableView
 	{
-		const int NodeSizeX = 128;
-		const int NodeSizeY = 64;
+		public Node ParentNode;
+		public int SiblingIndex;
 		
-		public NodeView( BaseEditorWindow xSourceWindow, Vector2 xCentre ) : base( xSourceWindow )
+		public NodeView( Node xNode, BaseEditorWindow xSourceWindow ) : base( xSourceWindow )
 		{
-			float fNodeOriginX = xCentre.x - 0.5f * NodeSizeX;
-			float fNodeOriginY = xCentre.y - 0.5f * NodeSizeY;
-			Rect xNodeBounds = new Rect( fNodeOriginX, fNodeOriginY, NodeSizeX, NodeSizeY );
-			ViewBounds = xNodeBounds;
+			m_node = xNode;
 		}
 		
 		public override void Draw()
@@ -23,5 +20,7 @@ namespace BaseFramework.AI
 			base.Draw();
 			GUI.Box( ViewBounds, "" );
 		}
+		
+		private Node m_node;
 	}
 }
