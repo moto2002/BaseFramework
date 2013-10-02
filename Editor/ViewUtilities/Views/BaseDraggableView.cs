@@ -3,8 +3,14 @@ using System.Collections;
 
 namespace BaseFramework.EditorUtils
 {
+	public delegate void DragInputEvent( BaseDraggableView xView );
+	
 	public abstract class BaseDraggableView : BaseEditorView
 	{
+		public event DragInputEvent DragBegan;
+		public event DragInputEvent DragChanged;
+		public event DragInputEvent DragEnded;
+		
 		public BaseDraggableView( BaseEditorWindow xSourceWindow ) : base( xSourceWindow )
 		{
 		}
@@ -23,48 +29,63 @@ namespace BaseFramework.EditorUtils
 					bool bWithinBounds = CursorIsWithinBounds( xMousePosition );
 					switch ( xCurrentEventType )
 					{
-						case EventType.MouseDown:
+					case EventType.MouseDown:
+					{
+						//TODO: Raycast to hit topmost BaseDraggableView...?
+						if ( bWithinBounds )
 						{
-							//TODO: Raycast to hit topmost BaseDraggableView...?
-							if ( bWithinBounds )
-							{
-								m_isBeingDragged = true;
-								
-								float fXOffset = ViewBounds.x - xMousePosition.x;
-								float fYOffset = ViewBounds.y - xMousePosition.y;
-								m_cursorOffsetFromCentre = new Vector2( fXOffset, fYOffset );
-							}
-							break;
-						}
+							m_isBeingDragged = true;
 							
-						case EventType.MouseDrag:
-						{
-							if ( m_isBeingDragged )
+							float fXOffset = ViewBounds.x - xMousePosition.x;
+							float fYOffset = ViewBounds.y - xMousePosition.y;
+							m_cursorOffsetFromCentre = new Vector2( fXOffset, fYOffset );
+						
+							if ( DragBegan != null )
 							{
-								float fBoundOriginX = xMousePosition.x + m_cursorOffsetFromCentre.x;
-								float fBoundOriginY = xMousePosition.y + m_cursorOffsetFromCentre.y;
-								Vector2 xNewBoundCentre = new Vector2( fBoundOriginX, fBoundOriginY );
-								
-								Rect NewBounds = new Rect();
-								NewBounds.x = xNewBoundCentre.x;
-								NewBounds.y = xNewBoundCentre.y;
-								NewBounds.width = ViewBounds.width;
-								NewBounds.height = ViewBounds.height;
-								
-								ViewBounds = NewBounds;
-								
-								SourceWindow.Repaint();
+								DragBegan( this );
 							}
-							break;
 						}
-						
-						case EventType.MouseUp:
+						break;
+					}
+					
+					case EventType.MouseDrag:
+					{
+						if ( m_isBeingDragged )
 						{
-							m_isBeingDragged = false;
-							m_cursorOffsetFromCentre = Vector2.zero;
-						
-							break;
+							float fBoundOriginX = xMousePosition.x + m_cursorOffsetFromCentre.x;
+							float fBoundOriginY = xMousePosition.y + m_cursorOffsetFromCentre.y;
+							Vector2 xNewBoundCentre = new Vector2( fBoundOriginX, fBoundOriginY );
+							
+							Rect NewBounds = new Rect();
+							NewBounds.x = xNewBoundCentre.x;
+							NewBounds.y = xNewBoundCentre.y;
+							NewBounds.width = ViewBounds.width;
+							NewBounds.height = ViewBounds.height;
+							
+							ViewBounds = NewBounds;
+							
+							SourceWindow.Repaint();
+							
+							if ( DragChanged != null )
+							{
+								DragChanged( this );
+							}
 						}
+						break;
+					}
+					
+					case EventType.MouseUp:
+					{
+						if ( DragEnded != null && m_isBeingDragged )
+						{
+							DragEnded( this );
+						}
+						
+						m_isBeingDragged = false;
+						m_cursorOffsetFromCentre = Vector2.zero;
+						
+						break;
+					}
 					}
 				}
 			}
