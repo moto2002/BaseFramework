@@ -1,24 +1,42 @@
 using UnityEngine;
+using System.Collections.Generic;
 
 namespace BaseFramework.AI
 {
 	public class BehaviourTree
 	{
-		public PrioritySelectorNode RootNode
+		public Node RootNode
 		{
-			get { return m_rootNode; }
+			get { return m_pxRootNode; }
 		}
 		
 		public BehaviourTree()
 		{
-			m_rootNode = new PrioritySelectorNode();
+//			m_rootNode = new PrioritySelectorNode();
+//			SequenceSelectorNode xSequenceSelector = new SequenceSelectorNode();
+//			ConditionLeafNode xCondition = new ConditionLeafNode();
+//			ActionLeafNode xAction = new ActionLeafNode();
+//			
+//			m_rootNode.AddChild( xSequenceSelector );
+//			xSequenceSelector.AddChild( xCondition );
+//			xSequenceSelector.AddChild( xAction );
 		}
 		
-		public Node[] GenerateBehaviourStream()
+		public BehaviourTree( Node pxRootNode )
 		{
-			return null;
+			m_pxRootNode = pxRootNode;
+			m_pxRootTask = pxRootNode.CreateTask();
 		}
 		
-		private PrioritySelectorNode m_rootNode;
+		public BehaviourNodeState Tick( Dictionary<string, object> pxActorView )
+		{
+			m_eStatus = m_pxRootTask.UpdateTask( pxActorView );
+			
+			return m_eStatus;
+		}
+
+		private Node m_pxRootNode;
+		private Task m_pxRootTask;
+		private BehaviourNodeState m_eStatus;
 	}
 }

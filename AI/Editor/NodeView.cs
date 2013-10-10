@@ -9,6 +9,7 @@ namespace BaseFramework.AI
 	{
 		public Node ParentNode;
 		public int SiblingIndex;
+		public NodeView[] ChildNodeViews;
 		
 		public NodeView( Node xNode, BaseEditorWindow xSourceWindow ) : base( xSourceWindow )
 		{
