@@ -5,16 +5,27 @@ namespace BaseFramework.AI
 {
 	public abstract class Task
 	{
+		public Task()
+		{
+		}
+		
 		public Task( Node pxNode )
 		{
 			m_pxNode = pxNode;
 		}
 		
-		public abstract void InitiliseTask();
+		public BehaviourNodeState GetCurrentState()
+		{
+			return m_eStatus;
+		}
+		
+		public abstract void InitialiseTask();
 		public abstract void DestroyTask();
 		
-		public abstract BehaviourNodeState UpdateTask( Dictionary<string, object> pxActorView );
+		public abstract void UpdateTask( Dictionary<string, object> pxActorView );
 		
 		protected Node m_pxNode;
+		
+		protected BehaviourNodeState m_eStatus;
 	}
 }
