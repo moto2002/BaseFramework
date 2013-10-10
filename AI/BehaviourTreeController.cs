@@ -5,10 +5,10 @@ namespace BaseFramework.AI
 {
 	public enum BehaviourNodeState
 	{
-		Ready,
-		Visited,
-		Running,
-		Failed
+		READY,
+		RUNNING,
+		SUCCESS,
+		FAILED
 	};
 	
 	public class BehaviourTreeController : MonoBehaviour
