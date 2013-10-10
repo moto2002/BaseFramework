@@ -12,14 +12,10 @@ namespace BaseFramework.AI
 		
 		public BehaviourTree()
 		{
-//			m_rootNode = new PrioritySelectorNode();
-//			SequenceSelectorNode xSequenceSelector = new SequenceSelectorNode();
-//			ConditionLeafNode xCondition = new ConditionLeafNode();
-//			ActionLeafNode xAction = new ActionLeafNode();
-//			
-//			m_rootNode.AddChild( xSequenceSelector );
-//			xSequenceSelector.AddChild( xCondition );
-//			xSequenceSelector.AddChild( xAction );
+			m_pxRootNode = new Node();
+			m_pxRootNode.SetIsLeaf( false );
+			m_pxRootNode.SetTaskType<SequenceTask>();
+//			m_pxRootNode.AddChild();
 		}
 		
 		public BehaviourTree( Node pxRootNode )
@@ -30,8 +26,8 @@ namespace BaseFramework.AI
 		
 		public BehaviourNodeState Tick( Dictionary<string, object> pxActorView )
 		{
-			m_eStatus = m_pxRootTask.UpdateTask( pxActorView );
-			
+			m_eStatus = m_pxRootTask.GetCurrentState();
+			m_pxRootTask.UpdateTask( pxActorView );
 			return m_eStatus;
 		}
 
