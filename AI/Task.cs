@@ -7,25 +7,49 @@ namespace BaseFramework.AI
 	{
 		public Task()
 		{
+			m_eStatus = TaskState.eTaskReady;
 		}
 		
 		public Task( Node pxNode )
 		{
 			m_pxNode = pxNode;
+			m_eStatus = TaskState.eTaskReady;
 		}
 		
-		public BehaviourNodeState GetCurrentState()
+		public TaskState GetCurrentState()
 		{
 			return m_eStatus;
 		}
 		
-		public abstract void InitialiseTask();
-		public abstract void DestroyTask();
+		public TaskState TickTask( Dictionary<string, object> pxActorView )
+		{
+			if ( m_eStatus == TaskState.eTaskReady )
+			{
+				InitialiseTask();
+				m_eStatus = TaskState.eTaskRunning;
+			}
+			
+			if ( m_eStatus == TaskState.eTaskRunning )
+			{
+				UpdateTask( pxActorView );
+			}
+			
+			if ( m_eStatus == TaskState.eTaskSuccess || m_eStatus == TaskState.eTaskFailed )
+			{
+				DestroyTask();
+				m_eStatus = TaskState.eTaskReady;
+			}
+			
+			return m_eStatus;
+		}
 		
-		public abstract void UpdateTask( Dictionary<string, object> pxActorView );
+		protected abstract void InitialiseTask();
+		protected abstract void DestroyTask();
+		
+		protected abstract void UpdateTask( Dictionary<string, object> pxActorView );
 		
 		protected Node m_pxNode;
 		
-		protected BehaviourNodeState m_eStatus;
+		protected TaskState m_eStatus;
 	}
 }

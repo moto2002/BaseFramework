@@ -3,36 +3,54 @@ using System.Collections.Generic;
 
 namespace BaseFramework.AI
 {
+	public enum TaskState
+	{
+		eTaskReady,
+		eTaskRunning,
+		eTaskSuccess,
+		eTaskFailed
+	};
+	
 	public class BehaviourTree
 	{
 		public Node RootNode
 		{
 			get { return m_pxRootNode; }
+			set
+			{
+				m_pxRootNode = value;
+				
+				m_pxRootTask = null;
+				if ( m_pxRootNode != null )
+				{
+					m_pxRootTask = m_pxRootNode.CreateTask();
+				}
+			}
 		}
 		
 		public BehaviourTree()
 		{
-			m_pxRootNode = new Node();
-			m_pxRootNode.SetIsLeaf( false );
-			m_pxRootNode.SetTaskType<SequenceTask>();
-//			m_pxRootNode.AddChild();
 		}
 		
 		public BehaviourTree( Node pxRootNode )
 		{
-			m_pxRootNode = pxRootNode;
-			m_pxRootTask = pxRootNode.CreateTask();
+			RootNode = pxRootNode;
 		}
 		
-		public BehaviourNodeState Tick( Dictionary<string, object> pxActorView )
+		public TaskState Tick( Dictionary<string, object> pxActorView )
 		{
-			m_eStatus = m_pxRootTask.GetCurrentState();
-			m_pxRootTask.UpdateTask( pxActorView );
-			return m_eStatus;
+			bool bHasTask = m_pxRootTask != null;
+			if ( bHasTask )
+			{
+				m_eStatus = m_pxRootTask.GetCurrentState();
+				m_pxRootTask.TickTask( pxActorView );
+				return m_eStatus;
+			}
+			return TaskState.eTaskFailed;
 		}
 
 		private Node m_pxRootNode;
 		private Task m_pxRootTask;
-		private BehaviourNodeState m_eStatus;
+		private TaskState m_eStatus;
 	}
 }

@@ -4,12 +4,14 @@ namespace BaseFramework.AI
 {
 	public class SequenceTask : Task
 	{
-		public override void InitialiseTask()
+		public SequenceTask( Node pxNode ) : base( pxNode ) {  }
+		
+		protected override void InitialiseTask()
 		{
 			bool bIsLeafNode = m_pxNode.IsLeaf();
 			if ( !bIsLeafNode )
 			{
-				m_eStatus = BehaviourNodeState.READY;
+				m_eStatus = TaskState.eTaskReady;
 				m_pxNodeEnumerator = m_pxNode.GetChildNodeEnumerator();
 				
 				m_pxCurrentNode = m_pxNodeEnumerator.Current;
@@ -17,7 +19,7 @@ namespace BaseFramework.AI
 			}
 		}
 		
-		public override void DestroyTask()
+		protected override void DestroyTask()
 		{
 			m_pxCurrentNode = null;
 			m_pxCurrentTask = null;
@@ -26,43 +28,37 @@ namespace BaseFramework.AI
 			m_pxNodeEnumerator = null;
 		}
 		
-		public override void UpdateTask( Dictionary<string, object> pxActorView )
+		protected override void UpdateTask( Dictionary<string, object> pxActorView )
 		{
-			BehaviourNodeState eCurrentTaskState = m_pxCurrentTask.GetCurrentState();
+			TaskState eCurrentTaskState = m_pxCurrentTask.TickTask( pxActorView );
 			
 			switch ( eCurrentTaskState )
 			{
 				
-			case BehaviourNodeState.READY:
+			case TaskState.eTaskReady:
 			{
-				m_pxCurrentTask.InitialiseTask();
-				m_pxCurrentTask.UpdateTask( pxActorView );
+				break;
+			}
+				
+			case TaskState.eTaskRunning:
+			{
+				m_eStatus = TaskState.eTaskRunning;
 				
 				break;
 			}
 				
-			case BehaviourNodeState.RUNNING:
+			case TaskState.eTaskFailed:
 			{
-				m_eStatus = BehaviourNodeState.RUNNING;
-				m_pxCurrentTask.UpdateTask( pxActorView );
-				
-				break;
-			}
-				
-			case BehaviourNodeState.FAILED:
-			{
-				m_pxCurrentTask.DestroyTask();
 				m_pxCurrentTask = null;
 				m_pxCurrentNode = null;
 				
-				m_eStatus = BehaviourNodeState.FAILED;
+				m_eStatus = TaskState.eTaskFailed;
 				
 				break;
 			}
 				
-			case BehaviourNodeState.SUCCESS:
+			case TaskState.eTaskSuccess:
 			{
-				m_pxCurrentTask.DestroyTask();
 				m_pxCurrentTask = null;
 				m_pxCurrentNode = null;
 				
@@ -70,11 +66,11 @@ namespace BaseFramework.AI
 				if ( bNextNode )
 				{
 					m_pxCurrentNode = m_pxNodeEnumerator.Current;
-					m_eStatus = BehaviourNodeState.RUNNING;
+					m_eStatus = TaskState.eTaskRunning;
 				}
 				else
 				{
-					m_eStatus = BehaviourNodeState.SUCCESS;
+					m_eStatus = TaskState.eTaskSuccess;
 				}
 				
 				break;

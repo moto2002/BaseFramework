@@ -8,8 +8,8 @@ namespace BaseFramework.AI
 	{
 		public Task CreateTask()
 		{
-			Task pxTask = (Task)Activator.CreateInstance( m_xType, this );
-			return pxTask;
+			Task pxTask = (Task)Activator.CreateInstance( m_xType, new object[] { this } );
+			return pxTask; 
 		}
 		
 		public void SetTaskType<T>() where T : Task
