@@ -34,11 +34,11 @@ namespace BaseFramework.EditorUtils
 						//TODO: Raycast to hit topmost BaseDraggableView...?
 						if ( bWithinBounds )
 						{
-							m_isBeingDragged = true;
+							m_bIsBeingDragged = true;
 							
 							float fXOffset = ViewBounds.x - xMousePosition.x;
 							float fYOffset = ViewBounds.y - xMousePosition.y;
-							m_cursorOffsetFromCentre = new Vector2( fXOffset, fYOffset );
+							m_pxCursorOffsetFromCentre = new Vector2( fXOffset, fYOffset );
 						
 							if ( DragBegan != null )
 							{
@@ -50,10 +50,10 @@ namespace BaseFramework.EditorUtils
 					
 					case EventType.MouseDrag:
 					{
-						if ( m_isBeingDragged )
+						if ( m_bIsBeingDragged )
 						{
-							float fBoundOriginX = xMousePosition.x + m_cursorOffsetFromCentre.x;
-							float fBoundOriginY = xMousePosition.y + m_cursorOffsetFromCentre.y;
+							float fBoundOriginX = xMousePosition.x + m_pxCursorOffsetFromCentre.x;
+							float fBoundOriginY = xMousePosition.y + m_pxCursorOffsetFromCentre.y;
 							Vector2 xNewBoundCentre = new Vector2( fBoundOriginX, fBoundOriginY );
 							
 							Rect NewBounds = new Rect();
@@ -76,13 +76,13 @@ namespace BaseFramework.EditorUtils
 					
 					case EventType.MouseUp:
 					{
-						if ( DragEnded != null && m_isBeingDragged )
+						if ( DragEnded != null && m_bIsBeingDragged )
 						{
 							DragEnded( this );
 						}
 						
-						m_isBeingDragged = false;
-						m_cursorOffsetFromCentre = Vector2.zero;
+						m_bIsBeingDragged = false;
+						m_pxCursorOffsetFromCentre = Vector2.zero;
 						
 						break;
 					}
@@ -102,7 +102,7 @@ namespace BaseFramework.EditorUtils
 			return bGreaterThanMin && bLessThanMax;
 		}
 		
-		private bool m_isBeingDragged;
-		private Vector2 m_cursorOffsetFromCentre;
+		private bool m_bIsBeingDragged;
+		private Vector2 m_pxCursorOffsetFromCentre;
 	}
 }

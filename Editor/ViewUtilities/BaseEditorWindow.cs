@@ -10,7 +10,7 @@ namespace BaseFramework.EditorUtils
 		{
 			get
 			{
-				return m_subviews.ToArray();
+				return m_pxSubviews.ToArray();
 			}
 		}
 		
@@ -19,19 +19,19 @@ namespace BaseFramework.EditorUtils
 		public void AddSubview( BaseEditorView xView )
 		{
 			xView.SourceWindow = this;
-			m_subviews.Add( xView );
+			m_pxSubviews.Add( xView );
 		}
 		
 		private void OnEnable()
 		{
-			m_subviews = new List<BaseEditorView>();
+			m_pxSubviews = new List<BaseEditorView>();
 			LoadView();
 		}
 		
 		private void OnGUI()
 		{
 			// TODO: Resize Subviews when window is resized!!
-			foreach ( BaseEditorView xView in m_subviews )
+			foreach ( BaseEditorView xView in m_pxSubviews )
 			{
 				GUI.BeginGroup( xView.ViewBounds );
 				{
@@ -43,12 +43,12 @@ namespace BaseFramework.EditorUtils
 		
 		private void Update()
 		{
-			foreach ( BaseEditorView xView in m_subviews )
+			foreach ( BaseEditorView xView in m_pxSubviews )
 			{
 				xView.Update();
 			}
 		}
 		
-		private List<BaseEditorView> m_subviews;
+		private List<BaseEditorView> m_pxSubviews;
 	}
 }

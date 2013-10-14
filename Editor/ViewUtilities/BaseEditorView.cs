@@ -8,42 +8,42 @@ namespace BaseFramework.EditorUtils
 	{
 		public BaseEditorWindow SourceWindow
 		{
-			get { return m_sourceWindow;  }
-			set { m_sourceWindow = value; }
+			get { return m_pxSourceWindow;  }
+			set { m_pxSourceWindow = value; }
 		}
 		
 		public BaseEditorView Superview
 		{
-			get { return m_superview;  }
-			set { m_superview = value; }
+			get { return m_pxSuperview;  }
+			set { m_pxSuperview = value; }
 		}
 		
 		public List<BaseEditorView> Subviews
 		{
-			get { return m_subviews; }
+			get { return m_pxSubviews; }
 		}
 		
 		public Vector2 Centre
 		{
 			get { return ViewBounds.center;    }
-			set { m_viewBounds.center = value; }
+			set { m_xViewBounds.center = value; }
 		}
 		
 		public Rect ViewBounds
 		{
-			get { return m_viewBounds;  }
-			set { m_viewBounds = value; }
+			get { return m_xViewBounds;  }
+			set { m_xViewBounds = value; }
 		}
 		
 		public BaseEditorView( BaseEditorWindow xSourceWindow )
 		{
-			m_subviews = new List<BaseEditorView>();
-			m_sourceWindow = xSourceWindow;
+			m_pxSubviews = new List<BaseEditorView>();
+			m_pxSourceWindow = xSourceWindow;
 		}
 		
 		public virtual void Draw()
 		{
-			foreach ( BaseEditorView xSubview in m_subviews )
+			foreach ( BaseEditorView xSubview in m_pxSubviews )
 			{
 				GUI.BeginGroup( ViewBounds );
 				{
@@ -61,27 +61,27 @@ namespace BaseFramework.EditorUtils
 		{
 			xView.RemoveFromSuperview();
 			
-			m_subviews.Add( xView );
+			m_pxSubviews.Add( xView );
 			xView.Superview = this;
 		}
 		
 		public void RemoveAllSubviews()
 		{
-			m_subviews = new List<BaseEditorView>();
+			m_pxSubviews = new List<BaseEditorView>();
 		}
 		
 		public void RemoveFromSuperview()
 		{
-			if ( m_superview != null )
+			if ( m_pxSuperview != null )
 			{
-				m_superview.Subviews.Remove( this );
+				m_pxSuperview.Subviews.Remove( this );
 			}
 		}
 		
-		private Rect m_viewBounds;
-		private List<BaseEditorView> m_subviews;
+		private Rect m_xViewBounds;
+		private List<BaseEditorView> m_pxSubviews;
 		
-		private BaseEditorView m_superview;
-		private BaseEditorWindow m_sourceWindow;
+		private BaseEditorView m_pxSuperview;
+		private BaseEditorWindow m_pxSourceWindow;
 	}
 }
