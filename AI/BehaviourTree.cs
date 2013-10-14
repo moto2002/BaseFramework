@@ -42,8 +42,9 @@ namespace BaseFramework.AI
 			bool bHasTask = m_pxRootTask != null;
 			if ( bHasTask )
 			{
-				m_eStatus = m_pxRootTask.GetCurrentState();
 				m_pxRootTask.TickTask( pxActorView );
+				m_eStatus = m_pxRootTask.GetCurrentState();
+				
 				return m_eStatus;
 			}
 			return TaskState.eTaskFailed;
