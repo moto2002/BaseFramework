@@ -23,17 +23,19 @@ namespace BaseFramework.AI
 				m_pxRootTask = null;
 				if ( m_pxRootNode != null )
 				{
-					m_pxRootTask = m_pxRootNode.CreateTask();
+					m_pxRootTask = m_pxRootNode.CreateTask( m_pxTreeController );
 				}
 			}
 		}
 		
-		public BehaviourTree()
+		public BehaviourTree( BehaviourTreeController pxTreeController )
 		{
+			m_pxTreeController = pxTreeController;
 		}
 		
-		public BehaviourTree( Node pxRootNode )
+		public BehaviourTree( BehaviourTreeController pxTreeController, Node pxRootNode )
 		{
+			m_pxTreeController = pxTreeController;
 			RootNode = pxRootNode;
 		}
 		
@@ -53,5 +55,6 @@ namespace BaseFramework.AI
 		private Node m_pxRootNode;
 		private Task m_pxRootTask;
 		private TaskState m_eStatus;
+		private BehaviourTreeController m_pxTreeController;
 	}
 }

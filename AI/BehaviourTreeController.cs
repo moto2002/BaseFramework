@@ -32,7 +32,7 @@ namespace BaseFramework.AI
 		private void Start()
 		{
 			Node pxRootNode = CreateBehaviourTree();
-			m_pxBehaviourTree = new BehaviourTree( pxRootNode );
+			m_pxBehaviourTree = new BehaviourTree( this, pxRootNode );
 		}
 		
 		private void Update()

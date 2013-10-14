@@ -33,8 +33,8 @@ namespace BaseFramework.AI
 		
 		private void CreateNewTree()
 		{
-			BehaviourTree xNewTree = new BehaviourTree();
-			m_editorView.SetTree( xNewTree );
+//			BehaviourTree xNewTree = new BehaviourTree();
+//			m_editorView.SetTree( xNewTree );
 		}
 		
 		private BehaviourTreeMenuView m_menuView;

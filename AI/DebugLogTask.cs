@@ -8,7 +8,7 @@ namespace BaseFramework.AI
 		public int m_iFramesToTick;
 		public string m_pxMessage;
 		
-		public DebugLogTask( Node pxNode ) : base( pxNode ) {  }
+		public DebugLogTask( BehaviourTreeController pxTreeController, Node pxNode ) : base( pxTreeController, pxNode ) {  }
 		
 		protected override void InitialiseTask()
 		{
