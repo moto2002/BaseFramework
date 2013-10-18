@@ -31,7 +31,7 @@ namespace BaseFramework.AI
 				m_eStatus = TaskState.eTaskRunning;
 			}
 			
-			if ( m_eStatus == TaskState.eTaskRunning )
+			if ( m_eStatus == TaskState.eTaskRunning && pxActorView != null )
 			{
 				UpdateTask( pxActorView );
 			}

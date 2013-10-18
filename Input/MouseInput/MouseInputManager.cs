@@ -30,6 +30,7 @@ namespace BaseFramework.MouseInput
 			Collider xColliderHit = ColliderHit();
 			Vector3 xCursorPosition = Input.mousePosition;
 			
+			//BUG: Gesture can't end if you go outside of bounds
 			if ( xColliderHit != null )
 			{
 				foreach ( MouseAction xAction in m_mouseActions )
