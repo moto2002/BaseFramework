@@ -4,10 +4,14 @@ namespace BaseFramework.MouseInput
 {
 	public class MouseHoverAction : MouseAction
 	{
-		MouseHoverAction( Collider xCollider, MouseActionDelegate xDelegate ) : base( xCollider, xDelegate )
+		public MouseHoverAction( Collider xCollider, MouseActionDelegate xDelegate ) : base( xCollider, xDelegate )
 		{
 		}
 		
-		
+		public override void OnHover (Vector3 xCursorPosition)
+		{
+			base.OnHover (xCursorPosition);
+			state = MouseActionState.MouseActionChanged;
+		}
 	}
 }

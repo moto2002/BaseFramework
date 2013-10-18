@@ -64,6 +64,7 @@ namespace BaseFramework.MouseInput
 		
 		public virtual void ResetAction()
 		{
+			state = MouseActionState.MouseActionPossible;
 		}
 		
 		private MouseActionState m_state;
