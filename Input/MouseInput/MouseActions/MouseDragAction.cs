@@ -7,6 +7,11 @@ namespace BaseFramework.MouseInput
 		public float beginDelay;
 		public int clickButton;
 		
+		public Vector3 moveDelta
+		{
+			get { return m_pxMoveDelta; }
+		}
+		
 		public MouseDragAction( Collider xCollider, MouseActionDelegate xDelegate ) : base( xCollider, xDelegate )
 		{
 			clickButton = 0;
@@ -18,8 +23,9 @@ namespace BaseFramework.MouseInput
 			if ( clickButton == iButtonID )
 			{
 				base.OnButtonPressed( iButtonID );
-				m_startTime = Time.time;
+				m_fStartTime = Time.time;
 				state = MouseActionState.MouseActionBegan;
+				m_pxMoveDelta = Vector3.zero;
 			}
 		}
 		
@@ -30,7 +36,7 @@ namespace BaseFramework.MouseInput
 				base.OnHover( xCursorPosition );
 				
 				float fCurrentTime = Time.time;
-				float fTimeElapsed = fCurrentTime - m_startTime;
+				float fTimeElapsed = fCurrentTime - m_fStartTime;
 				
 				if ( fTimeElapsed > beginDelay )
 				{
@@ -39,6 +45,10 @@ namespace BaseFramework.MouseInput
 			}
 			else if ( state == MouseActionState.MouseActionChanged )
 			{
+				Vector3 pxDifference = Input.mousePosition - focus;
+				m_pxMoveDelta = pxDifference;
+				m_pxMoveDelta.z = 0;
+				
 				base.OnHover( xCursorPosition );
 				state = MouseActionState.MouseActionChanged;
 			}
@@ -53,6 +63,13 @@ namespace BaseFramework.MouseInput
 			}
 		}
 		
-		private float m_startTime;
+		public override void ResetAction()
+		{
+			base.ResetAction();
+			m_pxMoveDelta = Vector3.zero;
+		}
+		
+		private float m_fStartTime;
+		private Vector3 m_pxMoveDelta;
 	}
 }

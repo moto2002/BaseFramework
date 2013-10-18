@@ -4,7 +4,7 @@ namespace BaseFramework.AI
 {
 	public class SequenceTask : Task
 	{
-		public SequenceTask( Node pxNode ) : base( pxNode ) {  }
+		public SequenceTask( BehaviourTreeController pxTreeController, Node pxNode ) : base( pxTreeController, pxNode ) {  }
 		
 		protected override void InitialiseTask()
 		{
@@ -15,7 +15,7 @@ namespace BaseFramework.AI
 				m_pxNodeEnumerator = m_pxNode.GetChildNodeEnumerator();
 				
 				m_pxCurrentNode = m_pxNodeEnumerator.Current;
-				m_pxCurrentTask = m_pxCurrentNode.CreateTask();
+				m_pxCurrentTask = m_pxCurrentNode.CreateTask( m_pxTreeController );
 			}
 		}
 		

@@ -6,10 +6,10 @@ namespace BaseFramework.AI
 {
 	public class Node
 	{
-		public Task CreateTask()
+		public Task CreateTask( BehaviourTreeController pxTreeController )
 		{
-			Task pxTask = (Task)Activator.CreateInstance( m_xType, new object[] { this } );
-			return pxTask; 
+			Task pxTask = (Task)Activator.CreateInstance( m_xType, new object[] { pxTreeController, this } );
+			return pxTask;
 		}
 		
 		public void SetTaskType<T>() where T : Task
