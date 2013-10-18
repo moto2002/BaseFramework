@@ -3,7 +3,7 @@ using System.Collections;
 
 namespace BaseFramework.Core
 {
-	public static class BaseHelper
+	public static class BaseTransformHelper
 	{
 		public static Transform GetRootParent( Transform childTransform ) // todo : make extensdion method
 		{
