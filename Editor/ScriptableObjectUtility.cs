@@ -19,6 +19,7 @@ namespace BaseFramework.EditorUtils
 			bool bPathSupplied = !string.IsNullOrEmpty( pxPath );
 			bool bFilenameSupplied  = !string.IsNullOrEmpty( pxFilename );
 			
+			// Concatenate the full path for the asset
 			if ( bPathSupplied )
 			{
 				List<string> pxPathComponents = new List<string>();
@@ -63,11 +64,10 @@ namespace BaseFramework.EditorUtils
 				pxFullPath = pxAssetPath + "/" + pxObjectTypeName + pxExtension;
 			}
 	 		
+			// Create the Asset
+			Debug.Log( "Creating asset at: " + pxFullPath + "..." );
 			AssetDatabase.CreateAsset( pxObject, pxFullPath );
 			AssetDatabase.SaveAssets();
-			
-			EditorUtility.FocusProjectWindow();
-			Selection.activeObject = pxObject;
 		}
 		
 		public static void CreateAssetAtRootDirectory( ScriptableObject pxObject )
