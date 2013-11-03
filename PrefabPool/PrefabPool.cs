@@ -4,127 +4,130 @@ using System.Collections.Generic;
 
 namespace BaseFramework.PrefabPool
 {
-	[ExecuteInEditMode ()]
+	[ExecuteInEditMode()]
 	public class PrefabPool : MonoBehaviour
 	{
 		[SerializeField]
-		private bool m_initialised;
+		private bool m_bInitialised;
 		
 		[SerializeField]
-		private GameObject m_objectPrefab;
+		private GameObject m_pxObjectPrefab;
 		
 		[SerializeField]
-		private List<GameObject> m_pooledObjects;
+		private List<GameObject> m_pxPooledObjects;
 		
 		[SerializeField]
-		private Queue<GameObject> m_inactiveObjects; // TODO : bug: this keeps getting set to nothing when play mode is entered.
+		private Queue<GameObject> m_pxInactiveObjects; // TODO : bug: this keeps getting set to nothing when play mode is entered.
 		
 		#region Public Interface
 		
 		public GameObject ObjectPrefab
 		{
-			get { return m_objectPrefab; }
-			set { m_objectPrefab = value; } // todo : check if a pool of this type exists already?
+			get { return m_pxObjectPrefab; }
+			set { m_pxObjectPrefab = value; } // todo : check if a pool of this type exists already?
 		}
 		
 		public int Cached
 		{
-			get { return m_pooledObjects.Count; }
+			get { return m_pxPooledObjects.Count; }
 			set { Recache (value); }
 		}
 		
 		public int InactiveObjects
 		{
-			get { return m_inactiveObjects.Count; }
+			get { return m_pxInactiveObjects.Count; }
 		}
 		
-		public GameObject GetNextActive ()
+		public GameObject GetNextActive()
 		{
-			if (m_inactiveObjects.Count == 0)
+			if (m_pxInactiveObjects.Count == 0)
 			{
 				Cached += 5;
 			}
 			
-			GameObject go = m_inactiveObjects.Dequeue ();
-			go.SetActive (true);
+			GameObject pxGameObject = m_pxInactiveObjects.Dequeue();
+			pxGameObject.SetActive( true );
 			
-			return go;
+			return pxGameObject;
 		}
 		
 		#endregion
 		
 		#region Internal Functions
 		
-		void Awake ()
+		private void Awake()
 		{
-			if (!m_initialised)
+			if ( !m_bInitialised )
 			{
-				Initialise ();
+				Initialise();
 			}
 		}
 		
-		void Initialise ()
+		private void Initialise()
 		{
-			if (!m_initialised)
+			if ( !m_bInitialised )
 			{
-				m_initialised = true;
+				m_bInitialised = true;
 				
-				if (m_pooledObjects == null)
+				if ( m_pxPooledObjects == null )
 				{
-					m_pooledObjects = new List<GameObject>();
+					m_pxPooledObjects = new List<GameObject>();
 				}
 				
-				if (m_inactiveObjects == null)
+				if ( m_pxInactiveObjects == null )
 				{
-					m_inactiveObjects = new Queue<GameObject>();
+					m_pxInactiveObjects = new Queue<GameObject>();
 				}
 			}
 		}
 		
-		void Update ()
+		private void Update()
 		{
 			// Don't do anything if in sync with all children
-			if (m_pooledObjects.Count.Equals (transform.childCount))
-			{
-				return;
-			}
+			int iNumberOfChildObjects = transform.childCount;
+			int iNumberOfObjectsRegisteredToPool = m_pxPooledObjects.Count;
 			
-			// If not in sync, sync up!
-			for (int i=0; i<transform.childCount; i++)
+			bool bAllObjectsRegistered = iNumberOfObjectsRegisteredToPool.Equals( iNumberOfChildObjects );
+			if ( !bAllObjectsRegistered )
 			{
-				GameObject go = transform.GetChild (i).gameObject;
-				if (!m_pooledObjects.Contains (go))
+				// If not in sync, sync up!
+				for (int i=0; i<transform.childCount; i++)
 				{
-					m_pooledObjects.Add (go);
+					GameObject go = transform.GetChild (i).gameObject;
+					if ( !m_pxPooledObjects.Contains( go ) )
+					{
+						m_pxPooledObjects.Add( go );
+					}
+					
+					if ( !go.activeSelf && !m_pxInactiveObjects.Contains( go ) )
+					{
+						m_pxInactiveObjects.Enqueue( go );
+					}
 				}
-				
-				if (!go.activeSelf && !m_inactiveObjects.Contains (go))
-				{
-					m_inactiveObjects.Enqueue (go);
-				}
+				RenameObjects();
 			}
-			RenameObjects ();
 		}
 		
 		// TODO : Recaching is bugged.
-		void Recache (int newSize)
+		private void Recache( int iNewPoolSize )
 		{
 			// How many objects we need to Instantiate / Destroy
-			int diff = newSize - m_pooledObjects.Count;
+			int iCurrentSize = m_pxPooledObjects.Count;
+			int iChangeInSize = iNewPoolSize - iCurrentSize;
 			
-			bool addMore = diff > 0;
-			diff = Mathf.Abs (diff);
+			bool bMustAddMoreObjects = iChangeInSize > 0;
+			iChangeInSize = Mathf.Abs( iChangeInSize );
 			
 			// Do the Instantions / Destroys
-			for (int i=0; i<diff; i++)
+			for ( int iObjectToModifyIndex = 0; iObjectToModifyIndex < iChangeInSize; iObjectToModifyIndex++ )
 			{
-				if (addMore)
+				if ( bMustAddMoreObjects )
 				{
-					PoolNewObject ();
+					PoolNewObject();
 				}
 				else
 				{
-					UnpoolObject ();
+					UnpoolObject();
 				}
 			}
 			
@@ -132,62 +135,68 @@ namespace BaseFramework.PrefabPool
 			RenameObjects ();
 		}
 		
-		void PoolNewObject ()
+		private void PoolNewObject()
 		{
-			GameObject go = Instantiate (m_objectPrefab) as GameObject;
-			go.SetActive (false);
-			go.transform.parent = transform;
+			GameObject pxNewGameObjectToPool = Instantiate( m_pxObjectPrefab ) as GameObject;
+			pxNewGameObjectToPool.SetActive( false );
+			pxNewGameObjectToPool.transform.parent = transform;
 			
-			Rename (go, m_pooledObjects.Count);
-			m_pooledObjects.Add (go);
-			PoolObject (go);
-		}
-		
-		void PoolObject (GameObject go)
-		{
-			if (!m_pooledObjects.Contains (go))
-			{
-				Debug.LogError ("[PrefabPool] GameObject is not contained in pooled objects!", gameObject);
-				return;
-			}
+			Rename( pxNewGameObjectToPool, m_pxPooledObjects.Count );
+			m_pxPooledObjects.Add( pxNewGameObjectToPool );
 			
-			m_inactiveObjects.Enqueue (go);
-			go.SetActive (false);
+			PoolObject( pxNewGameObjectToPool );
 		}
 		
-		void UnpoolObject ()
+		private void PoolObject( GameObject pxObjectToAddToPool )
 		{
-			GameObject toRemove = GetNextActive();
-			//GameObject toRemove = m_pooledObjects[m_pooledObjects.Count-1];
-			
-			if (toRemove != null)
+			bool bObjectIsRegisteredToPool = m_pxPooledObjects.Contains( pxObjectToAddToPool );
+			if ( bObjectIsRegisteredToPool )
 			{
-				m_pooledObjects.Remove (toRemove);
-				DestroyImmediate (toRemove);
-			}
-		}
-		
-		void RenameObjects ()
-		{
-			for (int i=0; i<transform.childCount; i++)
-			{
-				Transform t = transform.GetChild (i);
-				Rename (t.gameObject, i);
-			}
-		}
-		
-		void Rename (GameObject go, int index)
-		{
-			int nameIndex = go.name.IndexOf ('.');
-				
-			if (nameIndex > 0)
-			{
-				string trimmedName = go.name.Substring (0, nameIndex);
-				go.name = trimmedName + "." + index;
+				m_pxInactiveObjects.Enqueue( pxObjectToAddToPool );
+				pxObjectToAddToPool.SetActive( false );
 			}
 			else
 			{
-				go.name = go.name + "." + index;
+				Debug.LogError ("[PrefabPool] GameObject is not contained in pooled objects!", gameObject);
+			}
+		}
+		
+		private void UnpoolObject()
+		{
+			GameObject pxObjectToRemoveFromPool = GetNextActive();
+			//GameObject toRemove = m_pooledObjects[m_pooledObjects.Count-1];
+			
+			if ( pxObjectToRemoveFromPool != null )
+			{
+				m_pxPooledObjects.Remove( pxObjectToRemoveFromPool );
+				DestroyImmediate( pxObjectToRemoveFromPool );
+			}
+		}
+		
+		private void RenameObjects()
+		{
+			int iNumberOfObjects = transform.childCount;
+			for ( int iObjectIndex = 0; iObjectIndex < iNumberOfObjects; iObjectIndex++ )
+			{
+				Transform pxObjectTransform = transform.GetChild( iObjectIndex );
+				GameObject pxObject = pxObjectTransform.gameObject;
+				
+				Rename( pxObject, iObjectIndex );
+			}
+		}
+		
+		private void Rename( GameObject pxObjectToRename, int iIndexOfObjectInPool )
+		{
+			int iIndexOfStop = pxObjectToRename.name.IndexOf ('.');
+				
+			if ( iIndexOfStop > 0 )
+			{
+				string pxTrimmedName  = pxObjectToRename.name.Substring (0, iIndexOfStop);
+				pxObjectToRename.name = pxTrimmedName + "." + iIndexOfObjectInPool;
+			}
+			else
+			{
+				pxObjectToRename.name = pxObjectToRename.name + "." + iIndexOfObjectInPool;
 			}
 		}
 		
