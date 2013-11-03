@@ -7,57 +7,68 @@ namespace BaseFramework.PrefabPool
 	[CustomEditor (typeof (PrefabPoolManager))]
 	public class PrefabPoolManagerEditor : Editor
 	{
-		private PrefabPoolManager m_manager;
-		private GameObject m_newPoolObject;
+		public void OnEnable()
+		{
+			m_pxPrefabPoolManager = (PrefabPoolManager)target;
+		}
 		
-		public override void OnInspectorGUI ()
+		public override void OnInspectorGUI()
 		{	
 			// List all pools
-			EditorGUILayout.BeginHorizontal ();
-			EditorGUILayout.LabelField ("Pool Name");
-			EditorGUILayout.LabelField ("Object Type");
-			EditorGUILayout.LabelField ("Size");
-			EditorGUILayout.EndHorizontal ();
+			EditorGUILayout.BeginHorizontal();
+			EditorGUILayout.LabelField( "Pool Name" );
+			EditorGUILayout.LabelField( "Object Type" );
+			EditorGUILayout.LabelField( "Size" );
+			EditorGUILayout.EndHorizontal();
 			
-			m_manager = ((PrefabPoolManager)target);
-			PrefabPool[] pools = m_manager.GetAllPools ();
+			PrefabPool[] pxPrefabPools = m_pxPrefabPoolManager.GetAllPools();
+			int iNumberOfPrefabPools = pxPrefabPools.Length;
 			
-			int poolToRemove = -1;
-			for (int i=0; i<pools.Length; i++)
+			int iPoolIndexToRemove = -1;
+			for ( int iPrefabPoolIndex = 0; iPrefabPoolIndex < iNumberOfPrefabPools; iPrefabPoolIndex++ )
 			{
-				PrefabPool p = pools[i];
+				PrefabPool pxPrefabPool = pxPrefabPools[ iPrefabPoolIndex ];
 				
-				EditorGUILayout.BeginHorizontal ();
-				p.name = EditorGUILayout.TextField (p.name);
-				p.ObjectPrefab = EditorGUILayout.ObjectField (p.ObjectPrefab, typeof (GameObject), false) as GameObject;
-				p.Cached = EditorGUILayout.IntField (p.Cached);
-				if (GUILayout.Button ("-"))
+				EditorGUILayout.BeginHorizontal();
 				{
-					poolToRemove = i;
+					pxPrefabPool.name         = EditorGUILayout.TextField( pxPrefabPool.name);
+					pxPrefabPool.ObjectPrefab = EditorGUILayout.ObjectField( pxPrefabPool.ObjectPrefab, typeof( GameObject ), false ) as GameObject;
+					pxPrefabPool.Cached       = EditorGUILayout.IntField( pxPrefabPool.Cached );
+					bool bPoolShouldBeRemoved = GUILayout.Button( "-" );
+					if ( bPoolShouldBeRemoved )
+					{
+						iPoolIndexToRemove = iPrefabPoolIndex;
+					}
 				}
-				
-				EditorGUILayout.EndHorizontal ();
+				EditorGUILayout.EndHorizontal();
 			}
 			
-			if (poolToRemove >= 0 && poolToRemove < pools.Length)
+			if ( iPoolIndexToRemove >= 0 && iPoolIndexToRemove < pxPrefabPools.Length )
 			{
-				m_manager.RemovePool (pools[poolToRemove].ObjectPrefab);
+				m_pxPrefabPoolManager.RemovePool( pxPrefabPools[iPoolIndexToRemove].ObjectPrefab );
 			}
 			
-			EditorGUILayout.BeginHorizontal ();
-			m_newPoolObject = EditorGUILayout.ObjectField ("Create new pool", m_newPoolObject, typeof (GameObject), false) as GameObject;
-			if (GUILayout.Button ("+", GUILayout.Width (32)) && m_newPoolObject != null)
+			EditorGUILayout.BeginHorizontal();
 			{
-				m_manager.CreatePool (m_newPoolObject);
-				m_newPoolObject = null;
-				
-				EditorUtility.SetDirty (m_manager);
-				foreach (PrefabPool pool in m_manager.GetAllPools())
+				m_pxNewPrefabPoolObject = EditorGUILayout.ObjectField ("Create new pool", m_pxNewPrefabPoolObject, typeof (GameObject), false) as GameObject;
+				bool bShouldAddNewPool  = GUILayout.Button( "+", GUILayout.Width( 32 ) );
+				if ( bShouldAddNewPool && m_pxNewPrefabPoolObject != null)
 				{
-					EditorUtility.SetDirty (pool);
+					m_pxPrefabPoolManager.CreatePool( m_pxNewPrefabPoolObject );
+					m_pxNewPrefabPoolObject = null;
+					
+					EditorUtility.SetDirty( m_pxPrefabPoolManager );
+					
+					foreach ( PrefabPool pxPrefabPool in pxPrefabPools )
+					{
+						EditorUtility.SetDirty( pxPrefabPool );
+					}
 				}
 			}
-			EditorGUILayout.EndHorizontal ();
+			EditorGUILayout.EndHorizontal();
 		}
+		
+		private GameObject m_pxNewPrefabPoolObject;
+		private PrefabPoolManager m_pxPrefabPoolManager;
 	}
 }

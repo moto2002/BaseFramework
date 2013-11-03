@@ -12,25 +12,40 @@ namespace BaseFramework.PrefabPool
 	[CustomEditor (typeof (PrefabPool))]
 	public class PrefabPoolEditor : Editor
 	{
+		public void OnEnable()
+		{
+			m_pxPrefabPool = (PrefabPool)target;
+		}
+		
 		public override void OnInspectorGUI ()
 		{	
-			PrefabPool pool = target as PrefabPool;
-			string prefabType = pool.ObjectPrefab == null ? "None" : pool.ObjectPrefab.name;
+			GameObject pxPrefab = m_pxPrefabPool.ObjectPrefab;
+			string pxPrefabName = "None";
+			if ( pxPrefab != null )
+			{
+				pxPrefabName = m_pxPrefabPool.ObjectPrefab.name;
+			}
 			
-			EditorGUILayout.BeginHorizontal ();
-			EditorGUILayout.PrefixLabel ("Pool Prefab");
-			EditorGUILayout.LabelField (prefabType);
+			EditorGUILayout.BeginHorizontal();
+			EditorGUILayout.PrefixLabel( "Pool Prefab" );
+			EditorGUILayout.LabelField( pxPrefabName );
 			EditorGUILayout.EndHorizontal ();
 			
-			EditorGUILayout.BeginHorizontal ();
-			EditorGUILayout.PrefixLabel ("Size of Pool"); 
-			EditorGUILayout.LabelField (pool.Cached.ToString ());
-			EditorGUILayout.EndHorizontal ();
+			EditorGUILayout.BeginHorizontal();
+			EditorGUILayout.PrefixLabel( "Size of Pool" );
 			
-			EditorGUILayout.BeginHorizontal ();
-			EditorGUILayout.PrefixLabel ("Inactive Objects"); 
-			EditorGUILayout.LabelField (pool.InactiveObjects.ToString ());
-			EditorGUILayout.EndHorizontal ();
+			int iNumberOfObjectsCached = m_pxPrefabPool.Cached;
+			EditorGUILayout.LabelField( iNumberOfObjectsCached.ToString() );
+			EditorGUILayout.EndHorizontal();
+			
+			EditorGUILayout.BeginHorizontal();
+			EditorGUILayout.PrefixLabel( "Inactive Objects" );
+			
+			int iNumberOfInactiveObjects = m_pxPrefabPool.InactiveObjects;
+			EditorGUILayout.LabelField( iNumberOfInactiveObjects.ToString() );
+			EditorGUILayout.EndHorizontal();
 		}
+		
+		PrefabPool m_pxPrefabPool;
 	}
 }
