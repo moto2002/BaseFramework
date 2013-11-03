@@ -3,7 +3,9 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 
-namespace BaseFramework.Core
+using BaseFramework.Core;
+
+namespace BaseFramework.PrefabPool
 {
 	[ExecuteInEditMode ()]
 	public class PrefabPoolManager : MonoSingleton<PrefabPoolManager>

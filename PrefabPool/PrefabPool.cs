@@ -2,7 +2,7 @@ using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
 
-namespace BaseFramework
+namespace BaseFramework.PrefabPool
 {
 	[ExecuteInEditMode ()]
 	public class PrefabPool : MonoBehaviour
