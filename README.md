@@ -38,6 +38,13 @@ Feature Branch: feature/Input
 The 'Input' feature provides functionality for touch-screen gestures and Mouse input. Both frameworks are fully functional, but may lack all gestures/mouse actions required.
 
 
+Math
+====
+Feature Branch: <none>
+
+The 'Math' feature provides static methods for typical mathematical operations.
+
+
 Prefab Pool
 ===========
 Feature Branch: feature/PrefabPool
