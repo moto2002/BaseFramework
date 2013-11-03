@@ -14,35 +14,38 @@ namespace BaseFramework.PrefabPool
 		// - NO dupilcates
 		// - Don't need fast inserts / removals as pools are not set up at run time.
 		// - We could index or iterate. indexed would be quicker at runtime though?
-		private Dictionary<String, PrefabPool> m_prefabPools;
+		private Dictionary<String, PrefabPool> m_pxPrefabPools;
 		
 		[SerializeField]
-		private List<String> m_prefabKeys = new List<String>();
+		private List<String> m_pxPrefabKeys = new List<String>();
 		
 		[SerializeField]
-		private List<PrefabPool> m_prefabValues = new List<PrefabPool>();
+		private List<PrefabPool> m_pxPrefabValues = new List<PrefabPool>();
 		
-		public void CreatePool (GameObject prefabType)
+		public void CreatePool( GameObject pxPrefab )
 		{
-			UpdateDictionary ();
+			UpdateDictionary();
 			
-			string id = GetPrefabID (prefabType);
-			if (!m_prefabPools.ContainsKey (id))
+			string pxPoolID = GetPrefabID( pxPrefab );
+			if ( !m_pxPrefabPools.ContainsKey( pxPoolID ) )
 			{
-				m_prefabKeys.Add (id);
-				m_prefabValues.Add (NewPool (prefabType));
+				m_pxPrefabKeys.Add( pxPoolID );
 				
-				UpdateDictionary ();
+				PrefabPool pxPrefabPool = NewPool( pxPrefab );
+				m_pxPrefabValues.Add( pxPrefabPool );
+				
+				UpdateDictionary();
 			}
 		}
 		
-		public PrefabPool[] GetAllPools ()
+		public PrefabPool[] GetAllPools()
 		{
-			UpdateDictionary ();
+			UpdateDictionary();
 			
-			PrefabPool[] pools = new PrefabPool[m_prefabPools.Count];
-			m_prefabPools.Values.CopyTo (pools, 0);
-			return pools;
+			PrefabPool[] pxAllPrefabPools = new PrefabPool[m_pxPrefabPools.Count];
+			m_pxPrefabPools.Values.CopyTo( pxAllPrefabPools, 0 );
+			
+			return pxAllPrefabPools;
 		}
 		
 		public PrefabPool GetPool (GameObject prefabType)
@@ -50,9 +53,9 @@ namespace BaseFramework.PrefabPool
 			UpdateDictionary ();
 			
 			string id = GetPrefabID (prefabType);
-			if (m_prefabPools.ContainsKey (id))
+			if (m_pxPrefabPools.ContainsKey (id))
 			{
-				return m_prefabPools[id];
+				return m_pxPrefabPools[id];
 			}
 			
 			return null;
@@ -63,12 +66,12 @@ namespace BaseFramework.PrefabPool
 			UpdateDictionary ();
 			
 			string id = GetPrefabID (prefabType);
-			if (m_prefabPools.ContainsKey (id))
+			if (m_pxPrefabPools.ContainsKey (id))
 			{
-				DestroyImmediate (m_prefabPools[id].gameObject);
+				DestroyImmediate (m_pxPrefabPools[id].gameObject);
 				
-				m_prefabKeys.Remove (id);
-				m_prefabValues.Remove (NewPool (prefabType));
+				m_pxPrefabKeys.Remove (id);
+				m_pxPrefabValues.Remove (NewPool (prefabType));
 				
 				UpdateDictionary ();
 			}
@@ -83,98 +86,97 @@ namespace BaseFramework.PrefabPool
 		
 		private void UpdateDictionary ()
 		{
-			m_prefabPools = new Dictionary<string, PrefabPool>();
+			m_pxPrefabPools = new Dictionary<string, PrefabPool>();
 			
-			if (m_prefabKeys.Count != m_prefabValues.Count)
+			if (m_pxPrefabKeys.Count != m_pxPrefabValues.Count)
  			{
-				Debug.LogError ("Keys and Values are out of sync!! (keys: "+m_prefabKeys.Count+", values: "+m_prefabValues.Count+")");
-				m_prefabKeys = new List<string>();
-				m_prefabValues = new List<PrefabPool>();
+				Debug.LogError ("Keys and Values are out of sync!! (keys: "+m_pxPrefabKeys.Count+", values: "+m_pxPrefabValues.Count+")");
+				m_pxPrefabKeys = new List<string>();
+				m_pxPrefabValues = new List<PrefabPool>();
 				return;
 			}
 			
-			for (int i=0; i<m_prefabKeys.Count; i++)
+			for (int i=0; i<m_pxPrefabKeys.Count; i++)
 			{
-				m_prefabPools.Add (m_prefabKeys[i], m_prefabValues[i]);
+				m_pxPrefabPools.Add (m_pxPrefabKeys[i], m_pxPrefabValues[i]);
 			}
 		}
 		
-		// TODO : Better Generation of PrefabId's ??
-		private String GetPrefabID (GameObject prefabType)
+		private String GetPrefabID( GameObject pxPrefab )
 		{
-			if (prefabType == null)
+			if ( pxPrefab != null )
 			{
-				//Debug.LogError ("No prefabType specified!");
-				return null;
-			}
-			
-			int i = prefabType.name.IndexOf ('(');
-			
-			if (i < 0)
-			{
-				//Debug.Log ("PrefabID : "+prefabType.name);
-				return prefabType.name;
-			}
-			else
-			{
-				//Debug.Log ("PrefabID : "+prefabType.name.Substring (0, i));
-				return prefabType.name.Substring (0, i);
-			}
-		}
-		
-		private PrefabPool NewPool (GameObject prefabType)
-		{
-			GameObject go = new GameObject();
-			go.transform.parent = transform;
-			
-			PrefabPool pool = go.AddComponent<PrefabPool>();
-			pool.ObjectPrefab = prefabType;
-			pool.Cached = 5;
-			
-			return pool;
-		}
-		
-		void Update () // todo : optimize and do not execute in play mode
-		{
-			UpdateDictionary ();
-			
-			foreach (KeyValuePair<String, PrefabPool> prefabEntry in m_prefabPools)
-			{
-				if (prefabEntry.Value == null)
+				// Handle's the removal of the (copy) string Unity appends to a GameObject.
+				int iIndexOfBracket = pxPrefab.name.IndexOf ('(');
+				if ( iIndexOfBracket < 0 )
 				{
-					m_prefabPools.Remove (prefabEntry.Key);
+					return pxPrefab.name;
 				}
-				else if (prefabEntry.Value.ObjectPrefab == null)
+				else
 				{
-					DestroyImmediate (prefabEntry.Value.gameObject);
-					m_prefabPools.Remove (prefabEntry.Key);
+					return pxPrefab.name.Substring (0, iIndexOfBracket);
 				}
 			}
+			return null;
+		}
+		
+		private PrefabPool NewPool( GameObject pxPrefab )
+		{
+			GameObject pxPrefabPoolInstance = new GameObject();
+			pxPrefabPoolInstance.transform.parent = transform;
 			
-			foreach (Transform t in transform)
+			PrefabPool pxPrefabPool = pxPrefabPoolInstance.AddComponent<PrefabPool>();
+			pxPrefabPool.ObjectPrefab = pxPrefab;
+			pxPrefabPool.Cached = 5;
+			
+			return pxPrefabPool;
+		}
+		
+		private void Update()
+		{
+			UpdateDictionary();
+			
+			foreach ( KeyValuePair<String, PrefabPool> pxPrefabPoolKVPair in m_pxPrefabPools )
 			{
-				PrefabPool pool = t.GetComponent<PrefabPool>();
+				string pxPrefabPoolID = pxPrefabPoolKVPair.Key;
+				PrefabPool pxPrefabPool = pxPrefabPoolKVPair.Value;
 				
-				if (pool != null)
+				if ( pxPrefabPool == null )
 				{
-					if (m_prefabPools.ContainsValue (pool))
+					m_pxPrefabPools.Remove( pxPrefabPoolID );
+				}
+				else if ( pxPrefabPool.ObjectPrefab == null )
+				{
+					DestroyImmediate( pxPrefabPool.gameObject );
+					m_pxPrefabPools.Remove( pxPrefabPoolKVPair.Key );
+				}
+			}
+			
+			foreach ( Transform pxPrefabPoolTransform in transform )
+			{
+				PrefabPool pxPrefabPool = pxPrefabPoolTransform.GetComponent<PrefabPool>();
+				
+				if ( pxPrefabPool != null )
+				{
+					if ( m_pxPrefabPools.ContainsValue( pxPrefabPool ) )
 					{
 						continue;
 					}
 					
-					if (pool.ObjectPrefab != null)
+					GameObject pxPrefab = pxPrefabPool.ObjectPrefab;
+					if ( pxPrefab != null )
 					{
-						string id = GetPrefabID (pool.ObjectPrefab);
-						m_prefabPools.Add (id, pool);
+						string pxPrefabPoolID = GetPrefabID( pxPrefab );
+						m_pxPrefabPools.Add( pxPrefabPoolID, pxPrefabPool );
 					}
 					else
 					{
-						DestroyImmediate (t.gameObject);
+						DestroyImmediate( pxPrefabPoolTransform );
 					}	
 				}
 				else
 				{
-					DestroyImmediate (t.gameObject);
+					DestroyImmediate( pxPrefabPoolTransform );
 				}
 			}
 		}
