@@ -5,13 +5,10 @@ namespace BaseFramework.PrefabPool
 {
 	public static class PrefabPoolExtensions
 	{
-		public static void ReturnToPool (this GameObject go)
+		public static void ReturnToPool( this GameObject pxGameObject )
 		{
-			go.SendMessageUpwards ("PoolObject", go);
-		}
-		
-		public static void IsInPool (this GameObject go)
-		{
+			// To consider- Base class functionality..?
+			pxGameObject.SendMessageUpwards( "ReturnObjectToPool", pxGameObject );
 		}
 	}
 }
