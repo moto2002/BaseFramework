@@ -36,8 +36,6 @@ namespace BaseFramework.PrefabPool
 			GameObject pxGameObject = m_pxInactiveObjects.Dequeue();
 			pxGameObject.SetActive( true );
 			
-			Debug.Log ( "Unpool- " + pxGameObject );
-			
 			return pxGameObject;
 		}
 		
@@ -49,7 +47,6 @@ namespace BaseFramework.PrefabPool
 				bool bObjectIsAlreadyPooled = m_pxInactiveObjects.Contains( pxObjectToAddToPool );
 				if ( !bObjectIsAlreadyPooled )
 				{
-					Debug.Log ( "Pool- " + pxObjectToAddToPool );
 					m_pxInactiveObjects.Enqueue( pxObjectToAddToPool );
 					pxObjectToAddToPool.SetActive( false );
 				}
