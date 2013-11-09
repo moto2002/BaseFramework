@@ -13,143 +13,69 @@ namespace BaseFramework.Gestures
 		
 		public void AddGesture( GestureRecogniser xGesture )
 		{
-			m_gestures.Add( xGesture );
+			m_pxGestureRecognisers.Add( xGesture );
 		}
 		
 		public void RemoveGesture( GestureRecogniser xGesture )
 		{
-			m_gestures.Remove( xGesture );
+			m_pxGestureRecognisers.Remove( xGesture );
 		}
 		
 		private void Awake()
 		{
 			GameObject xCameraGameObject = GameObject.FindGameObjectWithTag( "MainCamera" );
-			m_camera = xCameraGameObject.GetComponent<Camera>();
-			m_gestures = new List<GestureRecogniser>();
+			m_pxCamera = xCameraGameObject.GetComponent<Camera>();
+			m_pxGestureRecognisers = new List<GestureRecogniser>();
 		}
 		
 		private void Update()
 		{
+			Touch[] pxTouches    = Input.touches;
 			int iNumberOfTouches = Input.touchCount;
-			Touch[] xTouches = Input.touches;
 			
-			bool bInputBegan      = false;
-			bool bInputChanged    = false;
-			bool bInputEnded      = false;
-			bool bInputCancelled  = false;
-			bool bInputStationary = false;
-			for ( int iTouchIndex = 0; iTouchIndex < iNumberOfTouches; iTouchIndex++ )
+			// Update each GestureRecogniser
+			foreach ( GestureRecogniser pxGesture in m_pxGestureRecognisers )
 			{
-				Touch xThisTouch = Input.touches[ iTouchIndex ];
-				TouchPhase xThisTouchPhase = xThisTouch.phase;
+				Collider pxGestureCollider = pxGesture.gestureCollider;
 				
-				bInputBegan      |= xThisTouchPhase == TouchPhase.Began;
-				bInputStationary |= xThisTouchPhase == TouchPhase.Stationary;
-				bInputChanged    |= xThisTouchPhase == TouchPhase.Moved;
-				bInputEnded      |= xThisTouchPhase == TouchPhase.Ended;
-				bInputCancelled  |= xThisTouchPhase == TouchPhase.Canceled;
-			}
-			
-			foreach ( GestureRecogniser xHandler in m_gestures )
-			{
-				int iHandlerTouchesRequired = xHandler.numberOfTouches;
-				switch ( xHandler.gestureState )
+				// With each Touch.
+				for ( int iTouchIndex = 0; iTouchIndex < iNumberOfTouches; iTouchIndex++ )
 				{
-					case GestureState.GestureStatePossible:
-					case GestureState.GestureStateBegan:
-					case GestureState.GestureStateChanged:
-					{
-						if ( bInputBegan && iNumberOfTouches == iHandlerTouchesRequired )
-						{
-							// Call only with the touches that are within the bounds of the InputHandlers' Collider.
-							Collider xHandlerCollider = xHandler.gestureCollider;
-							Touch[] xValidTouches = InputIntersectsCollider( xTouches, xHandlerCollider );
-							if ( xValidTouches.Length > 0 )
-							{
-								xHandler.InputBegan( xValidTouches );
-							}
-						}
-
-						if ( bInputChanged )
-						{
-							xHandler.InputChanged( xTouches );
-						}
-						
-						if ( bInputStationary )
-						{
-							xHandler.InputStationary( xTouches );
-						}
-						
-						if ( bInputEnded )
-						{
-							xHandler.InputEnded( xTouches );
-						}
-						
-						if ( bInputCancelled )
-						{
-							xHandler.InputCancelled( xTouches );
-						}
-						
-						break;
-					}
-						
-					case GestureState.GestureStateEnded:
-					case GestureState.GestureStateRecognised:
-					{
-						//Return to 'Possible' state.
-						xHandler.ResetGesture();
-						xHandler.gestureState = GestureState.GestureStatePossible;
-						break;
-					}
+					Touch pxTouch = pxTouches[ iTouchIndex ];
+					bool bTouchIntersectsCollider = InputIntersectsCollider( pxTouch, pxGestureCollider );
 					
-					case GestureState.GestureStateFailed:
-					case GestureState.GestureStateCancelled:
-					{
-						// Return to 'Possible' state when no touches remain.
-						if ( iNumberOfTouches == 0 )
-						{
-							xHandler.ResetGesture();
-							xHandler.gestureState = GestureState.GestureStatePossible;
-						}
-						break;
-					}
+					pxGesture.ReceiveTouch( pxTouch, bTouchIntersectsCollider );
 				}
 			}
 		}
 		
-		private Touch[] InputIntersectsCollider( Touch[] xTouchInput, Collider xCollider )
+		private bool InputIntersectsCollider( Touch pxTouch, Collider pxCollider )
 		{
-			List<Touch> xValidTouchInput = new List<Touch>();
-			foreach ( Touch xThisTouch in xTouchInput )
+			Vector2 pxTouchPoint = pxTouch.position;
+			
+			RaycastHit pxHitInfo;
+			Ray pxTouchRay = m_pxCamera.ScreenPointToRay( pxTouchPoint );
+			
+			int iLayerMask = 1 << LayerMask.NameToLayer( LAYER_MASK_NAME );
+			
+			bool bRaycastHit = Physics.Raycast( pxTouchRay, out pxHitInfo, 50.0f, iLayerMask );
+			if ( bRaycastHit )
 			{
-				Vector2 xTouchPoint = xThisTouch.position;
-				Ray xTouchRay = m_camera.ScreenPointToRay( xTouchPoint );
-				RaycastHit xHitInfo;
-				
-				int  iLayerMask = 1 << LayerMask.NameToLayer( LAYER_MASK_NAME );
-				bool bRaycastHit = Physics.Raycast( xTouchRay, out xHitInfo, 50.0f, iLayerMask );
-
-				if ( bRaycastHit )
+				//TODO: Lookup Collider in a Dictionary<Collider, List<GestureRecogniser>>.
+				bool bHitThisCollider = pxHitInfo.collider == pxCollider;
+				if ( bHitThisCollider )
 				{
-					//TODO: Lookup Collider in a Dictionary<Collider, List<GestureRecogniser>>.
-					bool bHitThisCollider = xHitInfo.collider == xCollider;
-					if ( bHitThisCollider )
-					{
-						Vector3 xHitPoint = xHitInfo.point;
-						Bounds xColliderBounds = xCollider.bounds;
-						
-						bool bIntersects = xColliderBounds.Contains( xHitPoint );
-						if ( bIntersects )
-						{
-							xValidTouchInput.Add( xThisTouch );
-						}
-					}
+					Vector3 xHitPoint = pxHitInfo.point;
+					Bounds xColliderBounds = pxCollider.bounds;
+					
+					bool bIntersects = xColliderBounds.Contains( xHitPoint );
+					return bIntersects;
 				}
 			}
-			return xValidTouchInput.ToArray();
+			return false;
 		}
 		
-		private Camera m_camera;
-		private List<GestureRecogniser> m_gestures;
+		private Camera m_pxCamera;
+		private List<GestureRecogniser> m_pxGestureRecognisers;
 	}
 }

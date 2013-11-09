@@ -14,12 +14,12 @@ namespace BaseFramework.Gestures
 			gestureTapTime = 0.3f;
 		}
 		
-		public override void InputBegan( Touch[] touches )
+		protected override void InputBegan( Touch pxTouch )
 		{
 			m_fGestureStartTime = Time.time;
 		}
 		
-		public override void InputEnded( Touch[] touches )
+		protected override void InputEnded( Touch pxTouch )
 		{
 			float fCurrentTime = Time.time;
 			float fTimeElapsed = fCurrentTime - m_fGestureStartTime;

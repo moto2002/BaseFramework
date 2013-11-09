@@ -1,4 +1,5 @@
 using UnityEngine;
+using System.Collections.Generic;
 
 namespace BaseFramework.Gestures
 {
@@ -32,60 +33,154 @@ namespace BaseFramework.Gestures
 			
 			set
 			{
-				m_state = value;
-				
-				if ( gestureDelegate != null &&
-					m_state != GestureState.GestureStatePossible )
+				if ( m_state != value )
 				{
-					gestureDelegate( this );
+					m_state = value;
+					
+					switch ( gestureState )
+					{
+						default:
+						{
+							break;
+						}
+							
+						case GestureState.GestureStateEnded:
+						case GestureState.GestureStateRecognised:
+						{
+							//Return to 'Possible' state.
+							ResetGesture();
+							gestureState = GestureState.GestureStatePossible;
+							break;
+						}
+						
+						case GestureState.GestureStateFailed:
+						case GestureState.GestureStateCancelled:
+						{
+							// Return to 'Possible' state when no touches remain.
+							if ( numberOfTouches == 0 )
+							{
+								ResetGesture();
+								gestureState = GestureState.GestureStatePossible;
+							}
+							break;
+						}
+					}
+					
+					if ( m_state != GestureState.GestureStatePossible )
+					{
+						gestureDelegate( this );
+					}
 				}
 			}
 		}
 		
-		public GestureRecogniser( Collider xCollider, GestureRecogniserDelegate xDelegate )
+		public GestureRecogniser( Collider pxCollider, GestureRecogniserDelegate pxDelegate )
 		{
+			m_pxActiveTouches = new List<Touch>();
+			
 			numberOfTouches = 1;
-			gestureCollider = xCollider;
-			gestureDelegate = xDelegate;
+			gestureCollider = pxCollider;
+			gestureDelegate = pxDelegate;
 		}
 		
-		public virtual void InputBegan( Touch[] xTouches )
+		public void ReceiveTouch( Touch pxTouch, bool bIntersectsWithCollider )
 		{
-			CalculateFocusFromAverageWithTouches( xTouches );
+			TouchPhase kTouchPhase = pxTouch.phase;
+			
+			if ( bIntersectsWithCollider )
+			{
+				switch ( kTouchPhase )
+				{
+					case TouchPhase.Began:
+					{
+						InputBegan( pxTouch );
+						break;
+					}
+					
+					case TouchPhase.Moved:
+					{
+						InputChanged( pxTouch );
+						break;
+					}
+					
+					case TouchPhase.Stationary:
+					{
+						InputStationary( pxTouch );
+						break;
+					}
+					
+					case TouchPhase.Ended:
+					{
+						InputEnded( pxTouch );
+						break;
+					}
+					
+					case TouchPhase.Canceled:
+					{
+						InputCancelled( pxTouch );
+						break;
+					}
+				}
+			}
+			else
+			{
+				InputEnded( pxTouch );
+			}
 		}
 		
-		public virtual void InputStationary( Touch[] xTouches )
+		#region Virtual Methods
+		
+		protected virtual void InputBegan( Touch pxTouch )
+		{
+			m_pxActiveTouches.Add( pxTouch );
+			CalculateFocusFromActiveTouches();
+		}
+		
+		protected virtual void InputStationary( Touch pxTouch )
 		{
 		}
 		
-		public virtual void InputChanged( Touch[] xTouches )
+		protected virtual void InputChanged( Touch pxTouch )
 		{
-			CalculateFocusFromAverageWithTouches( xTouches );
+			m_pxActiveTouches.Add( pxTouch );
+			CalculateFocusFromActiveTouches();
 		}
 		
-		public virtual void InputEnded( Touch[] xTouches )
+		protected virtual void InputEnded( Touch pxTouch )
 		{
+			m_pxActiveTouches.Remove( pxTouch );
+			CalculateFocusFromActiveTouches();
 		}
 		
-		public virtual void InputCancelled( Touch[] xTouches )
+		protected virtual void InputCancelled( Touch pxTouch )
 		{
+			m_pxActiveTouches.Remove( pxTouch );
+			CalculateFocusFromActiveTouches();
 		}
 		
-		public virtual void ResetGesture()
+		protected virtual void ResetGesture()
 		{
+			m_pxActiveTouches.Clear();
 		}
 		
-		private void CalculateFocusFromAverageWithTouches( Touch[] xTouches )
+		#endregion
+		
+		#region Helper Methods
+		
+		private void CalculateFocusFromActiveTouches()
 		{
 			focus = Vector2.zero;
-			foreach ( Touch xTouch in xTouches )
+			foreach ( Touch pxTouch in m_pxActiveTouches )
 			{
-				Vector2 xTouchPoint = xTouch.position;
-				focus += xTouchPoint;
+				Vector2 pxTouchPoint = pxTouch.position;
+				focus += pxTouchPoint;
 			}
-			focus /= xTouches.Length;
+			focus /= m_pxActiveTouches.Count;
 		}
 		
+		#endregion
+		
 		private GestureState m_state;
+		private List<Touch> m_pxActiveTouches;
 	}
 }

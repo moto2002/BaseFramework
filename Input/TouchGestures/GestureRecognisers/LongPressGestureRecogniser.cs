@@ -17,13 +17,13 @@ namespace BaseFramework.Gestures
 			m_fStartTime = -1.0f;
 		}
 		
-		public override void InputBegan( Touch[] xTouches )
+		protected override void InputBegan( Touch pxTouch )
 		{
-			base.InputBegan( xTouches );
+			base.InputBegan( pxTouch );
 			m_fStartTime = Time.time;
 		}
 			
-		public override void InputStationary( Touch[] xTouches )
+		protected override void InputStationary( Touch pxTouch )
 		{
 			if ( m_fStartTime >= 0.0f )
 			{
@@ -37,7 +37,7 @@ namespace BaseFramework.Gestures
 			}
 		}
 		
-		public override void InputChanged( Touch[] xTouches )
+		protected override void InputChanged( Touch pxTouch )
 		{
 			if ( gestureState == GestureState.GestureStatePossible )
 			{
@@ -46,18 +46,18 @@ namespace BaseFramework.Gestures
 			else if ( gestureState == GestureState.GestureStateBegan ||
 				      gestureState == GestureState.GestureStateChanged )
 			{
-				base.InputChanged( xTouches );
+				base.InputChanged( pxTouch );
 				
-				Vector2 pxDifference = xTouches[0].deltaPosition;
+				Vector2 pxDifference = pxTouch.deltaPosition;
 				m_pxMoveDelta = pxDifference;
 				
 				gestureState = GestureState.GestureStateChanged;
 			}
 		}
 		
-		public override void InputEnded( Touch[] xTouches )
+		protected override void InputEnded( Touch pxTouch )
 		{
-			base.InputEnded( xTouches );
+			base.InputEnded( pxTouch );
 			
 			if ( gestureState == GestureState.GestureStateBegan ||
 				gestureState == GestureState.GestureStateChanged )
@@ -66,9 +66,9 @@ namespace BaseFramework.Gestures
 			}
 		}
 		
-		public override void ResetGesture()
+		protected override void ResetGesture()
 		{
-			base.ResetGesture ();
+			base.ResetGesture();
 			
 			m_fStartTime  = -1.0f;
 			m_pxMoveDelta = Vector3.zero;
