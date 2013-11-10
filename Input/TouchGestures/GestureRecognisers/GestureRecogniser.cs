@@ -41,12 +41,20 @@ namespace BaseFramework.Gestures
 					{
 						default:
 						{
+							gestureDelegate( this );
 							break;
 						}
-							
+						
+						case GestureState.GestureStatePossible:
+						{
+							break;
+						}
+						
 						case GestureState.GestureStateEnded:
 						case GestureState.GestureStateRecognised:
 						{
+							gestureDelegate( this );
+						
 							//Return to 'Possible' state.
 							ResetGesture();
 							gestureState = GestureState.GestureStatePossible;
@@ -56,6 +64,8 @@ namespace BaseFramework.Gestures
 						case GestureState.GestureStateFailed:
 						case GestureState.GestureStateCancelled:
 						{
+							gestureDelegate( this );
+							
 							// Return to 'Possible' state when no touches remain.
 							if ( numberOfTouches == 0 )
 							{
@@ -65,11 +75,6 @@ namespace BaseFramework.Gestures
 							break;
 						}
 					}
-				}
-				
-				if ( m_kGestureState != GestureState.GestureStatePossible )
-				{
-					gestureDelegate( this );
 				}
 			}
 		}

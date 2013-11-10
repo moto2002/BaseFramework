@@ -6,52 +6,57 @@ namespace BaseFramework.Gestures
 	/// <summary>
 	/// A SwipeGesture looks for multiple(?) touches in the same
 	/// direction, and returns their direction and speed.
-	/// 
-	/// TODO: What would be the best way to implement multi-touch swipe gestures? In one class or several?
 	/// </summary>
-	public class SwipeGestureRecogniser //: GestureRecogniser
-	{		
-//		public override void Tick( float deltaTime )
-//		{
-//			// Get the one and only touch.
-//			if ( data.Length != 1 ) return Vector2.zero;
-//			InputData touch = data[0];
-//			
-//			// Initialise the gesture if the touch has just started
-//			string beganPhase = TouchInputType.TouchPhases[ (int)TouchPhase.Began ];
-//			if ( string.Compare( touch.Details, beganPhase ) == 0 )
-//			{
-//				m_touchData = touch;
-//				m_gestureTime = Time.time;
-//				m_result = touch.Focus;
-//			}
-//			
-//			if ( m_touchData != null )
-//			{
-////				Vector3 dir = touch.Focus - m_touchData.Focus;
-//				
-//				//TODO: Check if swipe gesture is a relatively straight line
-//				//TODO: Check if swipe gesture is performed within a certain time limit.
-//			}
-//			
-//			// Calculate & return resulting velocity vector
-//			string endPhase = TouchInputType.TouchPhases[ (int)TouchPhase.Ended ];
-//			if ( string.Compare( touch.Details, endPhase ) == 0 )
-//			{
-//				m_gestureTime = Time.time - m_gestureTime;
-//				m_result.x = touch.Focus.x - m_result.x;
-//				m_result.y = touch.Focus.y - m_result.y;
-//				
-//				Vector2 velocity = m_result / m_gestureTime;
-//				return velocity;
-//			}
-//			return Vector2.zero;
-//		}
-//		
-////		private static float m_maxTime = 2.0f;
-////		private static float m_maxAngularChangeDeg = 5.0f;
-//		
-//		private float m_gestureTime;
-//		private Vector2 m_result;
+	public class SwipeGestureRecogniser : GestureRecogniser
+	{
+		public Vector2 Velocity { get { return m_pxVelocityVector; } }
+		
+		public SwipeGestureRecogniser( Collider pxCollider, GestureRecogniserDelegate pxDelegate ) : base( pxCollider, pxDelegate )
+		{
+		}
+		
+		protected override void InputBegan( Touch pxTouch )
+		{
+			base.InputBegan( pxTouch );
+			
+			m_fStartTime = Time.time;
+			m_pxInitialTouchPosition = focus;
+		}
+		
+		protected override void InputChanged( Touch pxTouch )
+		{
+			base.InputChanged( pxTouch );
+		}
+		
+		protected override void InputCancelled( Touch pxTouch )
+		{
+			base.InputCancelled( pxTouch );
+		}
+		
+		protected override void InputStationary( Touch pxTouch )
+		{
+			base.InputStationary( pxTouch );
+		}
+		
+		protected override void InputEnded( Touch pxTouch )
+		{
+			base.InputEnded( pxTouch );
+			
+			float fTimeElapsed = Time.time - m_fStartTime;
+			Vector2 pxDistanceTravelled = focus - m_pxInitialTouchPosition;
+			
+			m_pxVelocityVector = pxDistanceTravelled / fTimeElapsed;
+			
+			gestureState = GestureState.GestureStateRecognised;
+		}
+		
+		
+//		private static float m_maxTime = 2.0f;
+//		private static float m_maxAngularChangeDeg = 5.0f;
+		
+		private float m_fStartTime;
+		
+		private Vector2 m_pxInitialTouchPosition;
+		private Vector2 m_pxVelocityVector;
 	}
 }
