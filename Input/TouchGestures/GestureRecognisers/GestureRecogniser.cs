@@ -28,16 +28,16 @@ namespace BaseFramework.Gestures
 		{
 			get
 			{
-				return m_state;
+				return m_kGestureState;
 			}
 			
 			set
 			{
-				if ( m_state != value )
+				if ( m_kGestureState != value )
 				{
-					m_state = value;
+					m_kGestureState = value;
 					
-					switch ( gestureState )
+					switch ( m_kGestureState )
 					{
 						default:
 						{
@@ -65,11 +65,11 @@ namespace BaseFramework.Gestures
 							break;
 						}
 					}
-					
-					if ( m_state != GestureState.GestureStatePossible )
-					{
-						gestureDelegate( this );
-					}
+				}
+				
+				if ( m_kGestureState != GestureState.GestureStatePossible )
+				{
+					gestureDelegate( this );
 				}
 			}
 		}
@@ -180,7 +180,7 @@ namespace BaseFramework.Gestures
 		
 		#endregion
 		
-		private GestureState m_state;
+		private GestureState m_kGestureState;
 		private List<Touch> m_pxActiveTouches;
 	}
 }
