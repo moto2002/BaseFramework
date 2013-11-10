@@ -5,6 +5,7 @@ namespace BaseFramework.MouseInput
 	public class MouseDragAction : MouseAction
 	{
 		public float beginDelay;
+		public float cancelDistance; // After travelling this far, the Gesture will fail. Ignored if <0.
 		public int clickButton;
 		
 		public Vector3 moveDelta
@@ -15,6 +16,8 @@ namespace BaseFramework.MouseInput
 		public MouseDragAction( Collider xCollider, MouseActionDelegate xDelegate ) : base( xCollider, xDelegate )
 		{
 			clickButton = 0;
+			cancelDistance = -1;
+			m_fDistanceTravelled = 0.0f;
 			beginDelay = 0.0f;
 		}
 		
@@ -51,6 +54,15 @@ namespace BaseFramework.MouseInput
 				
 				base.OnHover( xCursorPosition );
 				state = MouseActionState.MouseActionChanged;
+				
+				if ( cancelDistance >= 0 )
+				{
+					m_fDistanceTravelled += pxDifference.magnitude;
+					if ( m_fDistanceTravelled > cancelDistance )
+					{
+						state = MouseActionState.MouseActionEnded;
+					}
+				}
 			}
 		}
 		
@@ -66,10 +78,12 @@ namespace BaseFramework.MouseInput
 		protected override void ResetAction()
 		{
 			base.ResetAction();
+			m_fDistanceTravelled = 0.0f;
 			m_pxMoveDelta = Vector3.zero;
 		}
 		
 		private float m_fStartTime;
+		private float m_fDistanceTravelled;
 		private Vector3 m_pxMoveDelta;
 	}
 }
