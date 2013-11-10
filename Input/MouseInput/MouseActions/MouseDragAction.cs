@@ -18,7 +18,7 @@ namespace BaseFramework.MouseInput
 			beginDelay = 0.0f;
 		}
 		
-		public override void OnButtonPressed( int iButtonID )
+		protected override void OnButtonPressed( int iButtonID )
 		{
 			if ( clickButton == iButtonID )
 			{
@@ -29,7 +29,7 @@ namespace BaseFramework.MouseInput
 			}
 		}
 		
-		public override void OnHover( Vector3 xCursorPosition )
+		protected override void OnHover( Vector3 xCursorPosition )
 		{
 			if ( state == MouseActionState.MouseActionBegan )
 			{
@@ -54,7 +54,7 @@ namespace BaseFramework.MouseInput
 			}
 		}
 		
-		public override void OnButtonReleased( int iButtonID )
+		protected override void OnButtonReleased( int iButtonID )
 		{
 			if ( clickButton == iButtonID )
 			{
@@ -63,7 +63,7 @@ namespace BaseFramework.MouseInput
 			}
 		}
 		
-		public override void ResetAction()
+		protected override void ResetAction()
 		{
 			base.ResetAction();
 			m_pxMoveDelta = Vector3.zero;

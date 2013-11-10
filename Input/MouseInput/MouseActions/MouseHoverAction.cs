@@ -8,7 +8,7 @@ namespace BaseFramework.MouseInput
 		{
 		}
 		
-		public override void OnHover (Vector3 xCursorPosition)
+		protected override void OnHover (Vector3 xCursorPosition)
 		{
 			base.OnHover (xCursorPosition);
 			state = MouseActionState.MouseActionChanged;

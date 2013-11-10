@@ -13,7 +13,7 @@ namespace BaseFramework.MouseInput
 			clickTime = 0.3f;
 		}
 		
-		public override void OnButtonPressed( int iButtonID )
+		protected override void OnButtonPressed( int iButtonID )
 		{
 			if ( iButtonID == clickButton )
 			{
@@ -22,7 +22,7 @@ namespace BaseFramework.MouseInput
 			}
 		}
 		
-		public override void OnButtonReleased( int iButtonID )
+		protected override void OnButtonReleased( int iButtonID )
 		{
 			if ( iButtonID == clickButton )
 			{
