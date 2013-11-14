@@ -33,7 +33,7 @@ namespace BaseFramework.Gestures
 			
 			set
 			{
-				if ( m_kGestureState != value )
+				if ( m_kGestureState != value || value == GestureState.GestureStateChanged )
 				{
 					m_kGestureState = value;
 					
@@ -41,12 +41,12 @@ namespace BaseFramework.Gestures
 					{
 						default:
 						{
-							gestureDelegate( this );
 							break;
 						}
 						
-						case GestureState.GestureStatePossible:
+						case GestureState.GestureStateChanged:
 						{
+							gestureDelegate( this );
 							break;
 						}
 						
@@ -147,7 +147,6 @@ namespace BaseFramework.Gestures
 		
 		protected virtual void InputChanged( Touch pxTouch )
 		{
-			m_pxActiveTouches.Add( pxTouch );
 			CalculateFocusFromActiveTouches();
 		}
 		

@@ -9,7 +9,16 @@ namespace BaseFramework.Gestures
 	/// </summary>
 	public class SwipeGestureRecogniser : GestureRecogniser
 	{
-		public Vector2 Velocity { get { return m_pxVelocityVector; } }
+		public Vector2 Velocity
+		{
+			get { return m_pxVelocityVector; }
+		}
+		
+		public float SwipeDuration
+		{
+			get { return m_fMaxSwipeDuration;  }
+			set { m_fMaxSwipeDuration = value; }
+		}
 		
 		public SwipeGestureRecogniser( Collider pxCollider, GestureRecogniserDelegate pxDelegate ) : base( pxCollider, pxDelegate )
 		{
@@ -43,15 +52,29 @@ namespace BaseFramework.Gestures
 			base.InputEnded( pxTouch );
 			
 			float fTimeElapsed = Time.time - m_fStartTime;
-			Vector2 pxDistanceTravelled = focus - m_pxInitialTouchPosition;
-			
-			m_pxVelocityVector = pxDistanceTravelled / fTimeElapsed;
-			
-			gestureState = GestureState.GestureStateRecognised;
+			if ( fTimeElapsed < m_fMaxSwipeDuration )
+			{
+				Vector2 pxDistanceTravelled = focus - m_pxInitialTouchPosition;
+				
+				float fMagnitudeOfDistance = pxDistanceTravelled.magnitude;
+				if ( fMagnitudeOfDistance > 0.0f )
+				{
+					m_pxVelocityVector = pxDistanceTravelled / fTimeElapsed;
+					gestureState = GestureState.GestureStateRecognised;
+				}
+				else
+				{
+					gestureState = GestureState.GestureStateFailed;
+				}
+			}
+			else
+			{
+				gestureState = GestureState.GestureStateFailed;
+			}
 		}
 		
 		
-//		private static float m_maxTime = 2.0f;
+		private static float m_fMaxSwipeDuration = 0.75f;
 //		private static float m_maxAngularChangeDeg = 5.0f;
 		
 		private float m_fStartTime;
