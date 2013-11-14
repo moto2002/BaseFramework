@@ -29,7 +29,7 @@ namespace BaseFramework.MouseInput
 			
 			set
 			{
-				if ( m_kActionState != value )
+				if ( m_kActionState != value || value == MouseActionState.MouseActionChanged )
 				{
 					m_kActionState = value;
 				
@@ -39,11 +39,19 @@ namespace BaseFramework.MouseInput
 						{
 							break;
 						}
+						
+						case MouseActionState.MouseActionChanged:
+						{
+							actionDelegate( this );
+							break;
+						}
 							
 						case MouseActionState.MouseActionEnded:
 						case MouseActionState.MouseActionRecognised:
 						{
 							//Return to 'Possible' state.
+							actionDelegate( this );
+							
 							ResetAction();
 							state = MouseActionState.MouseActionPossible;
 							break;
@@ -52,18 +60,12 @@ namespace BaseFramework.MouseInput
 						case MouseActionState.MouseActionFailed:
 						{
 							// TODO: Return to 'Possible' state when no mouse presses remain.
+							actionDelegate( this );
+							
 							ResetAction();
 							state = MouseActionState.MouseActionPossible;
 							break;
 						}
-					}
-				}
-				
-				if ( m_kActionState != MouseActionState.MouseActionPossible )
-				{
-					if ( actionDelegate != null )
-					{
-						actionDelegate( this );
 					}
 				}
 			}
@@ -143,7 +145,7 @@ namespace BaseFramework.MouseInput
 			{
 				case MouseActionState.MouseActionPossible:
 				{
-					if ( bIntersectsWithCollider )
+//					if ( bIntersectsWithCollider )
 					{
 						OnButtonReleased( iButtonIndex );
 					}
