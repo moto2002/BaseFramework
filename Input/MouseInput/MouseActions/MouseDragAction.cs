@@ -27,8 +27,8 @@ namespace BaseFramework.MouseInput
 			{
 				base.OnButtonPressed( iButtonID );
 				m_fStartTime = Time.time;
-				state = MouseActionState.MouseActionBegan;
 				m_pxMoveDelta = Vector3.zero;
+				state = MouseActionState.MouseActionBegan;
 			}
 		}
 		

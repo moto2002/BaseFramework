@@ -40,6 +40,7 @@ namespace BaseFramework.MouseInput
 							break;
 						}
 						
+						case MouseActionState.MouseActionBegan:
 						case MouseActionState.MouseActionChanged:
 						{
 							actionDelegate( this );
@@ -165,13 +166,15 @@ namespace BaseFramework.MouseInput
 		
 		protected virtual void OnButtonPressed( int iButtonID )
 		{
+			focus = Input.mousePosition;
 		}
 		
 		protected virtual void OnButtonReleased( int iButtonID )
 		{
+			focus = Input.mousePosition;
 		}
 		
-		protected virtual void OnHover( Vector3 xCursorPosition )
+		protected virtual void OnHover( Vector3 pxCursorPosition )
 		{
 			focus = Input.mousePosition;
 		}
