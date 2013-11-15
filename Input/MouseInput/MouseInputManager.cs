@@ -48,7 +48,7 @@ namespace BaseFramework.MouseInput
 			RaycastHit pxHitInfo;
 			
 			int  iLayerMask = 1 << LayerMask.NameToLayer( LAYER_MASK_NAME );
-			bool bRaycastHit = Physics.Raycast( pxTouchRay, out pxHitInfo, 50.0f, iLayerMask );
+			bool bRaycastHit = Physics.Raycast( pxTouchRay, out pxHitInfo, Mathf.Infinity, iLayerMask );
 
 			if ( bRaycastHit )
 			{
