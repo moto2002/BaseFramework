@@ -13,9 +13,16 @@ namespace BaseFramework.MouseInput
 			set { m_fMaximumGestureTime = value; }
 		}
 		
+		public float MinimumMove
+		{
+			get { return m_fMinimumMoveDistance;  }
+			set { m_fMinimumMoveDistance = value; }
+		}
+		
 		public MouseSwipeAction( Collider pxCollider, MouseActionDelegate pxDelegate ) : base( pxCollider, pxDelegate )
 		{
-			m_fMaximumGestureTime = 1.25f;
+			m_fMaximumGestureTime  = 1.25f;
+			m_fMinimumMoveDistance = 2.0f;
 		}
 		
 		protected override void OnButtonPressed( int iButtonID )
@@ -24,6 +31,21 @@ namespace BaseFramework.MouseInput
 			
 			m_fStartTime = Time.time;
 			m_pxInitialPosition = focus;
+		}
+		
+		protected override void OnHover( Vector3 pxCursorPosition )
+		{
+			base.OnHover( pxCursorPosition );
+			
+			float fDistanceMoved = delta.magnitude;
+			float fTimeElapsed = Time.time - m_fStartTime;
+			
+			bool bTimedOut  = fTimeElapsed >= m_fMaximumGestureTime;
+			bool bNotASwipe = fDistanceMoved < m_fMinimumMoveDistance;
+			if ( bNotASwipe || bTimedOut )
+			{
+				state = MouseActionState.MouseActionFailed;
+			}
 		}
 		
 		protected override void OnButtonReleased( int iButtonID )
@@ -55,6 +77,7 @@ namespace BaseFramework.MouseInput
 		
 		private float m_fStartTime;
 		private float m_fMaximumGestureTime;
+		private float m_fMinimumMoveDistance;
 		
 		private Vector3 m_pxVelocity;
 		private Vector3 m_pxInitialPosition;
