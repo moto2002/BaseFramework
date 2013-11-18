@@ -17,6 +17,7 @@ namespace BaseFramework.MouseInput
 	public abstract class MouseAction
 	{
 		public Vector3 focus;
+		public Vector3 delta;
 		public Collider collider;
 		
 		public MouseActionDelegate actionDelegate;
@@ -176,7 +177,8 @@ namespace BaseFramework.MouseInput
 		
 		protected virtual void OnHover( Vector3 pxCursorPosition )
 		{
-			focus = Input.mousePosition;
+			delta = focus - pxCursorPosition;
+			focus = pxCursorPosition;
 		}
 		
 		protected virtual void ResetAction()
