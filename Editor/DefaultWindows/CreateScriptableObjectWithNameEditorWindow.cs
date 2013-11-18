@@ -4,7 +4,7 @@ using UnityEditor;
 using System;
 using System.Reflection;
 
-namespace BaseFramework.Utils
+namespace BaseFramework.EditorUtils
 {
 	public class CreateScriptableObjectWithNameEditorWindow : EditorWindow
 	{

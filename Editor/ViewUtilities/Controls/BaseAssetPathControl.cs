@@ -5,7 +5,7 @@ using System;
 using System.IO;
 using System.Collections.Generic;
 
-namespace BaseFramework.Utils
+namespace BaseFramework.EditorUtils
 {
 	public class BaseAssetPathControl
 	{
