@@ -45,11 +45,6 @@ namespace BaseFramework.Gestures
 					
 					switch ( m_kGestureState )
 					{
-						default:
-						{
-							break;
-						}
-						
 						case GestureState.GestureStateChanged:
 						{
 							InformDelegates();
@@ -64,7 +59,12 @@ namespace BaseFramework.Gestures
 							//Return to 'Possible' state.
 							ResetGesture();
 							
-							if ( m_pxBuffer != null )
+							if ( m_bDebuggingEnabled )
+							{
+								Debug.Log( "Gesture State: " + gestureState + "(" + this + ")" );
+							}
+							
+							if ( m_pxBuffer == null )
 							{
 								gestureState = GestureState.GestureStatePossible;
 							}
@@ -73,10 +73,7 @@ namespace BaseFramework.Gestures
 								gestureState = GestureState.GestureStateWaiting;
 							}
 							
-							if ( m_bDebuggingEnabled )
-							{
-								Debug.Log( "Gesture State: " + gestureState + "(" + this + ")" );
-							}
+							
 							
 							break;
 						}
@@ -91,6 +88,11 @@ namespace BaseFramework.Gestures
 							{
 								ResetGesture();
 								
+								if ( m_bDebuggingEnabled )
+								{
+									Debug.Log( "Gesture State: " + gestureState + "(" + this + ")" );
+								}
+								
 								if ( m_pxBuffer == null )
 								{
 									gestureState = GestureState.GestureStatePossible;
@@ -99,14 +101,14 @@ namespace BaseFramework.Gestures
 								{
 									gestureState = GestureState.GestureStateWaiting;
 								}
-							
-								if ( m_bDebuggingEnabled )
-								{
-									Debug.Log( "Gesture State: " + gestureState + "(" + this + ")" );
-								}
 							}
 							break;
 						}
+						
+//						default:
+//						{
+//							break;
+//						}
 					}
 				}
 			}
@@ -117,6 +119,7 @@ namespace BaseFramework.Gestures
 			m_pxActiveTouches = new List<Touch>();
 			m_pxGestureDelegates = new List<GestureRecogniserDelegate>();
 			
+			AddDelegate( pxDelegate );
 			numberOfTouches = 1;
 			gestureCollider = pxCollider;
 		}
