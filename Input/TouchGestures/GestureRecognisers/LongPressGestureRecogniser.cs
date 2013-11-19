@@ -30,7 +30,9 @@ namespace BaseFramework.Gestures
 				float fCurrentTime = Time.time;
 				float fTimeElapsed = fCurrentTime - m_fStartTime;
 				
-				if ( fTimeElapsed >= beginDelay )
+				bool bGestureHeld = fTimeElapsed >= beginDelay;
+				bool bGesturePossible = gestureState == GestureState.GestureStatePossible;
+				if ( bGestureHeld && bGesturePossible )
 				{
 					gestureState = GestureState.GestureStateBegan;
 				}
