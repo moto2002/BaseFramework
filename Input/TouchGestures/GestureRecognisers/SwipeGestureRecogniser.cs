@@ -22,8 +22,8 @@ namespace BaseFramework.Gestures
 		
 		public SwipeGestureRecogniser( Collider pxCollider, GestureRecogniserDelegate pxDelegate ) : base( pxCollider, pxDelegate )
 		{
-//			m_fMaximumGestureTime  = 0.75f;
-//			m_fMinimumMoveDistance = 2.0f;
+			m_fMaximumTimeStationary = 0.25f;
+			m_fMinimumMoveDistance = 62.0f; // Pixels
 		}
 		
 		protected override void InputBegan( Touch pxTouch )
@@ -50,12 +50,19 @@ namespace BaseFramework.Gestures
 //			base.InputCancelled( pxTouch );
 //			gestureState = GestureState.GestureStateFailed;
 //		}
-//		
-//		protected override void InputStationary( Touch pxTouch )
-//		{
-//			base.InputStationary( pxTouch );
-//			gestureState = GestureState.GestureStateFailed; // Causes immediate failure!
-//		}
+		
+		protected override void InputStationary( Touch pxTouch )
+		{
+			base.InputStationary( pxTouch );
+			
+			float fTimePassed = Time.time - m_fStartTime;
+			bool bTooMuchTimePassed = fTimePassed >= m_fMaximumTimeStationary;
+			
+			if ( bTooMuchTimePassed )
+			{
+				gestureState = GestureState.GestureStateFailed;
+			}
+		}
 		
 		protected override void InputEnded( Touch pxTouch )
 		{
@@ -64,7 +71,7 @@ namespace BaseFramework.Gestures
 			Vector2 pxDistanceTravelled = pxTouch.position - m_pxInitialTouchPosition;
 						
 			float fMagnitudeOfDistance = pxDistanceTravelled.magnitude;
-			if ( fMagnitudeOfDistance > 0.0f )
+			if ( fMagnitudeOfDistance > m_fMinimumMoveDistance )
 			{
 				float fTimeElapsed = Time.time - m_fStartTime;
 				m_pxVelocityVector = pxDistanceTravelled / fTimeElapsed;
@@ -90,9 +97,10 @@ namespace BaseFramework.Gestures
 //			return !bNotASwipe && !bTimedOut;
 //		}
 //		
-//		private static float m_fMaximumGestureTime;
-//		private float m_fMinimumMoveDistance;
 		
+		private float m_fMinimumMoveDistance;
+		
+		private float m_fMaximumTimeStationary;
 		private float m_fStartTime;
 		
 		private Vector2 m_pxInitialTouchPosition;
