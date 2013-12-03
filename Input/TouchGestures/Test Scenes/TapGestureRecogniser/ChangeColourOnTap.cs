@@ -6,17 +6,17 @@ public class ChangeColourOnTap : MonoBehaviour
 	private void Start ()
 	{
 		Collider xMyCollider = collider;
-		TapGestureRecogniser xTapGesture = new TapGestureRecogniser( xMyCollider, OnTap );
-		
-		GestureManager xGestureManager = GestureManager.Instance;
-		xGestureManager.AddGesture( xTapGesture );
+//		TapGestureRecogniser xTapGesture = new TapGestureRecogniser( xMyCollider, OnTap );
+//		
+//		GestureManager xGestureManager = GestureManager.Instance;
+//		xGestureManager.AddGesture( xTapGesture );
 		
 		m_myMaterial = renderer.material;
 	}
 	
 	private void OnTap( GestureRecogniser xGesture )
 	{
-		if ( xGesture.gestureState == GestureState.GestureStateRecognised )
+		if ( xGesture.State == GestureState.GestureStateRecognised )
 		{
 			m_currentColourIndex += 1;
 			if ( m_currentColourIndex >= m_coloursToCycle.Length )

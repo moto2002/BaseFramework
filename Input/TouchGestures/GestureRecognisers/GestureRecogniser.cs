@@ -1,4 +1,5 @@
 using UnityEngine;
+using System.Collections;
 using System.Collections.Generic;
 
 namespace BaseFramework.Gestures
@@ -17,31 +18,41 @@ namespace BaseFramework.Gestures
 		GestureStateWaiting
 	};
 	
-	public abstract class GestureRecogniser
+	public abstract class GestureRecogniser : MonoBehaviour
 	{
-		public Vector2 focus;
-		public int numberOfTouches;
+		public static string LAYER_MASK_NAME = "Input";
 		
-		public Collider gestureCollider;
+		#region Properties
+		
+		public Vector2 Focus {
+			get {
+				return CalculateFocusFromActiveTouches();
+			}
+		}
+		
+		public Collider GestureCollider {
+			get {
+				if ( m_pxCollider == null ) {
+					m_pxCollider = collider;
+				}
+				return m_pxCollider;
+			}
+		}
 		
 		public bool DebugEnabled {
-			get { return m_bDebuggingEnabled;  }
-			set
-			{
+			get { return m_bDebuggingEnabled; }
+			set {
 				m_bDebuggingEnabled = value;
-				if ( m_bDebuggingEnabled )
-				{
+				if ( m_bDebuggingEnabled ) {
 					// Log current state
-					if ( m_bDebuggingEnabled )
-					{
-						Debug.Log( "Gesture State: " + gestureState + "(" + this + ")" );
+					if ( m_bDebuggingEnabled ) {
+						Debug.Log( "Gesture State: " + State + "(" + this + ")" );
 					}
 				}
 			}
 		}
 		
-		public GestureState gestureState
-		{
+		public GestureState State {
 			get { return m_kGestureState; }
 			set
 			{
@@ -49,7 +60,7 @@ namespace BaseFramework.Gestures
 										|| m_kGestureState == GestureState.GestureStateCancelled
 										|| m_kGestureState == GestureState.GestureStateEnded;
 				bool bGestureWillReset = value == GestureState.GestureStatePossible || value == GestureState.GestureStateWaiting;
-				bool bGestureHasNoTouchesRegistered = m_iActiveTouches == 0;
+				bool bGestureHasNoTouchesRegistered = Input.touchCount == 0;
 				
 				bool bGestureStateIsRepeatable = value == GestureState.GestureStateChanged;
 				bool bGestureStateIsDifferent = value != m_kGestureState;
@@ -64,7 +75,7 @@ namespace BaseFramework.Gestures
 					// Log the new state
 					if ( m_bDebuggingEnabled )
 					{
-						Debug.Log( "Gesture State: " + gestureState + "(" + this + ")" );
+						Debug.Log( "Gesture State: " + State + "(" + this + ")" );
 					}
 					
 					// Perform Action depending on state
@@ -102,16 +113,7 @@ namespace BaseFramework.Gestures
 			}
 		}
 		
-		public GestureRecogniser( Collider pxCollider, GestureRecogniserDelegate pxDelegate )
-		{
-			m_iMaxTouches = 4;
-			m_pxActiveTouches = new Touch[ m_iMaxTouches ];
-			m_pxGestureDelegates = new List<GestureRecogniserDelegate>();
-			
-			AddDelegate( pxDelegate );
-			numberOfTouches = 1;
-			gestureCollider = pxCollider;
-		}
+		#endregion
 		
 		public void AddDelegate( GestureRecogniserDelegate pxDelegate )
 		{
@@ -125,92 +127,39 @@ namespace BaseFramework.Gestures
 		
 		public void RequireGestureToFail( GestureRecogniser pxOther )
 		{
-			gestureState = GestureState.GestureStateWaiting;
+			State = GestureState.GestureStateWaiting;
 			m_pxBuffer = new GestureRecogniserBuffer( pxOther, this );
 		}
 		
-		public void ReceiveTouch( Touch pxTouch, bool bIntersectsWithCollider )
+		protected virtual IEnumerator ProcessGesture()
 		{
-			TouchPhase kTouchPhase = pxTouch.phase;
-			if ( m_pxBuffer != null && gestureState == GestureState.GestureStateWaiting )
-			{
-				m_pxBuffer.QueueTouch( pxTouch, bIntersectsWithCollider );
-			}
-			else
-			{
-				if ( bIntersectsWithCollider )
-				{
-					switch ( kTouchPhase )
-					{
-						case TouchPhase.Began:
-						{
-							InputBegan( pxTouch );
-							break;
-						}
-						
-						case TouchPhase.Moved:
-						{
-							InputChanged( pxTouch );
-							break;
-						}
-						
-						case TouchPhase.Stationary:
-						{
-							InputStationary( pxTouch );
-							break;
-						}
-						
-						case TouchPhase.Ended:
-						{
-							InputEnded( pxTouch );
-							break;
-						}
-						
-						case TouchPhase.Canceled:
-						{
-							InputCancelled( pxTouch );
-							break;
-						}
-					}
-				}
-				else
-				{
-					InputEnded( pxTouch );
-				}
-			}
-		}
-		
-		#region Virtual Methods
-		
-		protected virtual void InputBegan( Touch pxTouch )
-		{
-			RegisterTouch( pxTouch );
-		}
-		
-		protected virtual void InputStationary( Touch pxTouch )
-		{
-		}
-		
-		protected virtual void InputChanged( Touch pxTouch )
-		{
-			CalculateFocusFromActiveTouches();
-		}
-		
-		protected virtual void InputEnded( Touch pxTouch )
-		{
-			RemoveTouch( pxTouch );
-		}
-		
-		protected virtual void InputCancelled( Touch pxTouch )
-		{
-			RemoveTouch( pxTouch );
+			yield return null;
 		}
 		
 		protected virtual void ResetGesture()
 		{
 		}
 		
-		#endregion
+		private void Awake()
+		{
+			m_pxGestureDelegates = new List<GestureRecogniserDelegate>();
+			
+			GameObject xCameraGameObject = GameObject.FindGameObjectWithTag( "MainCamera" );
+			m_pxCamera = xCameraGameObject.GetComponent<Camera>();
+		}
+		
+		private void Update()
+		{
+//			TouchPhase kTouchPhase = pxTouch.phase;
+//			if ( m_pxBuffer != null && State == GestureState.GestureStateWaiting )
+//			{
+//				m_pxBuffer.QueueTouch( pxTouch, bIntersectsWithCollider );
+//			}
+//			else
+//			{
+//				
+//			}
+		}
 		
 		#region Helper Methods
 		
@@ -222,64 +171,57 @@ namespace BaseFramework.Gestures
 			}
 		}
 		
-		private void RegisterTouch( Touch pxTouch )
+		private Vector2 CalculateFocusFromActiveTouches()
 		{
-//			if ( m_bDebuggingEnabled )
-//			{
-//				Debug.Log( "Add Touch(" + this + "): " + pxTouch.fingerId );
-//			}
+			Vector2 pxFocus = Vector2.zero;
+			Touch[] pxActiveTouches = Input.touches;
 			
-			if ( pxTouch.fingerId <= m_iMaxTouches )
-			{
-				m_iActiveTouches++;
-				int iTouchIndex = pxTouch.fingerId;
-				m_pxActiveTouches[ iTouchIndex ] = pxTouch;
-				
-				CalculateFocusFromActiveTouches();
-			}
-		}
-		
-		private void RemoveTouch( Touch pxTouch )
-		{
-			if ( pxTouch.fingerId <= m_iMaxTouches )
-			{
-				m_iActiveTouches--;
-				CalculateFocusFromActiveTouches();
-				
-				if ( m_iActiveTouches == 0 )
-				{
-					if ( m_pxBuffer == null )
-					{
-						gestureState = GestureState.GestureStatePossible;
-					}
-					else
-					{
-						gestureState = GestureState.GestureStateWaiting;
-					}
-				}
-			}
-		}
-		
-		private void CalculateFocusFromActiveTouches()
-		{
-			focus = Vector2.zero;
-			foreach ( Touch pxTouch in m_pxActiveTouches )
+			foreach ( Touch pxTouch in pxActiveTouches )
 			{
 				Vector2 pxTouchPoint = pxTouch.position;
-				focus += pxTouchPoint;
+				pxFocus += pxTouchPoint;
 			}
-			focus /= m_iActiveTouches;
+			
+			int iActiveTouches = Input.touchCount;
+			pxFocus /= iActiveTouches;
+			
+			return pxFocus;
+		}
+		
+		private bool InputIntersectsCollider( Touch pxTouch )
+		{
+			Collider pxCollider = m_pxCollider;
+			Vector2 pxTouchPoint = pxTouch.position;
+			
+			RaycastHit pxHitInfo;
+			Ray pxTouchRay = m_pxCamera.ScreenPointToRay( pxTouchPoint );
+			
+			int iLayerMask = 1 << LayerMask.NameToLayer( LAYER_MASK_NAME );
+			
+			bool bRaycastHit = Physics.Raycast( pxTouchRay, out pxHitInfo, 50.0f, iLayerMask );
+			if ( bRaycastHit )
+			{
+				//TODO: Lookup Collider in a Dictionary<Collider, List<GestureRecogniser>>.
+				bool bHitThisCollider = pxHitInfo.collider == pxCollider;
+				if ( bHitThisCollider )
+				{
+					Vector3 xHitPoint = pxHitInfo.point;
+					Bounds xColliderBounds = pxCollider.bounds;
+					
+					bool bIntersects = xColliderBounds.Contains( xHitPoint );
+					return bIntersects;
+				}
+			}
+			return false;
 		}
 		
 		#endregion
 		
+		private Camera m_pxCamera;
+		private Collider m_pxCollider;
 		private bool m_bDebuggingEnabled;
 		private GestureState m_kGestureState;
 		private GestureRecogniserBuffer m_pxBuffer;
-		
-		private int m_iMaxTouches;
-		private int m_iActiveTouches;
-		private Touch[] m_pxActiveTouches;
 		private List<GestureRecogniserDelegate> m_pxGestureDelegates;
 	}
 }

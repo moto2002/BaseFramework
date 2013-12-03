@@ -36,24 +36,24 @@ namespace BaseFramework.Gestures
 		{
 			while ( m_pxTouchQueue.Count > 0 )
 			{
-				TouchInfo pxTouchInfo = m_pxTouchQueue.Dequeue();
-				
-				Touch pxTouch  = pxTouchInfo.m_pxTouch;
-				bool bCollided = pxTouchInfo.m_bCollided;
-				m_pxGestureWaiting.ReceiveTouch( pxTouch, bCollided );
+//				TouchInfo pxTouchInfo = m_pxTouchQueue.Dequeue();
+//				
+//				Touch pxTouch  = pxTouchInfo.m_pxTouch;
+//				bool bCollided = pxTouchInfo.m_bCollided;
+//				m_pxGestureWaiting.ReceiveTouch( pxTouch, bCollided );
 			}
 		}
 		
 		private void FailGestureHandler( GestureRecogniser pxGestureToFail )
 		{
-			if ( pxGestureToFail.gestureState == GestureState.GestureStateFailed )
+			if ( pxGestureToFail.State == GestureState.GestureStateFailed )
 			{
-				m_pxGestureWaiting.gestureState = GestureState.GestureStatePossible;
+				m_pxGestureWaiting.State = GestureState.GestureStatePossible;
 				DequeueTouches();
 			}
-			if ( pxGestureToFail.gestureState == GestureState.GestureStateRecognised
-				|| pxGestureToFail.gestureState == GestureState.GestureStateEnded 
-				|| pxGestureToFail.gestureState == GestureState.GestureStateCancelled )
+			if ( pxGestureToFail.State == GestureState.GestureStateRecognised
+				|| pxGestureToFail.State == GestureState.GestureStateEnded 
+				|| pxGestureToFail.State == GestureState.GestureStateCancelled )
 			{
 				m_pxTouchQueue.Clear();
 			}

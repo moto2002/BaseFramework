@@ -14,17 +14,17 @@ public class DragSphereController : MonoBehaviour
 		m_distanceFromCamera = Mathf.Abs( xCameraPosition.y - m_transform.position.y );
 		
 		Collider xCollider = collider;
-		LongPressGestureRecogniser xLongPressGesture = new LongPressGestureRecogniser( xCollider, HandleLongPress );
-		
-		GestureManager xGestureManager = GestureManager.Instance;
-		xGestureManager.AddGesture( xLongPressGesture );
+//		LongPressGestureRecogniser xLongPressGesture = new LongPressGestureRecogniser( xCollider, HandleLongPress );
+//		
+//		GestureManager xGestureManager = GestureManager.Instance;
+//		xGestureManager.AddGesture( xLongPressGesture );
 	}
 	
 	private void HandleLongPress( GestureRecogniser xGesture )
 	{
 		Vector3 xScreenPoint = new Vector3();
-		xScreenPoint.x = xGesture.focus.x;
-		xScreenPoint.y = xGesture.focus.y;
+		xScreenPoint.x = xGesture.Focus.x;
+		xScreenPoint.y = xGesture.Focus.y;
 		xScreenPoint.z = m_distanceFromCamera;
 		
 		Vector3 xWorldPoint = m_camera.ScreenToWorldPoint( xScreenPoint );
