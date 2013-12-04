@@ -110,10 +110,16 @@ namespace BaseFramework.Gestures
 						
 						case GestureState.GestureStateBegan:
 						case GestureState.GestureStateChanged:
+						{
+							InformDelegates();
+							break;
+						}
+
 						case GestureState.GestureStateFailed:
 						case GestureState.GestureStateCancelled:
 						{
 							InformDelegates();
+							StartCoroutine( ResetWhenTouchesEnd() );
 							break;
 						}
 					}
@@ -154,6 +160,8 @@ namespace BaseFramework.Gestures
 			
 			GameObject xCameraGameObject = GameObject.FindGameObjectWithTag( "MainCamera" );
 			m_pxCamera = xCameraGameObject.GetComponent<Camera>();
+
+			ResetGesture();
 		}
 		
 		private void Update()
@@ -180,7 +188,7 @@ namespace BaseFramework.Gestures
 					else
 					{
 						m_bTrackingGesture = true;
-						StartCoroutine( ProcessMouseGesture() );
+						StartCoroutine( ProcessTouchGesture() );
 					}
 				}
 			}
@@ -202,7 +210,7 @@ namespace BaseFramework.Gestures
 					else
 					{
 						m_bTrackingGesture = true;
-						StartCoroutine( ProcessTouchGesture() );
+						StartCoroutine( ProcessMouseGesture() );
 					}
 				}
 			}
@@ -262,7 +270,32 @@ namespace BaseFramework.Gestures
 			}
 			return false;
 		}
-		
+
+		private IEnumerator ResetWhenTouchesEnd()
+		{
+			// Wait for lack of input
+			bool bHasTouches = Input.touchCount > 0;
+			bool bHasMouseInput = !Input.GetMouseButton( 0 );
+			while ( bHasTouches || bHasMouseInput )
+			{
+				yield return null;
+
+				bHasTouches = Input.touchCount > 0;
+				bHasMouseInput = !Input.GetMouseButton( 0 );
+			}
+
+			// Reset Gesture
+			bool bHasBuffer = m_pxBuffer != null;
+			if ( bHasBuffer )
+			{
+				State = GestureState.GestureStateWaiting;
+			}
+			else
+			{
+				State = GestureState.GestureStatePossible;
+			}
+		}
+
 		#endregion
 		
 		private Camera m_pxCamera;
