@@ -1,4 +1,5 @@
 using UnityEngine;
+using System.Collections;
 
 
 namespace BaseFramework.Gestures
@@ -7,103 +8,130 @@ namespace BaseFramework.Gestures
 	/// A SwipeGesture looks for multiple(?) touches in the same
 	/// direction, and returns their direction and speed.
 	/// </summary>
-//	public class SwipeGestureRecogniser : GestureRecogniser
-//	{
-//		public Vector2 Velocity
-//		{
-//			get { return m_pxVelocityVector; }
-//		}
-//		
-////		public float SwipeDuration
-////		{
-////			get { return m_fMaximumGestureTime;  }
-////			set { m_fMaximumGestureTime = value; }
-////		}
-//		
-//		public SwipeGestureRecogniser( Collider pxCollider, GestureRecogniserDelegate pxDelegate ) : base( pxCollider, pxDelegate )
-//		{
-//			m_fMaximumTimeStationary = 0.25f;
-//			m_fMinimumMoveDistance = 62.0f; // Pixels
-//		}
-//		
-//		protected override void InputBegan( Touch pxTouch )
-//		{
-//			base.InputBegan( pxTouch );
-//			
-//			m_fStartTime = Time.time;
-//			m_pxInitialTouchPosition = Focus;
-//		}
-//		
-////		protected override void InputChanged( Touch pxTouch )
-////		{
-////			base.InputChanged( pxTouch );
-////			
-////			bool bValidInput = ValidGestureInput( pxTouch );
-////			if ( !bValidInput )
-////			{
-////				gestureState = GestureState.GestureStateFailed;
-////			}
-////		}
-////		
-////		protected override void InputCancelled( Touch pxTouch )
-////		{
-////			base.InputCancelled( pxTouch );
-////			gestureState = GestureState.GestureStateFailed;
-////		}
-//		
-//		protected override void InputStationary( Touch pxTouch )
-//		{
-//			base.InputStationary( pxTouch );
-//			
-//			float fTimePassed = Time.time - m_fStartTime;
-//			bool bTooMuchTimePassed = fTimePassed >= m_fMaximumTimeStationary;
-//			
-//			if ( bTooMuchTimePassed )
-//			{
-//				State = GestureState.GestureStateFailed;
-//			}
-//		}
-//		
-//		protected override void InputEnded( Touch pxTouch )
-//		{
-//			base.InputEnded( pxTouch );
-//			
-//			Vector2 pxDistanceTravelled = pxTouch.position - m_pxInitialTouchPosition;
-//						
-//			float fMagnitudeOfDistance = pxDistanceTravelled.magnitude;
-//			if ( fMagnitudeOfDistance > m_fMinimumMoveDistance )
-//			{
-//				float fTimeElapsed = Time.time - m_fStartTime;
-//				m_pxVelocityVector = pxDistanceTravelled / fTimeElapsed;
-//				State = GestureState.GestureStateRecognised;
-//			}
-//			else
-//			{
-//				State = GestureState.GestureStateFailed;
-//			}
-//		}
-//		
-////		private bool ValidGestureInput( Touch pxTouch )
-////		{
-////			float fDistanceMoved = pxTouch.deltaPosition.magnitude;
-////			float fTimeElapsed = Time.time - m_fStartTime;
-////			
-////			bool bTimedOut  = fTimeElapsed >= m_fMaximumGestureTime;
-////			bool bNotASwipe = fDistanceMoved > m_fMinimumMoveDistance;
-////			
-////			Debug.Log( bTimedOut + "/" + bNotASwipe );
-////			Debug.Log( fDistanceMoved + ">" + m_fMinimumMoveDistance );
-////			
-////			return !bNotASwipe && !bTimedOut;
-////		}
-////		
-//		
-//		private float m_fMinimumMoveDistance;
-//		
-//		private float m_fMaximumTimeStationary;
-//		private float m_fStartTime;
-//		
-//		private Vector2 m_pxInitialTouchPosition;
-//		private Vector2 m_pxVelocityVector;
-//	}
+	public class SwipeGestureRecogniser : GestureRecogniser
+	{
+		public Vector2 Velocity {
+			get { return m_pxVelocityVector; }
+		}
+		
+		public float SwipeDuration {
+			get { return m_fMaximumGestureTime;  }
+			set { m_fMaximumGestureTime = value; }
+		}
+
+		protected override IEnumerator ProcessTouchGesture()
+		{
+			throw new System.NotImplementedException();
+		}
+		
+		protected override IEnumerator ProcessMouseGesture()
+		{
+			m_fStartTime = Time.time;
+			m_pxInitialTouchPosition = Focus;
+			Vector2 pxCurrentPosition = m_pxInitialTouchPosition;
+
+			bool bHasMouseDown = Input.GetMouseButton( 0 );
+			while ( bHasMouseDown )
+			{
+				pxCurrentPosition = Focus;
+
+				bool bTimedOut = SwipeHasTimedOut();
+				bool bNotASwipe = false;
+
+				bool bHasTargetSwipeAngle = m_pxTargetSwipe != Vector2.zero;
+				if ( bHasTargetSwipeAngle )
+				{
+					bNotASwipe = SwipeIsNotValid();
+				}
+				else
+				{
+					m_iNumberOfFramesPassed++;
+					bool bShouldDetermineAngle = m_iNumberOfFramesPassed >= m_iNumberOfFramesToDetermineAngle;
+					if ( bShouldDetermineAngle )
+					{
+						Vector2 pxCurrentSwipe = pxCurrentPosition - m_pxInitialTouchPosition;
+						m_pxTargetSwipe = pxCurrentSwipe.normalized;
+					}
+				}
+
+				if ( bTimedOut || bNotASwipe )
+				{
+					State = GestureState.GestureStateFailed;
+					break;
+				}
+
+				bHasMouseDown = Input.GetMouseButton( 0 );
+				m_pxLastTouchPosition = pxCurrentPosition;
+
+				yield return null;
+			}
+
+			if ( State != GestureState.GestureStateFailed )
+			{
+				Vector2 pxDistanceTravelled = m_pxLastTouchPosition - m_pxInitialTouchPosition;
+				float fTimeElapsed = Time.time - m_fStartTime;
+
+				m_pxVelocityVector = pxDistanceTravelled / fTimeElapsed;
+				State = GestureState.GestureStateRecognised;
+			}
+		}
+
+		protected override void ResetGesture()
+		{
+			m_pxTargetSwipe = Vector2.zero;
+			m_iNumberOfFramesPassed = 0;
+			m_iNumberOfFramesToDetermineAngle = 3;
+			m_fMaximumGestureTime = 0.25f;
+			m_fSwipeAngleAccuracy = 20.0f; // Swipe can vary by 5 degrees.
+		}
+
+		#region Helper Methods
+
+		private bool SwipeHasTimedOut()
+		{
+			float fTimeElapsed = Time.time - m_fStartTime;
+			
+			bool bTimedOut  = fTimeElapsed >= m_fMaximumGestureTime;
+			if ( DebugEnabled && bTimedOut )
+			{
+				Debug.Log( "SwipeGestureRecogniser (" + this + ") timed out!" );
+			}
+
+			return bTimedOut;
+		}
+
+		private bool SwipeIsNotValid()
+		{
+			Vector2 pxLastSwipeVector = m_pxLastTouchPosition - m_pxInitialTouchPosition;
+			Vector2 pxTargetSwipeVector = m_pxTargetSwipe;
+
+			float fSwipeAngleDifference = Vector2.Angle( pxTargetSwipeVector, pxLastSwipeVector );
+			float fSwipeAngleAccuracy = m_fSwipeAngleAccuracy;
+
+			bool bNotASwipe = !(fSwipeAngleDifference <= fSwipeAngleAccuracy && fSwipeAngleAccuracy >= -fSwipeAngleAccuracy);
+
+			if ( DebugEnabled && bNotASwipe )
+			{
+				Debug.Log( "SwipeGestureRecogniser (" + this + ") is not a swipe!" );
+			}
+			
+			return bNotASwipe;
+		}
+
+		#endregion
+
+		public float m_fMaximumGestureTime;
+
+		private int m_iNumberOfFramesToDetermineAngle;
+		private int m_iNumberOfFramesPassed;
+
+		private float m_fStartTime;
+		private Vector2 m_pxVelocityVector;
+
+		private float m_fSwipeAngleAccuracy;
+		private Vector2 m_pxTargetSwipe;
+
+		private Vector2 m_pxLastTouchPosition;
+		private Vector2 m_pxInitialTouchPosition;
+	}
 }
