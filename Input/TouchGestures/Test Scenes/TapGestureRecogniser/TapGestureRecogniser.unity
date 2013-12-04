@@ -87,7 +87,7 @@ GameObject:
   - 23: {fileID: 1143804684}
   - 114: {fileID: 1143804683}
   - 114: {fileID: 1143804688}
-  m_Layer: 8
+  m_Layer: 0
   m_Name: Plane
   m_TagString: Untagged
   m_Icon: {fileID: 0}
