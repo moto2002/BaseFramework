@@ -275,7 +275,7 @@ namespace BaseFramework.Gestures
 		{
 			// Wait for lack of input
 			bool bHasTouches = Input.touchCount > 0;
-			bool bHasMouseInput = !Input.GetMouseButton( 0 );
+			bool bHasMouseInput = Input.GetMouseButton( 0 );
 			while ( bHasTouches || bHasMouseInput )
 			{
 				yield return null;
