@@ -5,12 +5,9 @@ public class ChangeColourOnTap : MonoBehaviour
 {
 	private void Start ()
 	{
-		Collider xMyCollider = collider;
-//		TapGestureRecogniser xTapGesture = new TapGestureRecogniser( xMyCollider, OnTap );
-//		
-//		GestureManager xGestureManager = GestureManager.Instance;
-//		xGestureManager.AddGesture( xTapGesture );
-		
+		TapGestureRecogniser pxTapGesture = GetComponent<TapGestureRecogniser>();
+		pxTapGesture.AddDelegate( OnTap );
+		pxTapGesture.DebugEnabled = true;
 		m_myMaterial = renderer.material;
 	}
 	
