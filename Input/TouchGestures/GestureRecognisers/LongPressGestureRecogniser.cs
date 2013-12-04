@@ -1,82 +1,136 @@
 using UnityEngine;
+using System.Collections;
 
 namespace BaseFramework.Gestures
 {
-//	public class LongPressGestureRecogniser : GestureRecogniser
-//	{
-//		public float beginDelay;
-//		
-//		public Vector2 moveDelta
-//		{
-//			get { return m_pxMoveDelta; }
-//		}
-//		
-//		public LongPressGestureRecogniser( Collider xCollider, GestureRecogniserDelegate xDelegate ) : base( xCollider, xDelegate )
-//		{
-//			beginDelay = 0.5f;
-//			m_fStartTime = -1.0f;
-//		}
-//		
-//		protected override void InputBegan( Touch pxTouch )
-//		{
-//			base.InputBegan( pxTouch );
-//			m_fStartTime = Time.time;
-//		}
-//			
-//		protected override void InputStationary( Touch pxTouch )
-//		{
-//			if ( m_fStartTime >= 0.0f )
-//			{
-//				float fCurrentTime = Time.time;
-//				float fTimeElapsed = fCurrentTime - m_fStartTime;
-//				
-//				bool bGestureHeld = fTimeElapsed >= beginDelay;
-//				bool bGesturePossible = State == GestureState.GestureStatePossible;
-//				if ( bGestureHeld && bGesturePossible )
-//				{
-//					State = GestureState.GestureStateBegan;
-//				}
-//			}
-//		}
-//		
-//		protected override void InputChanged( Touch pxTouch )
-//		{
-//			if ( State == GestureState.GestureStatePossible )
-//			{
-//				State = GestureState.GestureStateFailed;
-//			}
-//			else if ( State == GestureState.GestureStateBegan ||
-//				      State == GestureState.GestureStateChanged )
-//			{
-//				base.InputChanged( pxTouch );
-//				
-//				Vector2 pxDifference = pxTouch.deltaPosition;
-//				m_pxMoveDelta = pxDifference;
-//				
-//				State = GestureState.GestureStateChanged;
-//			}
-//		}
-//		
-//		protected override void InputEnded( Touch pxTouch )
-//		{
-//			base.InputEnded( pxTouch );
-//			
-//			if ( State == GestureState.GestureStateBegan ||
-//				State == GestureState.GestureStateChanged )
-//			{
-//				State = GestureState.GestureStateEnded;
-//			}
-//		}
-//		
-//		protected override void ResetGesture()
-//		{
-//			base.ResetGesture();
-//			
-//			m_fStartTime  = -1.0f;
-//			m_pxMoveDelta = Vector3.zero;
-//		}
-//		
-//		private float m_fStartTime;
-//		private Vector2 m_pxMoveDelta;
-//	}
+	public class LongPressGestureRecogniser : GestureRecogniser
+	{
+		public Vector2 MoveDelta {
+			get { return m_pxMoveDelta; }
+		}
+
+		protected override IEnumerator ProcessMouseGesture()
+		{
+			m_fStartTime = Time.time;
+			m_pxInitialPosition = Focus;
+			m_pxLastPosition = m_pxInitialPosition;
+
+			bool bMouseButtonDown = Input.GetMouseButton( 0 );
+			while ( bMouseButtonDown )
+			{
+				float fTimeHeld = TimeHeld();
+				Vector2 pxCurrentPosition = Focus;
+
+				bool bGestureBegan = fTimeHeld > m_fStartDelay;
+				if ( bGestureBegan )
+				{
+					if ( State == GestureState.GestureStatePossible )
+					{
+						State = GestureState.GestureStateBegan;
+					}
+					else
+					{
+						Vector2 pxDelta = pxCurrentPosition - m_pxLastPosition;
+						m_pxMoveDelta = pxDelta;
+
+						State = GestureState.GestureStateChanged;
+					}
+				}
+				else
+				{
+					Vector2 pxDifference = m_pxInitialPosition - pxCurrentPosition;
+					float fDistanceMoved = pxDifference.magnitude;
+
+					bool bMovedTooFar = fDistanceMoved > m_fInitialMovementToCancel;
+					if ( bMovedTooFar )
+					{
+						State = GestureState.GestureStateFailed;
+						break;
+					}
+				}
+				m_pxLastPosition = pxCurrentPosition;
+				bMouseButtonDown = Input.GetMouseButton( 0 );
+
+				yield return null;
+			}
+
+			if ( State != GestureState.GestureStateFailed )
+			{
+				State = GestureState.GestureStateEnded;
+			}
+		}
+
+		protected override IEnumerator ProcessTouchGesture()
+		{
+			m_fStartTime = Time.time;
+			m_pxInitialPosition = Focus;
+			m_pxLastPosition = m_pxInitialPosition;
+			
+			bool bTouchesExist = Input.touchCount > 0;
+			while ( bTouchesExist )
+			{
+				float fTimeHeld = TimeHeld();
+				Vector2 pxCurrentPosition = Focus;
+				
+				bool bGestureBegan = fTimeHeld > m_fStartDelay;
+				if ( bGestureBegan )
+				{
+					if ( State == GestureState.GestureStatePossible )
+					{
+						State = GestureState.GestureStateBegan;
+					}
+					else
+					{
+						Vector2 pxDelta = pxCurrentPosition - m_pxLastPosition;
+						m_pxMoveDelta = pxDelta;
+						
+						State = GestureState.GestureStateChanged;
+					}
+				}
+				else
+				{
+					Vector2 pxDifference = m_pxInitialPosition - pxCurrentPosition;
+					float fDistanceMoved = pxDifference.magnitude;
+					
+					bool bMovedTooFar = fDistanceMoved > m_fInitialMovementToCancel;
+					if ( bMovedTooFar )
+					{
+						State = GestureState.GestureStateFailed;
+						break;
+					}
+				}
+				m_pxLastPosition = pxCurrentPosition;
+				bTouchesExist = Input.touchCount > 0;
+				
+				yield return null;
+			}
+			
+			if ( State != GestureState.GestureStateFailed )
+			{
+				State = GestureState.GestureStateEnded;
+			}
+		}
+
+		protected override void ResetGesture()
+		{
+			m_fStartTime  = 0.0f;
+			m_pxMoveDelta = Vector3.zero;
+		}
+
+		private float TimeHeld()
+		{
+			float fCurrentTime = Time.time;
+			float fTimeElapsed = fCurrentTime - m_fStartTime;
+
+			return fTimeElapsed;
+		}
+
+		public float m_fStartDelay;
+		public float m_fInitialMovementToCancel;
+
+		private float m_fStartTime;
+		private Vector2 m_pxMoveDelta;
+		private Vector2 m_pxInitialPosition;
+		private Vector2 m_pxLastPosition;
+	}
 }
