@@ -16,36 +16,38 @@ namespace BaseFramework.Gestures
 		GestureStateCancelled,
 		GestureStateFailed,
 		GestureStateWaiting
-	};
+	}
+	;
 	
 	public abstract class GestureRecogniser : MonoBehaviour
 	{
-		public static string LAYER_MASK_NAME = "Input";
-		
 		#region Properties
 		
 		public Vector2 Focus {
-			get {
+			get
+			{
+#if UNITY_EDITOR
+				return Input.mousePosition;
+#else
 				return CalculateFocusFromActiveTouches();
+#endif
 			}
 		}
 		
 		public Collider GestureCollider {
-			get {
-				if ( m_pxCollider == null ) {
-					m_pxCollider = collider;
-				}
-				return m_pxCollider;
-			}
+			get { return m_pxCollider; }
 		}
 		
 		public bool DebugEnabled {
 			get { return m_bDebuggingEnabled; }
-			set {
+			set
+			{
 				m_bDebuggingEnabled = value;
-				if ( m_bDebuggingEnabled ) {
+				if ( m_bDebuggingEnabled )
+				{
 					// Log current state
-					if ( m_bDebuggingEnabled ) {
+					if ( m_bDebuggingEnabled )
+					{
 						Debug.Log( "Gesture State: " + State + "(" + this + ")" );
 					}
 				}
@@ -57,8 +59,8 @@ namespace BaseFramework.Gestures
 			set
 			{
 				bool bGestureHasEnded = m_kGestureState == GestureState.GestureStateFailed 
-										|| m_kGestureState == GestureState.GestureStateCancelled
-										|| m_kGestureState == GestureState.GestureStateEnded;
+					|| m_kGestureState == GestureState.GestureStateCancelled
+					|| m_kGestureState == GestureState.GestureStateEnded;
 				bool bGestureWillReset = value == GestureState.GestureStatePossible || value == GestureState.GestureStateWaiting;
 				bool bGestureHasNoTouchesRegistered = Input.touchCount == 0;
 				
@@ -84,14 +86,8 @@ namespace BaseFramework.Gestures
 						case GestureState.GestureStatePossible:
 						case GestureState.GestureStateWaiting:
 						{
+							m_bTrackingGesture = false;
 							ResetGesture();
-							break;
-						}
-						
-						case GestureState.GestureStateBegan:
-						case GestureState.GestureStateChanged:
-						{
-							InformDelegates();
 							break;
 						}
 						
@@ -99,9 +95,21 @@ namespace BaseFramework.Gestures
 						case GestureState.GestureStateRecognised:
 						{
 							InformDelegates();
+							
+							bool bHasBuffer = m_pxBuffer != null;
+							if ( bHasBuffer )
+							{
+								State = GestureState.GestureStateWaiting;
+							}
+							else
+							{
+								State = GestureState.GestureStatePossible;
+							}
 							break;
 						}
 						
+						case GestureState.GestureStateBegan:
+						case GestureState.GestureStateChanged:
 						case GestureState.GestureStateFailed:
 						case GestureState.GestureStateCancelled:
 						{
@@ -114,6 +122,8 @@ namespace BaseFramework.Gestures
 		}
 		
 		#endregion
+		
+		#region Gesture Ordering
 		
 		public void AddDelegate( GestureRecogniserDelegate pxDelegate )
 		{
@@ -131,17 +141,15 @@ namespace BaseFramework.Gestures
 			m_pxBuffer = new GestureRecogniserBuffer( pxOther, this );
 		}
 		
-		protected virtual IEnumerator ProcessGesture()
-		{
-			yield return null;
-		}
+		#endregion
 		
-		protected virtual void ResetGesture()
-		{
-		}
+		protected abstract IEnumerator ProcessTouchGesture();
+		protected abstract IEnumerator ProcessMouseGesture();
+		protected abstract void ResetGesture();
 		
 		private void Awake()
 		{
+			m_pxCollider = collider;
 			m_pxGestureDelegates = new List<GestureRecogniserDelegate>();
 			
 			GameObject xCameraGameObject = GameObject.FindGameObjectWithTag( "MainCamera" );
@@ -150,15 +158,55 @@ namespace BaseFramework.Gestures
 		
 		private void Update()
 		{
-//			TouchPhase kTouchPhase = pxTouch.phase;
-//			if ( m_pxBuffer != null && State == GestureState.GestureStateWaiting )
-//			{
-//				m_pxBuffer.QueueTouch( pxTouch, bIntersectsWithCollider );
-//			}
-//			else
-//			{
-//				
-//			}
+			bool bHasTouches = Input.touchCount > 0;
+			
+			bool bIsReady = State == GestureState.GestureStatePossible;
+			bool bIsWaiting = State == GestureState.GestureStateWaiting;
+			
+			bool bIsTracking = m_bTrackingGesture;
+			bool bShouldStartTracking = bHasTouches && !bIsTracking && (bIsReady || bIsWaiting);
+			
+			if ( bShouldStartTracking )
+			{
+				bool bHasBuffer = m_pxBuffer != null;
+				bool bInputIntesects = InputIntersectsCollider();
+				
+				if ( bInputIntesects )
+				{
+					if ( bHasBuffer && bIsWaiting )
+					{
+//						m_pxBuffer.QueueTouch( pxTouch, bIntersectsWithCollider );
+					}
+					else
+					{
+						m_bTrackingGesture = true;
+						StartCoroutine( ProcessMouseGesture() );
+					}
+				}
+			}
+
+#if UNITY_EDITOR
+			bool bHasMouseInput = Input.GetMouseButtonDown( 0 );
+			bool bShouldStartTrackingMouse = bHasMouseInput && !bHasTouches && !bIsTracking && (bIsReady || bIsWaiting);
+			if ( bShouldStartTrackingMouse )
+			{
+				bool bHasBuffer = m_pxBuffer != null;
+				bool bInputIntesects = InputIntersectsCollider();
+
+				if ( bInputIntesects )
+				{
+					if ( bHasBuffer && bIsWaiting )
+					{
+//						m_pxBuffer.QueueTouch( pxTouch, bIntersectsWithCollider );
+					}
+					else
+					{
+						m_bTrackingGesture = true;
+						StartCoroutine( ProcessTouchGesture() );
+					}
+				}
+			}
+#endif
 		}
 		
 		#region Helper Methods
@@ -188,28 +236,28 @@ namespace BaseFramework.Gestures
 			return pxFocus;
 		}
 		
-		private bool InputIntersectsCollider( Touch pxTouch )
+		private bool InputIntersectsCollider()
 		{
 			Collider pxCollider = m_pxCollider;
-			Vector2 pxTouchPoint = pxTouch.position;
+			Vector2 pxFocus = Focus;
 			
 			RaycastHit pxHitInfo;
-			Ray pxTouchRay = m_pxCamera.ScreenPointToRay( pxTouchPoint );
-			
-			int iLayerMask = 1 << LayerMask.NameToLayer( LAYER_MASK_NAME );
-			
-			bool bRaycastHit = Physics.Raycast( pxTouchRay, out pxHitInfo, 50.0f, iLayerMask );
+			Ray pxTouchRay = m_pxCamera.ScreenPointToRay( pxFocus );
+
+			bool bRaycastHit =  pxCollider.Raycast( pxTouchRay, out pxHitInfo, Mathf.Infinity );
 			if ( bRaycastHit )
 			{
-				//TODO: Lookup Collider in a Dictionary<Collider, List<GestureRecogniser>>.
 				bool bHitThisCollider = pxHitInfo.collider == pxCollider;
 				if ( bHitThisCollider )
 				{
 					Vector3 xHitPoint = pxHitInfo.point;
 					Bounds xColliderBounds = pxCollider.bounds;
 					
-					bool bIntersects = xColliderBounds.Contains( xHitPoint );
-					return bIntersects;
+					bool bIntersects = xColliderBounds.Contains (xHitPoint);
+					if ( bIntersects )
+					{
+						return true;
+					}
 				}
 			}
 			return false;
@@ -219,7 +267,10 @@ namespace BaseFramework.Gestures
 		
 		private Camera m_pxCamera;
 		private Collider m_pxCollider;
+		
 		private bool m_bDebuggingEnabled;
+		private bool m_bTrackingGesture;
+		
 		private GestureState m_kGestureState;
 		private GestureRecogniserBuffer m_pxBuffer;
 		private List<GestureRecogniserDelegate> m_pxGestureDelegates;
