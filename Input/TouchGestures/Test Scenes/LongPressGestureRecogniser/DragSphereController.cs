@@ -1,40 +1,43 @@
 using UnityEngine;
 using BaseFramework.Gestures;
 
-public class DragSphereController : MonoBehaviour
+namespace BaseFramework.Gestures.TestScenes
 {
-	public Camera m_camera;
-	
-	private void Start()
+	public class DragSphereController : MonoBehaviour
 	{
-		m_transform = transform;
+		public Camera m_camera;
 		
-		Transform xCameraTransform = m_camera.transform;
-		Vector3 xCameraPosition = xCameraTransform.position;
-		m_distanceFromCamera = Mathf.Abs( xCameraPosition.y - m_transform.position.y );
-
-		LongPressGestureRecogniser pxLongPressGesture = GetComponent<LongPressGestureRecogniser>();
-		pxLongPressGesture.DebugEnabled = true;
-		pxLongPressGesture.AddDelegate( HandleLongPress );
-	}
-	
-	private void HandleLongPress( GestureRecogniser pxGesture )
-	{
-		GestureState kState = pxGesture.State;
-
-		if ( kState == GestureState.GestureStateChanged )
+		private void Start()
 		{
-			Vector3 xScreenPoint = new Vector3();
-			xScreenPoint.x = pxGesture.Focus.x;
-			xScreenPoint.y = pxGesture.Focus.y;
-			xScreenPoint.z = m_distanceFromCamera;
+			m_transform = transform;
 			
-			Vector3 xWorldPoint = m_camera.ScreenToWorldPoint( xScreenPoint );
-			
-			m_transform.position = xWorldPoint;
+			Transform xCameraTransform = m_camera.transform;
+			Vector3 xCameraPosition = xCameraTransform.position;
+			m_distanceFromCamera = Mathf.Abs( xCameraPosition.y - m_transform.position.y );
+
+			LongPressGestureRecogniser pxLongPressGesture = GetComponent<LongPressGestureRecogniser>();
+			pxLongPressGesture.DebugEnabled = true;
+			pxLongPressGesture.AddDelegate( HandleLongPress );
 		}
+		
+		private void HandleLongPress( GestureRecogniser pxGesture )
+		{
+			GestureState kState = pxGesture.State;
+
+			if ( kState == GestureState.GestureStateChanged )
+			{
+				Vector3 xScreenPoint = new Vector3();
+				xScreenPoint.x = pxGesture.Focus.x;
+				xScreenPoint.y = pxGesture.Focus.y;
+				xScreenPoint.z = m_distanceFromCamera;
+				
+				Vector3 xWorldPoint = m_camera.ScreenToWorldPoint( xScreenPoint );
+				
+				m_transform.position = xWorldPoint;
+			}
+		}
+		
+		private Transform m_transform;
+		private float m_distanceFromCamera;
 	}
-	
-	private Transform m_transform;
-	private float m_distanceFromCamera;
 }
