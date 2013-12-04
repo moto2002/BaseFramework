@@ -21,7 +21,54 @@ namespace BaseFramework.Gestures
 
 		protected override IEnumerator ProcessTouchGesture()
 		{
-			throw new System.NotImplementedException();
+			m_fStartTime = Time.time;
+			m_pxInitialTouchPosition = Focus;
+			Vector2 pxCurrentPosition = m_pxInitialTouchPosition;
+			
+			bool bHasTouches = Input.touchCount > 0;
+			while ( bHasTouches )
+			{
+				pxCurrentPosition = Focus;
+				
+				bool bTimedOut = SwipeHasTimedOut();
+				bool bNotASwipe = false;
+				
+				bool bHasTargetSwipeAngle = m_pxTargetSwipe != Vector2.zero;
+				if ( bHasTargetSwipeAngle )
+				{
+					bNotASwipe = SwipeIsNotValid();
+				}
+				else
+				{
+					m_iNumberOfFramesPassed++;
+					bool bShouldDetermineAngle = m_iNumberOfFramesPassed >= m_iNumberOfFramesToDetermineAngle;
+					if ( bShouldDetermineAngle )
+					{
+						Vector2 pxCurrentSwipe = pxCurrentPosition - m_pxInitialTouchPosition;
+						m_pxTargetSwipe = pxCurrentSwipe.normalized;
+					}
+				}
+				
+				if ( bTimedOut || bNotASwipe )
+				{
+					State = GestureState.GestureStateFailed;
+					break;
+				}
+				
+				bHasTouches = Input.touchCount > 0;
+				m_pxLastTouchPosition = pxCurrentPosition;
+				
+				yield return null;
+			}
+			
+			if ( State != GestureState.GestureStateFailed )
+			{
+				Vector2 pxDistanceTravelled = m_pxLastTouchPosition - m_pxInitialTouchPosition;
+				float fTimeElapsed = Time.time - m_fStartTime;
+				
+				m_pxVelocityVector = pxDistanceTravelled / fTimeElapsed;
+				State = GestureState.GestureStateRecognised;
+			}
 		}
 		
 		protected override IEnumerator ProcessMouseGesture()
