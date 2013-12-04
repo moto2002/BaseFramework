@@ -10,50 +10,56 @@ namespace BaseFramework.Gestures
 		//TODO: Multi-tap support
 		//TODO: Movement validation
 		
-		protected override IEnumerator ProcessTouchGesture ()
+		protected override IEnumerator ProcessTouchGesture()
 		{
 			m_fGestureStartTime = Time.time;
 			
 			bool bTimedOut = false;
-			while (Input.touchCount > 0) {
-				bTimedOut = HasTimedOut ();
-				if (bTimedOut) {
+			while ( Input.touchCount > 0 )
+			{
+				bTimedOut = HasTimedOut();
+				if ( bTimedOut )
+				{
 					State = GestureState.GestureStateFailed;
 				}
+				yield return null;
 			}
 			
-			if (!bTimedOut) {
+			if ( !bTimedOut )
+			{
 				State = GestureState.GestureStateRecognised;
 			}
-			
-			yield return null;
 		}
 		
-		protected override IEnumerator ProcessMouseGesture ()
+		protected override IEnumerator ProcessMouseGesture()
 		{
 			m_fGestureStartTime = Time.time;
 			
 			bool bTimedOut = false;
-			while (Input.touchCount > 0) {
-				bTimedOut = HasTimedOut ();
-				if (bTimedOut) {
+			bool bMouseButtonDown = !Input.GetMouseButton( 0 );
+			while ( bMouseButtonDown )
+			{
+				bTimedOut = HasTimedOut();
+				Debug.Log( bTimedOut );
+				if ( bTimedOut )
+				{
 					State = GestureState.GestureStateFailed;
 				}
+				yield return null;
 			}
 			
-			if (!bTimedOut) {
+			if ( !bTimedOut )
+			{
 				State = GestureState.GestureStateRecognised;
 			}
-			
-			yield return null;
 		}
 
-		protected override void ResetGesture ()
+		protected override void ResetGesture()
 		{
 			m_fGestureStartTime = 0.0f;
 		}
 		
-		private bool HasTimedOut ()
+		private bool HasTimedOut()
 		{
 			float fCurrentTime = Time.time;
 			float fTimeElapsed = fCurrentTime - m_fGestureStartTime;
