@@ -129,7 +129,7 @@ namespace BaseFramework.Gestures
 			m_iNumberOfFramesPassed = 0;
 			m_iNumberOfFramesToDetermineAngle = 3;
 			m_fMaximumGestureTime = 0.25f;
-			m_fSwipeAngleAccuracy = 20.0f; // Swipe can vary by 5 degrees.
+			m_fSwipeAngleAccuracy = 45.0f; // Swipe can vary by 45 degrees.
 		}
 
 		#region Helper Methods
@@ -159,7 +159,7 @@ namespace BaseFramework.Gestures
 
 			if ( DebugEnabled && bNotASwipe )
 			{
-				Debug.Log( "SwipeGestureRecogniser (" + this + ") is not a swipe!" );
+				Debug.Log( "SwipeGestureRecogniser (" + this + ") is not a swipe (difference of " + fSwipeAngleDifference + " degrees)!" );
 			}
 			
 			return bNotASwipe;
