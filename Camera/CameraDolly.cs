@@ -1,72 +1,47 @@
 using UnityEngine;
-using System.Collections;
+using BaseFramework.Core;
 
-namespace BaseFramework
+namespace BaseFramework.CameraUtils
 {
-	[RequireComponent (typeof (Camera))]
 	public class CameraDolly : MonoBehaviour
 	{
-		private Camera m_viewCamera;
-		
-		// todo : send messages when angular limits are hit
-		//        these can be received by the actor script, apply a character rotation or whatever.
-		private float m_pitchLimit;
-		private float m_yawLimit;
-		private float m_rollLimit;
-		
-		public float PitchAngularLimit
+		private void Awake()
 		{
-			get { return m_pitchLimit; }
-			set { m_pitchLimit = value; }
-		}
-		
-		public float YawAngularLimit
-		{
-			get { return m_yawLimit; }
-			set { m_yawLimit = value; }
-		}
-		
-		public float RollAngularLimit	
-		{
-			get { return m_rollLimit; }
-			set { m_rollLimit = value; }
-		}
-		
-		public Camera ViewCamera
-		{
-			get { return m_viewCamera; }
-		}
-		
-		void Awake ()
-		{
-			if (m_viewCamera == null)
-			{
-				m_viewCamera = GetComponent<Camera> ();
-				
-				if (m_viewCamera == null)
-				{
-					Debug.LogError ("No View Camera found!", this);
-				}
-			}
-		}
-		
-		void LateUpdate()
-		{
-			//Quaternion maxRotation = Quaternion.Euler (m_pitchLimit, m_yawLimit, m_rollLimit);
+			m_pxTransform = transform;
 			
+			Vector3 pxInitialOffset = CalculateOffset();
 			
+			m_pxMinimumOffset = pxInitialOffset - m_pxLockDistance;
+			m_pxMaximumOffset = pxInitialOffset + m_pxLockDistance;
 		}
 		
-		void OnDrawGizmos ()
+		private void LateUpdate()
 		{
-			Gizmos.color = Color.cyan;
+			Vector3 pxCurrentOffset = CalculateOffset();
+			Vector3 pxClampedOffset = pxCurrentOffset.Clamp( m_pxMinimumOffset, m_pxMaximumOffset );
 			
-			/*
-			Quaternion tempRotation = Quaternion.Euler (PitchAngularLimit, YawAngularLimit, RollAngularLimit);
-			Vector3 tempPos = Quaternion.LookRotation(transform.forward, transform.up);
+			Vector3 pxObjectPosition = m_pxTrackedTransform.position;
+			Vector3 pxNewCameraPosition = pxObjectPosition + pxClampedOffset;
 			
-			Gizmos.DrawLine (transform.position, tempPos);
-			*/
+			m_pxTransform.position = pxNewCameraPosition;
 		}
+		
+		private Vector3 CalculateOffset()
+		{
+			Vector3 pxCameraPosition = m_pxTransform.position;
+			Vector3 pxObjectPosition = m_pxTrackedTransform.position;
+			
+			Vector3 pxOffset = pxCameraPosition - pxObjectPosition;
+			return pxOffset;
+		}
+		
+		private Vector3 m_pxMinimumOffset;
+		private Vector3 m_pxMaximumOffset;
+		private Transform m_pxTransform;
+		
+		//TODO: Expose following ivars using editor script (for correct name label)
+		public Transform m_pxTrackedTransform;
+		public Vector3 m_pxLockDistance; // Distance object can move before camera will begin to follow.
+//		public Vector3 m_pxLockRotation; //TODO: Degrees camera can rotate around object.
 	}
 }

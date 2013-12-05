@@ -31,11 +31,11 @@ Feature Branch: feature/EditorUtils
 The 'Editor Utilities' feature includes definitions of generic editor windows, and provides functionality for common tasks needed to be performed from Unity Editor Scripts.
 
 
-Input
+TouchGestures
 =====
 Feature Branch: feature/Input
 
-The 'Input' feature provides functionality for touch-screen gestures and Mouse input. Both frameworks are fully functional, but may lack all gestures/mouse actions required.
+The 'TouchGestures' feature provides functionality for touch-screen gestures. Gestures can also be performed with the mouse in the Unity Editor.
 
 
 Math
