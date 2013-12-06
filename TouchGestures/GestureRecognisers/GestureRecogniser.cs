@@ -26,11 +26,7 @@ namespace BaseFramework.Gestures
 		public Vector2 Focus {
 			get
 			{
-#if UNITY_EDITOR
-				return Input.mousePosition;
-#else
 				return CalculateFocusFromActiveTouches();
-#endif
 			}
 		}
 		
@@ -230,17 +226,27 @@ namespace BaseFramework.Gestures
 		private Vector2 CalculateFocusFromActiveTouches()
 		{
 			Vector2 pxFocus = Vector2.zero;
-			Touch[] pxActiveTouches = Input.touches;
-			
-			foreach ( Touch pxTouch in pxActiveTouches )
-			{
-				Vector2 pxTouchPoint = pxTouch.position;
-				pxFocus += pxTouchPoint;
-			}
-			
+
 			int iActiveTouches = Input.touchCount;
-			pxFocus /= iActiveTouches;
-			
+			bool bHasTouches = iActiveTouches > 0;
+			bool bHasMouseInput = Input.GetMouseButton( 0 );
+
+			if ( bHasTouches )
+			{
+				Touch[] pxActiveTouches = Input.touches;
+				
+				foreach ( Touch pxTouch in pxActiveTouches )
+				{
+					Vector2 pxTouchPoint = pxTouch.position;
+					pxFocus += pxTouchPoint;
+				}
+				pxFocus /= iActiveTouches;
+			}
+			else if ( bHasMouseInput )
+			{
+				pxFocus = Input.mousePosition;
+			}
+
 			return pxFocus;
 		}
 		
@@ -281,7 +287,7 @@ namespace BaseFramework.Gestures
 				yield return null;
 
 				bHasTouches = Input.touchCount > 0;
-				bHasMouseInput = !Input.GetMouseButton( 0 );
+				bHasMouseInput = Input.GetMouseButton( 0 );
 			}
 
 			// Reset Gesture
