@@ -44,6 +44,11 @@ namespace BaseFramework.Gestures
 					bool bMovedTooFar = fDistanceMoved > m_fInitialMovementToCancel;
 					if ( bMovedTooFar )
 					{
+						if ( DebugEnabled )
+						{
+							Debug.Log( "LongPressGestureRecogniser (" + this + ") moved too far ( " + fDistanceMoved + " )!" );
+						}
+
 						State = GestureState.GestureStateFailed;
 						break;
 					}
@@ -95,6 +100,11 @@ namespace BaseFramework.Gestures
 					bool bMovedTooFar = fDistanceMoved > m_fInitialMovementToCancel;
 					if ( bMovedTooFar )
 					{
+						if ( DebugEnabled )
+						{
+							Debug.Log( "LongPressGestureRecogniser (" + this + ") moved too far ( " + fDistanceMoved + " )!" );
+						}
+
 						State = GestureState.GestureStateFailed;
 						break;
 					}
