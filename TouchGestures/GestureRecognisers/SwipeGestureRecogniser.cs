@@ -56,18 +56,32 @@ namespace BaseFramework.Gestures
 				}
 				
 				bHasTouches = Input.touchCount > 0;
-				m_pxLastTouchPosition = pxCurrentPosition;
-				
+
+				if ( bHasTouches )
+				{
+					m_pxLastTouchPosition = pxCurrentPosition;
+				}
+
 				yield return null;
 			}
 			
 			if ( State != GestureState.GestureStateFailed )
 			{
 				Vector2 pxDistanceTravelled = m_pxLastTouchPosition - m_pxInitialTouchPosition;
-				float fTimeElapsed = Time.time - m_fStartTime;
-				
-				m_pxVelocityVector = pxDistanceTravelled / fTimeElapsed;
-				State = GestureState.GestureStateRecognised;
+				float fDistanceTravelled = pxDistanceTravelled.magnitude;
+
+				bool bTravelledFarEnough = fDistanceTravelled >= m_fMinimumDistance;
+				if ( bTravelledFarEnough )
+				{
+					float fTimeElapsed = Time.time - m_fStartTime;
+					
+					m_pxVelocityVector = pxDistanceTravelled / fTimeElapsed;
+					State = GestureState.GestureStateRecognised;
+				}
+				else
+				{
+					State = GestureState.GestureStateFailed;
+				}
 			}
 		}
 		
@@ -108,7 +122,11 @@ namespace BaseFramework.Gestures
 				}
 
 				bHasMouseDown = Input.GetMouseButton( 0 );
-				m_pxLastTouchPosition = pxCurrentPosition;
+
+				if ( bHasMouseDown )
+				{
+					m_pxLastTouchPosition = pxCurrentPosition;
+				}
 
 				yield return null;
 			}
@@ -126,8 +144,13 @@ namespace BaseFramework.Gestures
 		protected override void ResetGesture()
 		{
 			m_pxTargetSwipe = Vector2.zero;
+			m_pxLastTouchPosition = Vector2.zero;
+			m_pxInitialTouchPosition = Vector2.zero;
+
 			m_iNumberOfFramesPassed = 0;
 			m_iNumberOfFramesToDetermineAngle = 3;
+
+			m_fMinimumDistance = 20; // Swipe must span at least 20 pixels.
 			m_fMaximumGestureTime = 0.25f;
 			m_fSwipeAngleAccuracy = 45.0f; // Swipe can vary by 45 degrees.
 		}
@@ -168,6 +191,7 @@ namespace BaseFramework.Gestures
 		#endregion
 
 		public float m_fMaximumGestureTime;
+		private float m_fMinimumDistance;
 
 		private int m_iNumberOfFramesToDetermineAngle;
 		private int m_iNumberOfFramesPassed;
