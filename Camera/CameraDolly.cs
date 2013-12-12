@@ -26,10 +26,10 @@ namespace BaseFramework.CameraUtils
 			Camera pxCamera = camera;
 			Vector3 pxCameraWorldOrigin = pxCamera.ViewportToWorldPoint( Vector3.zero );
 
-			m_pxMinimumOffset = m_pxCamera.ViewportToWorldPoint( pxMinOffsetViewport );
+			m_pxMinimumOffset = pxCamera.ViewportToWorldPoint( pxMinOffsetViewport );
 			m_pxMinimumOffset -= pxCameraWorldOrigin;
 
-			m_pxMaximumOffset = m_pxCamera.ViewportToWorldPoint( pxMaxOffsetViewport );
+			m_pxMaximumOffset = pxCamera.ViewportToWorldPoint( pxMaxOffsetViewport );
 			m_pxMaximumOffset -= pxCameraWorldOrigin;
 		}
 		
@@ -42,8 +42,6 @@ namespace BaseFramework.CameraUtils
 		{
 			Vector3 pxCurrentOffset = CalculateWorldPositionOffset();
 			Vector3 pxClampedOffset = pxCurrentOffset.Clamp( m_pxMinimumOffset, m_pxMaximumOffset );
-
-			Debug.Log( pxCurrentOffset + " - " + pxClampedOffset );
 
 			Vector3 pxObjectPosition = m_pxTrackedTransform.position;
 			Vector3 pxNewCameraPosition = pxObjectPosition + pxClampedOffset;
@@ -63,7 +61,6 @@ namespace BaseFramework.CameraUtils
 		private Vector3 m_pxMinimumOffset;
 		private Vector3 m_pxMaximumOffset;
 		private Transform m_pxTransform;
-		private Camera m_pxCamera;
 
 		public Transform m_pxTrackedTransform;
 		public float m_fViewportLockX;
