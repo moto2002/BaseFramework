@@ -3,52 +3,59 @@ using System.Collections;
 
 namespace BaseFramework
 {
-	[RequireComponent (typeof (Collider))]
-	public class OnScreen : MonoBehaviour
-	{
-		private Camera m_camera;
+    [RequireComponent (typeof( Collider ))]
+    public class OnScreen : MonoBehaviour
+    {
+        private void Awake()
+        {
+            m_pxCamera = Camera.main;
+            m_pxCollider = collider;
+            m_bWasOnScreen = IsOnScreen();
+        }
+        
+        private void OnEnable()
+        {
+            m_bWasOnScreen = IsOnScreen();
+        }
 		
-		private bool m_wasOnScreen;
-		private float m_offScreenDistance = 1.0f;
+        private void Update()
+        {
+            bool bOnScreen = IsOnScreen();
+			
+            if( bOnScreen && !m_bWasOnScreen )
+            {
+                // entered view
+                SendMessageUpwards( "AppearedOnScreen", m_pxCollider, SendMessageOptions.DontRequireReceiver );
+            }
+			
+            if( !bOnScreen && m_bWasOnScreen )
+            {
+                // exited view
+                SendMessageUpwards( "WentOffScreen", m_pxCollider, SendMessageOptions.DontRequireReceiver );
+            }
+			
+            m_bWasOnScreen = bOnScreen;
+        }
 		
-		void Start ()
-		{
-			m_camera = Camera.mainCamera;
-			m_wasOnScreen = IsOnScreen ();
-		}
-		
-		void Update ()
-		{
-			bool onScreen = IsOnScreen ();
+        private bool IsOnScreen()
+        {
+            Bounds pxBounds = m_pxCollider.bounds;
+            Vector3 pxMin = m_pxCamera.WorldToViewportPoint( pxBounds.min );
+            Vector3 pxMax = m_pxCamera.WorldToViewportPoint( pxBounds.max );
 			
-			if (onScreen && !m_wasOnScreen)
-			{
-				// entered view
-				SendMessageUpwards ("AppearedOnScreen", collider, SendMessageOptions.DontRequireReceiver);
-			}
-			
-			if (!onScreen && m_wasOnScreen)
-			{
-				// exited view
-				SendMessageUpwards ("WentOffScreen", collider, SendMessageOptions.DontRequireReceiver);
-			}
-			
-			m_wasOnScreen = onScreen;
-		}
-		
-		bool IsOnScreen ()
-		{
-			Vector3 min = m_camera.WorldToViewportPoint (collider.bounds.min);
-			Vector3 max = m_camera.WorldToViewportPoint (collider.bounds.max);
-			
-			return min.x <= m_offScreenDistance
-				&& min.x > 0
-				&& min.y <= m_offScreenDistance
-				&& min.y > 0
-				&& max.x <= m_offScreenDistance
-				&& max.x > 0
-				&& max.y <= m_offScreenDistance
-				&& max.y > 0;
-		}
-	}
+            bool bMinBoundsAreOnScreen = pxMin.x <= m_fOffScreenDistance && pxMin.x >= 0;
+            bMinBoundsAreOnScreen &= pxMin.y <= m_fOffScreenDistance && pxMin.y >= 0;
+            
+            bool bMaxBoundsAreOnScreen = pxMax.x <= m_fOffScreenDistance && pxMax.x >= 0;
+            bMaxBoundsAreOnScreen = pxMax.y <= m_fOffScreenDistance && pxMax.y >= 0;
+            
+            return bMinBoundsAreOnScreen && bMaxBoundsAreOnScreen;
+        }
+        
+        private bool m_bWasOnScreen;
+        private float m_fOffScreenDistance = 1.0f;
+        
+        private Camera m_pxCamera;
+        private Collider m_pxCollider;
+    }
 }
