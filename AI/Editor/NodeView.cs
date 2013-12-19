@@ -5,15 +5,15 @@ using BaseFramework.EditorUtils;
 
 namespace BaseFramework.AI
 {
-	public class NodeView : BaseDraggableView
-	{
-		public Node ParentNode;
-		public int SiblingIndex;
-		public NodeView[] ChildNodeViews;
+    public class NodeView : BaseDraggableView
+    {
+        public Node ParentNode;
+        public int SiblingIndex;
+        public NodeView[] ChildNodeViews;
 		
-		public NodeView( Node xNode, BaseEditorWindow xSourceWindow ) : base( xSourceWindow )
+        public NodeView( Node xNode, BaseEditorWindow xSourceWindow ) : base( xSourceWindow )
 		{
-			m_node = xNode;
+//			m_node = xNode;
 		}
 		
 		public override void Draw()
@@ -22,6 +22,6 @@ namespace BaseFramework.AI
 			GUI.Box( ViewBounds, "" );
 		}
 		
-		private Node m_node;
+//		private Node m_node;
 	}
 }
