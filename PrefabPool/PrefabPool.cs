@@ -4,22 +4,19 @@ using System.Collections.Generic;
 
 namespace BaseFramework.PrefabPool
 {
-	public class PrefabPool : MonoBehaviour
-	{
-		public GameObject ObjectPrefab
-		{
-			get { return m_pxObjectPrefab;  }
-			set
-			{
-				m_pxObjectPrefab = value;
-				this.gameObject.name = m_pxObjectPrefab.name + " - PrefabPool";
-			}
-		}
+    public class PrefabPool : MonoBehaviour
+    {
+        public GameObject ObjectPrefab {
+            get { return m_pxObjectPrefab;  }
+            set {
+                m_pxObjectPrefab = value;
+                this.gameObject.name = m_pxObjectPrefab.name + " - PrefabPool";
+            }
+        }
 		
-		public int Cached
-		{
-			get { return m_pxAllPooledObjects.Count; }
-			set { Recache( value ); }
+        public int Cached {
+            get { return m_pxAllPooledObjects.Count; }
+            set { Recache( value ); }
 		}
 		
 		public int InactiveObjects
@@ -27,19 +24,32 @@ namespace BaseFramework.PrefabPool
 			get { return m_pxInactiveObjects.Count; }
 		}
 		
-		public GameObject GetNextActive()
-		{
-			if ( m_pxInactiveObjects.Count == 0 )
-			{
-				Cached += 5;
-			}
-			GameObject pxGameObject = m_pxInactiveObjects.Dequeue();
-			pxGameObject.SetActive( true );
-			
-			return pxGameObject;
-		}
-		
-		public void ReturnObjectToPool( GameObject pxObjectToAddToPool )
+        public GameObject GetNextActive()
+        {
+            return GetNextActive( Vector3.zero, Quaternion.identity );
+        }
+        
+        public GameObject GetNextActive( Vector3 pxInitialPosition )
+        {
+            return GetNextActive( pxInitialPosition, Quaternion.identity );
+        }
+        
+        public GameObject GetNextActive( Vector3 pxInitialPosition, Quaternion pxRotation )
+        {
+            if ( m_pxInactiveObjects.Count == 0 )
+            {
+                Cached += 5;
+            }
+            GameObject pxGameObject = m_pxInactiveObjects.Dequeue();
+            Transform pxTransform = pxGameObject.transform;
+            pxTransform.position = pxInitialPosition;
+            pxTransform.rotation = pxRotation;
+            pxGameObject.SetActive( true );
+            
+            return pxGameObject;
+        }
+        
+        public void ReturnObjectToPool( GameObject pxObjectToAddToPool )
 		{
 			bool bObjectIsRegisteredToPool = m_pxAllPooledObjects.Contains( pxObjectToAddToPool );
 			if ( bObjectIsRegisteredToPool )
