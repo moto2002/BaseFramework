@@ -49,7 +49,7 @@ namespace BaseFramework
             bool bMaxBoundsAreOnScreen = pxMax.x <= m_fOffScreenDistance && pxMax.x >= 0;
             bMaxBoundsAreOnScreen = pxMax.y <= m_fOffScreenDistance && pxMax.y >= 0;
             
-            return bMinBoundsAreOnScreen && bMaxBoundsAreOnScreen;
+            return bMinBoundsAreOnScreen || bMaxBoundsAreOnScreen;
         }
         
         private bool m_bWasOnScreen;
