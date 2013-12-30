@@ -3,30 +3,53 @@ using BaseFramework.Core;
 
 namespace BaseFramework.CameraUtils
 {
+	[RequireComponent( typeof( Camera ) )]
 	public class CameraDolly : MonoBehaviour
 	{
 		private void Awake()
 		{
 			m_pxTransform = transform;
-			
-			Vector3 pxInitialOffset = CalculateOffset();
-			
-			m_pxMinimumOffset = pxInitialOffset - m_pxLockDistance;
-			m_pxMaximumOffset = pxInitialOffset + m_pxLockDistance;
+
+			float fMinViewportLimitX = 0.5f + 0.5f * m_fViewportLockX;
+			float fMinViewportLimitY = 0.5f + 0.5f * m_fViewportLockY;
+
+			float fMaxViewportLimitX = 0.5f - 0.5f * m_fViewportLockX;
+			float fMaxViewportLimitY = 0.5f - 0.5f * m_fViewportLockY;
+
+			Vector3 pxCameraPosition = m_pxTransform.position;
+			Vector3 pxObjectPosition = m_pxTrackedTransform.position;
+			float fCameraDistance = pxCameraPosition.z - pxObjectPosition.z;
+
+			Vector3 pxMinOffsetViewport = new Vector3( fMinViewportLimitX, fMinViewportLimitY, fCameraDistance );
+			Vector3 pxMaxOffsetViewport = new Vector3( fMaxViewportLimitX, fMaxViewportLimitY, fCameraDistance );
+
+			Camera pxCamera = camera;
+			Vector3 pxCameraWorldOrigin = pxCamera.ViewportToWorldPoint( Vector3.zero );
+
+			m_pxMinimumOffset = pxCamera.ViewportToWorldPoint( pxMinOffsetViewport );
+			m_pxMinimumOffset -= pxCameraWorldOrigin;
+
+			m_pxMaximumOffset = pxCamera.ViewportToWorldPoint( pxMaxOffsetViewport );
+			m_pxMaximumOffset -= pxCameraWorldOrigin;
 		}
 		
-		private void LateUpdate()
+		private void Update()
 		{
-			Vector3 pxCurrentOffset = CalculateOffset();
+			ClampToWorldLimits();
+		}
+
+		private void ClampToWorldLimits()
+		{
+			Vector3 pxCurrentOffset = CalculateWorldPositionOffset();
 			Vector3 pxClampedOffset = pxCurrentOffset.Clamp( m_pxMinimumOffset, m_pxMaximumOffset );
-			
+
 			Vector3 pxObjectPosition = m_pxTrackedTransform.position;
 			Vector3 pxNewCameraPosition = pxObjectPosition + pxClampedOffset;
 			
 			m_pxTransform.position = pxNewCameraPosition;
 		}
-		
-		private Vector3 CalculateOffset()
+
+		private Vector3 CalculateWorldPositionOffset()
 		{
 			Vector3 pxCameraPosition = m_pxTransform.position;
 			Vector3 pxObjectPosition = m_pxTrackedTransform.position;
@@ -38,9 +61,11 @@ namespace BaseFramework.CameraUtils
 		private Vector3 m_pxMinimumOffset;
 		private Vector3 m_pxMaximumOffset;
 		private Transform m_pxTransform;
-		
-		//TODO: Expose following ivars using editor script (for correct name label)
+
 		public Transform m_pxTrackedTransform;
+		public float m_fViewportLockX;
+		public float m_fViewportLockY;
+
 		public Vector3 m_pxLockDistance; // Distance object can move before camera will begin to follow.
 //		public Vector3 m_pxLockRotation; //TODO: Degrees camera can rotate around object.
 	}

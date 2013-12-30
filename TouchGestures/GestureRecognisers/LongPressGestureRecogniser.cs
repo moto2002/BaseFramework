@@ -18,6 +18,8 @@ namespace BaseFramework.Gestures
 			bool bMouseButtonDown = Input.GetMouseButton( 0 );
 			while ( bMouseButtonDown )
 			{
+				bMouseButtonDown = Input.GetMouseButton( 0 );
+
 				float fTimeHeld = TimeHeld();
 				Vector2 pxCurrentPosition = Focus;
 
@@ -30,10 +32,13 @@ namespace BaseFramework.Gestures
 					}
 					else
 					{
-						Vector2 pxDelta = pxCurrentPosition - m_pxLastPosition;
-						m_pxMoveDelta = pxDelta;
+						if ( bMouseButtonDown )
+						{
+							Vector2 pxDelta = pxCurrentPosition - m_pxLastPosition;
+							m_pxMoveDelta = pxDelta;
 
-						State = GestureState.GestureStateChanged;
+							State = GestureState.GestureStateChanged;
+						}
 					}
 				}
 				else
@@ -44,12 +49,16 @@ namespace BaseFramework.Gestures
 					bool bMovedTooFar = fDistanceMoved > m_fInitialMovementToCancel;
 					if ( bMovedTooFar )
 					{
+						if ( DebugEnabled )
+						{
+							Debug.Log( "LongPressGestureRecogniser (" + this + ") moved too far ( " + fDistanceMoved + " )!" );
+						}
+
 						State = GestureState.GestureStateFailed;
 						break;
 					}
 				}
 				m_pxLastPosition = pxCurrentPosition;
-				bMouseButtonDown = Input.GetMouseButton( 0 );
 
 				yield return null;
 			}
@@ -69,6 +78,8 @@ namespace BaseFramework.Gestures
 			bool bTouchesExist = Input.touchCount > 0;
 			while ( bTouchesExist )
 			{
+				bTouchesExist = Input.touchCount > 0;
+
 				float fTimeHeld = TimeHeld();
 				Vector2 pxCurrentPosition = Focus;
 				
@@ -81,10 +92,13 @@ namespace BaseFramework.Gestures
 					}
 					else
 					{
-						Vector2 pxDelta = pxCurrentPosition - m_pxLastPosition;
-						m_pxMoveDelta = pxDelta;
-						
-						State = GestureState.GestureStateChanged;
+						if ( bTouchesExist )
+						{
+							Vector2 pxDelta = pxCurrentPosition - m_pxLastPosition;
+							m_pxMoveDelta = pxDelta;
+							
+							State = GestureState.GestureStateChanged;
+						}
 					}
 				}
 				else
@@ -95,13 +109,17 @@ namespace BaseFramework.Gestures
 					bool bMovedTooFar = fDistanceMoved > m_fInitialMovementToCancel;
 					if ( bMovedTooFar )
 					{
+						if ( DebugEnabled )
+						{
+							Debug.Log( "LongPressGestureRecogniser (" + this + ") moved too far ( " + fDistanceMoved + " )!" );
+						}
+
 						State = GestureState.GestureStateFailed;
 						break;
 					}
 				}
 				m_pxLastPosition = pxCurrentPosition;
-				bTouchesExist = Input.touchCount > 0;
-				
+
 				yield return null;
 			}
 			
@@ -114,7 +132,7 @@ namespace BaseFramework.Gestures
 		protected override void ResetGesture()
 		{
 			m_fStartTime  = 0.0f;
-			m_pxMoveDelta = Vector3.zero;
+			m_pxMoveDelta = Vector2.zero;
 		}
 
 		private float TimeHeld()
