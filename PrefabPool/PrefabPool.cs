@@ -40,39 +40,23 @@ namespace BaseFramework.PrefabPool
             {
                 Cached += 5;
             }
-            GameObject pxGameObject = m_pxInactiveObjects.Dequeue();
-            Transform pxTransform = pxGameObject.transform;
-            pxTransform.position = pxInitialPosition;
-            pxTransform.rotation = pxRotation;
-            pxGameObject.SetActive( true );
+            PrefabPoolObject pxPoolObject = m_pxInactiveObjects.Dequeue();
+            pxPoolObject.Spawn( pxInitialPosition, pxRotation );
             
-            return pxGameObject;
+            return pxPoolObject.gameObject;
         }
         
-        public void ReturnObjectToPool( GameObject pxObjectToAddToPool )
-		{
-			bool bObjectIsRegisteredToPool = m_pxAllPooledObjects.Contains( pxObjectToAddToPool );
-			if ( bObjectIsRegisteredToPool )
-			{
-				bool bObjectIsAlreadyPooled = m_pxInactiveObjects.Contains( pxObjectToAddToPool );
-				if ( !bObjectIsAlreadyPooled )
-				{
-					m_pxInactiveObjects.Enqueue( pxObjectToAddToPool );
-					pxObjectToAddToPool.SetActive( false );
-				}
-			}
-			else
-			{
-				Debug.LogError( "[PrefabPool] GameObject is not contained in pooled objects!", gameObject );
-			}
-		}
-		
-		private void Awake()
-		{
-			m_pxAllPooledObjects   = new List<GameObject>();
-			m_pxInactiveObjects = new Queue<GameObject>();
-		}
-		
+        private void Awake()
+        {
+            m_pxAllPooledObjects = new List<PrefabPoolObject>();
+            m_pxInactiveObjects = new Queue<PrefabPoolObject>();
+        }
+        
+        private void ReturnObjectToPool( PrefabPoolObject pxPoolComponent )
+        {
+            m_pxInactiveObjects.Enqueue( pxPoolComponent );
+        }
+        
 		#region Adding / Removing Objects to the Pool
 		
 		private void Recache( int iNewPoolSize )
@@ -95,7 +79,7 @@ namespace BaseFramework.PrefabPool
 			}
 			
 			// Rename pooled objects
-			RenameObjects ();
+			RenameObjects();
 		}
 		
 		private void PoolNewObjects( int iAmountToAdd )
@@ -106,10 +90,20 @@ namespace BaseFramework.PrefabPool
 				pxNewGameObjectToPool.SetActive( false );
 				pxNewGameObjectToPool.transform.parent = transform;
 				
-				Rename( pxNewGameObjectToPool, m_pxAllPooledObjects.Count );
-				m_pxAllPooledObjects.Add( pxNewGameObjectToPool );
-				
-				ReturnObjectToPool( pxNewGameObjectToPool );
+                PrefabPoolObject pxPoolComponent = pxNewGameObjectToPool.GetComponent<PrefabPoolObject>();
+                if ( pxPoolComponent == null )
+                {
+                    Debug.LogError( "No PrefabPoolObject Component could be found on " + m_pxObjectPrefab + ". Cannot create prefab pool." );
+                    Destroy( pxNewGameObjectToPool );
+                    break;
+                }
+                else
+                {
+    				Rename( pxNewGameObjectToPool, m_pxAllPooledObjects.Count );
+    				m_pxAllPooledObjects.Add( pxPoolComponent );
+    				
+                    pxPoolComponent.OwnerPool = this;
+                }
 			}
 		}
 		
@@ -121,7 +115,7 @@ namespace BaseFramework.PrefabPool
 			for ( int iRemoveIndex = 0; iRemoveIndex < iTotalAvailableForRemoval; iRemoveIndex++ )
 			{
 				// We only want to remove inactive objects. Active objects may be busy.
-				GameObject pxObjectToRemoveFromPool = m_pxInactiveObjects.Dequeue();
+                PrefabPoolObject pxObjectToRemoveFromPool = m_pxInactiveObjects.Dequeue();
 				m_pxAllPooledObjects.Remove( pxObjectToRemoveFromPool );
 				
 				Destroy( pxObjectToRemoveFromPool );
@@ -163,7 +157,7 @@ namespace BaseFramework.PrefabPool
 		
 		private bool m_bInitialised;
 		private GameObject m_pxObjectPrefab;
-		private List<GameObject> m_pxAllPooledObjects;
-		private Queue<GameObject> m_pxInactiveObjects;
+		private List<PrefabPoolObject> m_pxAllPooledObjects;
+        private Queue<PrefabPoolObject> m_pxInactiveObjects;
 	}
 }
